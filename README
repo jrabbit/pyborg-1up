@@ -3,3 +3,7 @@ Pyborg is a markov chain bot for irc that generates repleis based on messages an
 It was originally developed by Tom Morton and SŽbastien Dailly.
 
 Tarballs may be found at http://download.gna.org/pyborg/
+
+TODO:
+	* test and document MSN interface
+	* make built-in replies useful on irc
