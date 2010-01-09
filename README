@@ -3,7 +3,9 @@
 It was originally developed by Tom Morton and Sébastien Dailly.
 
 Tarballs may be found at http://download.gna.org/pyborg/
+Uses the pure python irc library "irclib" http://python-irclib.sourceforge.net/ (Known to to work with 1.30)
 
 TODO:
 	* test and document MSN interface
-	* make built-in replies useful on irc
+	* <s>make built-in replies useful on irc</s> Not easy: not doing it.
+	* 
