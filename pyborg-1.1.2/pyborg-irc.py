@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+﻿#! /usr/bin/env python
 #
 # PyBorg IRC module
 #
@@ -290,7 +290,13 @@ class ModIRC(SingleServerIRCBot):
 		# double reply chance if the text contains our nickname :-)
 		if body.lower().find(self.settings.myname.lower() ) != -1:
 			replyrate = replyrate * 2
-
+		
+		# If text matches answers.txt 100% reply
+		for sentence in self.answers.sentences.keys():
+				pattern = "^%s$" % sentence
+				if re.search(pattern, body):
+					replyrate = 100
+					
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":
 			replyrate = 100
