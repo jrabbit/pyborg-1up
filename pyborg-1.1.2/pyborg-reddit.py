@@ -36,30 +36,31 @@ class ModRedditIn:
 	commanddict = {}
 	
 	def __init__(self, Borg, args):
-#begin copypasta thanks http://github.com/ketralnis/redditron/blob/master/redditron.py
-	    url = 'http://www.reddit.com/comments.json?limit=100'
+        #begin copypasta thanks http://github.com/ketralnis/redditron/blob/master/redditron.py
+		url = 'http://www.reddit.com/comments.json?limit=100'
+		while True:
+			s = urlopen(url).read().decode('utf8')
 
-	    s = urlopen(url).read().decode('utf8')
-        js = json.loads(s)
-        cms = js['data']['children']
-        bodies = {}
+			js = json.loads(s)
+			cms = js['data']['children']
+			bodies = {}
 
-        for cm in cms:
-            cm = cm['data']
-            if cm.get('body', None):
-                bodies[cm['id']] = cm['body']
-#end copypasta
-		print "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading Reddit.com"
-		buffer = pyborg.filter_message(buffer, Borg)
-		# Learn from input
-		try:
-			print buffer
-			Borg.learn(buffer)
-		except KeyboardInterrupt, e:
-			# Close database cleanly
-			print "Premature termination :-("
-		print "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
-		del Borg
+			for cm in cms:
+				cm = cm['data']
+				if cm.get('body', None):
+					bodies[cm['id']] = cm['body']
+			#end copypasta
+			print "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading Reddit.com"
+			buffer = pyborg.filter_message(cm, Borg)
+			# Learn from input
+			try:
+				print buffer
+				Borg.learn(buffer)
+			except KeyboardInterrupt, e:
+				# Close database cleanly
+				print "Premature termination :-("
+			print "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
+			del Borg
 
 	def shutdown(self):
 		pass
