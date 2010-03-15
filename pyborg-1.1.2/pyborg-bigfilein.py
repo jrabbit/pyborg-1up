@@ -37,11 +37,11 @@ class ModFileIn:
 	def __init__(self, Borg, args):
 		print "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading "+sys.argv[1]
 		
-		f = open(args[1], "r")
+		#f = open(args[1], "r")
 		#buffer = f.read()
 		#f.close()
 		
-		for line in fileinput.input([f]):
+		for line in fileinput.input(args[1]):
 			buffer = pyborg.filter_message(line, Borg)
 			try:
 				print buffer
