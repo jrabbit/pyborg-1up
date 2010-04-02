@@ -84,7 +84,7 @@ class ModIRC(SingleServerIRCBot):
 		"reply2ignored": "Owner command. Usage: !reply2ignored [on|off]\nAllow/disallow replying to ignored users. Without arguments shows the current setting",
 		"stealth": "Owner command. Usage: !stealth [on|off]\nTurn stealth mode on or off (disable non-owner commands and don't return CTCP VERSION). Without arguments shows the current setting",
 		"quitmsg": "Owner command. Usage: !quitmsg [message]\nSet the quit message. Without arguments show the current quit message",
-		"talk": "Owner commande. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'",
+		"talk": "Owner command. Usage !talk nick message\nmake the bot send the sentence 'message' to 'nick'",
 		"quit": "Owner command. Usage: !quit\nMake the bot quit IRC",
 		"owner": "Usage: !owner password\nAllow to become owner of the bot"
 	}
