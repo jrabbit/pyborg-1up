@@ -25,6 +25,7 @@ from urllib2 import urlopen
 import simplejson as json
 import time
 import pyborg
+import pdb
 
 class ModRedditIn:
 	"""
@@ -35,7 +36,7 @@ class ModRedditIn:
 	commandlist = "Reddit Module Commands:\nNone"
 	commanddict = {}
 	
-	def __init__(self, Borg, args):
+	def __init__(self, Borg):
         #begin copypasta thanks http://github.com/ketralnis/redditron/blob/master/redditron.py
 		url = 'http://www.reddit.com/comments.json?limit=100'
 		while True:
@@ -45,22 +46,26 @@ class ModRedditIn:
 			cms = js['data']['children']
 			bodies = {}
 
+			
 			for cm in cms:
 				cm = cm['data']
+				print type(cms), type(cm)
 				if cm.get('body', None):
 					bodies[cm['id']] = cm['body']
 			#end copypasta
 			print "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading Reddit.com"
-			buffer = pyborg.filter_message(cm, Borg)
+		#	cm['body'] = buffer
+			for k in bodies:
+				#print cm['id'], k
+				buffer = pyborg.filter_message(bodies[cm['id']], Borg)
 			# Learn from input
-			try:
-				print buffer
-				Borg.learn(buffer)
-			except KeyboardInterrupt, e:
+				try:
+					print buffer
+					Borg.learn(buffer)
+				except KeyboardInterrupt, e:
 				# Close database cleanly
-				print "Premature termination :-("
+					print "Premature termination :-("
 			print "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
-			del Borg
 
 	def shutdown(self):
 		pass
@@ -78,7 +83,7 @@ if __name__ == "__main__":
 	# start the pyborg
 	# No need for this, we don't have any args to process (until I add subredits)
 	my_pyborg = pyborg.pyborg()
-	ModRedditIn(my_pyborg, sys.argv)
+	ModRedditIn(my_pyborg)
 	my_pyborg.save_all()
 	del my_pyborg
 

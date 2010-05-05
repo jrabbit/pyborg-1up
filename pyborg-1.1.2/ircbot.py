@@ -16,7 +16,7 @@
 #
 # Joel Rosdahl <joel@rosdahl.net>
 #
-# $Id: ircbot.py,v 1.23 2008/09/11 07:38:30 keltus Exp $
+# $Id: ircbot.py,v 1.19 2005/01/19 08:57:29 keltus Exp $
 
 """ircbot -- Simple IRC bot library.
 
@@ -25,6 +25,7 @@ write simpler bots.
 """
 
 import sys
+import string
 from UserDict import UserDict
 
 from irclib import SimpleIRCClient
@@ -123,7 +124,7 @@ class SingleServerIRCBot(SimpleIRCClient):
 
     def _on_mode(self, c, e):
         """[Internal]"""
-        modes = parse_channel_modes(" ".join(e.arguments()))
+        modes = parse_channel_modes(string.join(e.arguments()))
         t = e.target()
         if is_channel(t):
             ch = self.channels[t]
@@ -147,7 +148,7 @@ class SingleServerIRCBot(SimpleIRCClient):
         # e.arguments()[2] == nick list
 
         ch = e.arguments()[1]
-        for nick in e.arguments()[2].split():
+        for nick in string.split(e.arguments()[2]):
             if nick[0] == "@":
                 nick = nick[1:]
                 self.channels[ch].set_mode("o", nick)
@@ -188,8 +189,7 @@ class SingleServerIRCBot(SimpleIRCClient):
 
             msg -- Quit message.
         """
-
-        self.connection.disconnect(msg)
+        self.connection.quit(msg)
         sys.exit(0)
 
     def disconnect(self, msg="I'll be back!"):
@@ -201,7 +201,7 @@ class SingleServerIRCBot(SimpleIRCClient):
 
             msg -- Quit message.
         """
-        self.connection.disconnect(msg)
+        self.connection.quit(msg)
 
     def get_version(self):
         """Returns the bot version.
@@ -217,8 +217,13 @@ class SingleServerIRCBot(SimpleIRCClient):
         jump_server is called.
         """
         if self.connection.is_connected():
-            self.connection.disconnect(msg)
-
+            self.connection.quit(msg)
+            self.connected = 0
+            try:
+                self.connection.socket.close()
+            except socket.error, x:
+                pass
+            self.socket = None
         self.server_list.append(self.server_list.pop(0))
         self._connect()
 
@@ -235,7 +240,8 @@ class SingleServerIRCBot(SimpleIRCClient):
             if len(e.arguments()) > 1:
                 c.ctcp_reply(nm_to_n(e.source()),
                              "PING " + e.arguments()[1])
-        elif e.arguments()[0] == "DCC" and e.arguments()[1].split(" ", 1)[0] == "CHAT":
+        elif e.arguments()[0] == "DCC" and string.split(e.arguments()[1],
+                                                        " ", 1)[0] == "CHAT":
             self.on_dccchat(c, e)
 
     def on_dccchat(self, c, e):
@@ -273,7 +279,7 @@ class IRCDict:
     def __getitem__(self, key):
         return self.data[self.canon_keys[irc_lower(key)]]
     def __setitem__(self, key, item):
-        if key in self:
+        if self.has_key(key):
             del self[key]
         self.data[key] = item
         self.canon_keys[irc_lower(key)] = key
@@ -300,7 +306,7 @@ class IRCDict:
     def values(self):
         return self.data.values()
     def has_key(self, key):
-        return irc_lower(key) in self.canon_keys
+        return self.canon_keys.has_key(irc_lower(key))
     def update(self, dict):
         for k, v in dict.items():
             self.data[k] = v
@@ -335,31 +341,31 @@ class Channel:
 
     def has_user(self, nick):
         """Check whether the channel has a user."""
-        return nick in self.userdict
+        return self.userdict.has_key(nick)
 
     def is_oper(self, nick):
         """Check whether a user has operator status in the channel."""
-        return nick in self.operdict
+        return self.operdict.has_key(nick)
 
     def is_voiced(self, nick):
         """Check whether a user has voice mode set in the channel."""
-        return nick in self.voiceddict
+        return self.voiceddict.has_key(nick)
 
     def add_user(self, nick):
         self.userdict[nick] = 1
 
     def remove_user(self, nick):
         for d in self.userdict, self.operdict, self.voiceddict:
-            if nick in d:
+            if d.has_key(nick):
                 del d[nick]
 
     def change_nick(self, before, after):
         self.userdict[after] = 1
         del self.userdict[before]
-        if before in self.operdict:
+        if self.operdict.has_key(before):
             self.operdict[after] = 1
             del self.operdict[before]
-        if before in self.voiceddict:
+        if self.voiceddict.has_key(before):
             self.voiceddict[after] = 1
             del self.voiceddict[before]
 

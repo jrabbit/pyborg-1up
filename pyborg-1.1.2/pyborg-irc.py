@@ -292,11 +292,12 @@ class ModIRC(SingleServerIRCBot):
 			replyrate = replyrate * 2
 		
 		# If text matches answers.txt 100% reply
-		for sentence in self.answers.sentences.keys():
-				pattern = "^%s$" % sentence
-				if re.search(pattern, body):
-					replyrate = 100
-					
+		#for sentence in self.answers.sentences.keys():
+		#		pattern = "^%s$" % sentence
+		#		if re.search(pattern, body):
+		#			replyrate = 100
+		# This seems to break IRC completely.
+
 		# Always reply to private messages
 		if e.eventtype() == "privmsg":
 			replyrate = 100
