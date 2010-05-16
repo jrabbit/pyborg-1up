@@ -1089,4 +1089,5 @@ class pyborg:
 		# Split body text into sentences and parse them
 		# one by one.
 		body += " "
-		map ( (lambda x : learn_line(self, x, num_context)), body.split(". "))
+#		map ( (lambda x : learn_line(self, x, num_context)), body.split(". "))
+		for part in body.split('. '): learn_line(self, part, num_context) #Iterate cleanly THANKS nosklo on #python!
