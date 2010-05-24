@@ -1043,7 +1043,7 @@ class pyborg:
 				if len(words[x]) > 13 \
 				or ( ((nb_voy*100) / len(words[x]) < 26) and len(words[x]) > 5 ) \
 				or ( char and digit ) \
-				or ( words[x] in self.words ) == 0 and self.settings.learning == 0 ):
+				or ( words[x] in self.words ) == 0 and self.settings.learning == 0:
 					#if one word as more than 13 characters, don't learn
 					#		( in french, this represent 12% of the words )
 					#and d'ont learn words where there are less than 25% of voyels
