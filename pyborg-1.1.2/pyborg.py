@@ -232,7 +232,7 @@ class pyborg:
 					word = f.readline().strip('\n')
 					if word == "":
 						break
-					if self.words.has_key(word):
+					if word in self.words:
 						self.unlearn(word)
 				f.close()
 			except (EOFError, IOError), e:
@@ -409,7 +409,7 @@ class pyborg:
 			if len(command_list) == 2:
 				# single word specified
 				word = command_list[1].lower()
-				if self.words.has_key(word):
+				if word in self.words:
 					c = len(self.words[word])
 					msg = "%s is known (%d contexts)" % (word, c)
 				else:
@@ -421,7 +421,7 @@ class pyborg:
 					words.append(x.lower())
 				msg = "Number of contexts: "
 				for x in words:
-					if self.words.has_key(x):
+					if x in self.words:
 						c = len(self.words[x])
 						msg += x+"/"+str(c)+" "
 					else:
@@ -478,7 +478,7 @@ class pyborg:
 						line_idx, word_num = struct.unpack("iH", wlist[i])
 
 						# Nasty critical error we should fix
-						if not self.lines.has_key(line_idx):
+						if not line_idx in self.lines:
 							print "Removing broken link '%s' -> %d" % (w, line_idx)
 							num_broken = num_broken + 1
 							del wlist[i]
@@ -756,7 +756,7 @@ class pyborg:
 				self.lines[l][1] += number
 				changed += 1
 
-		if self.words.has_key(new):
+		if new in self.words:
 			self.settings.num_words -= 1
 			self.words[new].extend(self.words[old])
 		else:
@@ -830,7 +830,7 @@ class pyborg:
 		#The word has to bee seen in already 3 contexts differents for being choosen
 		known_min = 3
 		for x in xrange(0, len(words)):
-			if self.words.has_key(words[x]):
+			if words[x] in self.words:
 				k = len(self.words[words[x]])
 			else:
 				continue
@@ -874,7 +874,7 @@ class pyborg:
 						look_for = cwords[w-2]+" "+look_for
 
 					#saves how many times we can found each word
-					if not(pre_words.has_key(look_for)):
+					if not look_for in pre_words:
 						pre_words[look_for] = num_context
 					else :
 						pre_words[look_for] += num_context
@@ -946,7 +946,7 @@ class pyborg:
 					if look_for in self.settings.ignore_list and w < len(cwords) -2:
 						look_for = look_for+" "+cwords[w+2]
 
-					if not(post_words.has_key(look_for)):
+					if not look_for in post_words:
 						post_words[look_for] = num_context
 					else :
 						post_words[look_for] += num_context
@@ -1043,7 +1043,7 @@ class pyborg:
 				if len(words[x]) > 13 \
 				or ( ((nb_voy*100) / len(words[x]) < 26) and len(words[x]) > 5 ) \
 				or ( char and digit ) \
-				or ( self.words.has_key(words[x]) == 0 and self.settings.learning == 0 ):
+				or ( words[x] in self.words ) == 0 and self.settings.learning == 0 ):
 					#if one word as more than 13 characters, don't learn
 					#		( in french, this represent 12% of the words )
 					#and d'ont learn words where there are less than 25% of voyels
@@ -1067,13 +1067,13 @@ class pyborg:
 			hashval = hash(cleanbody)
 
 			# Check context isn't already known
-			if not self.lines.has_key(hashval):
+			if not hashval in self.lines:
 				if not(num_cpw > 100 and self.settings.learning == 0):
 					
 					self.lines[hashval] = [cleanbody, num_context]
 					# Add link for each word
 					for x in xrange(0, len(words)):
-						if self.words.has_key(words[x]):
+						if words[x] in self.words:
 							# Add entry. (line number, word number)
 							self.words[words[x]].append(struct.pack("iH", hashval, x))
 						else:
