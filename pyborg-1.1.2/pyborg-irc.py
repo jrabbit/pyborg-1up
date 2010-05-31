@@ -235,6 +235,7 @@ class ModIRC(SingleServerIRCBot):
 				# Ignore all the other CTCPs
 				return
 
+#This realy doesn't seem to work at all.
 		for irc_color_char in [',', "\x03"]:
 			debut = body.rfind(irc_color_char)
 			if 0 <= debut < 5:
@@ -529,8 +530,11 @@ class ModIRC(SingleServerIRCBot):
 				c.action(source, message)
 				# send copy to owner
 				if not source in self.owners:
-					map ( ( lambda x: c.action(x, "(From "+source+") "+body) ), self.owners)
-					map ( ( lambda x: c.action(x, "(To   "+source+") "+message) ), self.owners)
+					for ni in self.owners: c.action(ni, "(From "+source+") "+body)
+					for ni in self.owners: c.action(ni, "(To   "+source+") "+message)
+					
+					#map ( ( lambda x: c.action(x, "(From "+source+") "+body) ), self.owners)
+					#map ( ( lambda x: c.action(x, "(To   "+source+") "+message) ), self.owners)
 
 if __name__ == "__main__":
 	
