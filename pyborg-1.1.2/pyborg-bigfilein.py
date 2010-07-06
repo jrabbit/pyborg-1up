@@ -26,61 +26,61 @@ import os
 import pyborg
 
 class ModFileIn:
-	"""
-	Module for file input. Learning from ASCII text files.
-	"""
-	
-	# Command list for this module
-	commandlist = "FileIn Module Commands:\nNone"
-	commanddict = {}
-	
-	def __init__(self, Borg, args):
-		print "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading "+sys.argv[1]
-		
-		#f = open(args[1], "r")
-		#buffer = f.read()
-		#f.close()
-		counter = 0
-		# Grab save frequency from argv
-		#limit = args[2]
-		#if limit == 0:
-		#	limit = 40
-		for line in fileinput.input(args[1]):
-			buffer = pyborg.filter_message(line, Borg)
-			counter = counter + 1
-			try:
-				#print buffer
-				Borg.learn(buffer)
-				
-			except KeyboardInterrupt, e:
-				# Close database cleanly
-				print "Premature termination :-("
-			if counter > 1000000:
-				my_pyborg.save_all()
-				counter = 0
-				# growling for development
-				#os.system("growlnotify -m Pyborg Saving Dictionary")
-		
-		# Learn from input
-		print "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
-		del Borg
-	
-	def shutdown(self):
-		pass
-	
-	def start(self):
-		sys.exit()
-	
-	def output(self, message, args):
-		pass
+    """
+    Module for file input. Learning from ASCII text files.
+    """
+    
+    # Command list for this module
+    commandlist = "FileIn Module Commands:\nNone"
+    commanddict = {}
+    
+    def __init__(self, Borg, args):
+        print "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading "+sys.argv[1]
+        
+        #f = open(args[1], "r")
+        #buffer = f.read()
+        #f.close()
+        counter = 0
+        # Grab save frequency from argv
+        #limit = args[2]
+        #if limit == 0:
+        #   limit = 40
+        for line in fileinput.input(args[1]):
+            buffer = pyborg.filter_message(line, Borg)
+            counter = counter + 1
+            try:
+                #print buffer
+                Borg.learn(buffer)
+                
+            except KeyboardInterrupt, e:
+                # Close database cleanly
+                print "Premature termination :-("
+            if counter > 1000000:
+                my_pyborg.save_all()
+                counter = 0
+                # growling for development
+                #os.system("growlnotify -m Pyborg Saving Dictionary")
+        
+        # Learn from input
+        print "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
+        del Borg
+    
+    def shutdown(self):
+        pass
+    
+    def start(self):
+        sys.exit()
+    
+    def output(self, message, args):
+        pass
 
 if __name__ == "__main__":
-	if len(sys.argv) < 2:
-		print "Specify a filename."
-		sys.exit()
-	# start the pyborg
-	my_pyborg = pyborg.pyborg()
-	ModFileIn(my_pyborg, sys.argv)
-	my_pyborg.save_all()
-	del my_pyborg
+    if len(sys.argv) < 2:
+        print "Specify a filename."
+        sys.exit()
+    # start the pyborg
+    my_pyborg = pyborg.pyborg()
+    ModFileIn(my_pyborg, sys.argv)
+    my_pyborg.save_all()
+    del my_pyborg
 

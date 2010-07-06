@@ -28,62 +28,62 @@ import pyborg
 import pdb
 
 class ModRedditIn:
-	"""
-	Module for reddit input. Learning from reddit, is that even possible?
-	"""
+    """
+    Module for reddit input. Learning from reddit, is that even possible?
+    """
 
-	# Command list for this module
-	commandlist = "Reddit Module Commands:\nNone"
-	commanddict = {}
-	
-	def __init__(self, Borg):
+    # Command list for this module
+    commandlist = "Reddit Module Commands:\nNone"
+    commanddict = {}
+    
+    def __init__(self, Borg):
         #begin copypasta thanks http://github.com/ketralnis/redditron/blob/master/redditron.py
-		url = 'http://www.reddit.com/comments.json?limit=100'
-		while True:
-			s = urlopen(url).read().decode('utf8')
+        url = 'http://www.reddit.com/comments.json?limit=100'
+        while True:
+            s = urlopen(url).read().decode('utf8')
 
-			js = json.loads(s)
-			cms = js['data']['children']
-			bodies = {}
+            js = json.loads(s)
+            cms = js['data']['children']
+            bodies = {}
 
-			
-			for cm in cms:
-				cm = cm['data']
-				print type(cms), type(cm)
-				if cm.get('body', None):
-					bodies[cm['id']] = cm['body']
-			#end copypasta
-			print "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading Reddit.com"
-		#	cm['body'] = buffer
-			for k in bodies:
-				#print cm['id'], k
-				buffer = pyborg.filter_message(bodies[cm['id']], Borg)
-			# Learn from input
-				try:
-					print buffer
-					Borg.learn(buffer)
-				except KeyboardInterrupt, e:
-				# Close database cleanly
-					print "Premature termination :-("
-			print "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
+            
+            for cm in cms:
+                cm = cm['data']
+                print type(cms), type(cm)
+                if cm.get('body', None):
+                    bodies[cm['id']] = cm['body']
+            #end copypasta
+            print "I knew "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) before reading Reddit.com"
+        #   cm['body'] = buffer
+            for k in bodies:
+                #print cm['id'], k
+                buffer = pyborg.filter_message(bodies[cm['id']], Borg)
+            # Learn from input
+                try:
+                    print buffer
+                    Borg.learn(buffer)
+                except KeyboardInterrupt, e:
+                # Close database cleanly
+                    print "Premature termination :-("
+            print "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
 
-	def shutdown(self):
-		pass
+    def shutdown(self):
+        pass
 
-	def start(self):
-		sys.exit()
+    def start(self):
+        sys.exit()
 
-	def output(self, message, args):
-		pass
+    def output(self, message, args):
+        pass
 
 if __name__ == "__main__":
-	# if len(sys.argv) < 2:
-	#	print "Specify a filename."
-	#	sys.exit()
-	# start the pyborg
-	# No need for this, we don't have any args to process (until I add subredits)
-	my_pyborg = pyborg.pyborg()
-	ModRedditIn(my_pyborg)
-	my_pyborg.save_all()
-	del my_pyborg
+    # if len(sys.argv) < 2:
+    #   print "Specify a filename."
+    #   sys.exit()
+    # start the pyborg
+    # No need for this, we don't have any args to process (until I add subredits)
+    my_pyborg = pyborg.pyborg()
+    ModRedditIn(my_pyborg)
+    my_pyborg.save_all()
+    del my_pyborg
 
