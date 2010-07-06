@@ -89,15 +89,15 @@ def _save_config(filename, fields):
 			continue
 
 		#If the line exceed a normal display ( 80 col ) cut it
-		if len(s) > 80:
-			cut_string = ""
-			while len(s) > 80:
-				position = s.rfind(",",0,80)+1
-				#cut_string = cut_string + s[:position] + "\\\n\t\t"
-				cut_string = cut_string + s[:position] + "\n\t\t"
-				s = s[position:]
-			s = cut_string + s
-		f.write(s+"\n")
+        # if len(s) > 80:
+        #   cut_string = ""
+        #   while len(s) > 80:
+        #       position = s.rfind(",",0,80)+1
+        #       #cut_string = cut_string + s[:position] + "\\\n\t\t"
+        #       cut_string = cut_string + s[:position] + "\n\t\t"
+        #       s = s[position:]
+        #   s = cut_string + s
+        # f.write(s+"\n")
 
 	#f.write("# End of configuration #")
 	f.close()

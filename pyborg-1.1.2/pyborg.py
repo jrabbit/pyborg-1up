@@ -97,7 +97,6 @@ def filter_message(message, bot):
 
 
 class pyborg:
-	import re
 	import cfgfile
 
 	ver_string = "I am a version 1.1.0 PyBorg"
@@ -1013,8 +1012,6 @@ class pyborg:
 			"""
 			Learn from a sentence.
 			"""
-			import re
-
 			words = body.split()
 			# Ignore sentences of < 1 words XXX was <3
 			if len(words) < 1:
