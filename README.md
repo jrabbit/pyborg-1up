@@ -5,9 +5,10 @@ It was originally developed by Tom Morton and Sébastien Dailly.
 Tarballs may be found at http://download.gna.org/pyborg/
 Uses the pure python irc library "irclib" http://python-irclib.sourceforge.net/ (Known to to work with 1.30)
 
-TODO:
-	* Rock pyborg-reddit.py
+Done:
 	* Python 2.6 Compat (One line with a lambada at the end of pyborg.py breaks here... I'll need some #python help on this one) *DONE*.
-	* Python 3.0 Compat?
-	* Document/test msn interface *NO* (This won't happen, it does not work and MSNP is abandoned, last version still errors, will keep the experimental module for start on an XMPP one)
-	* Make the database work with reddditron?
+	* Python 3.0 Compat? *Works in 2.7, will keep it working on 2.7 as it will move toward 3.x*
+Todo:
+	* spelling or better heuristics
+	* graphing and visualization of the database
+	* Move to irclib? (mutli server capable, or make pyborg thread-able.)
