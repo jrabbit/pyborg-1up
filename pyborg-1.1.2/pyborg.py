@@ -33,7 +33,7 @@ import struct
 import time
 import zipfile
 import re
-
+from zlib import crc32
 
 def filter_message(message, bot):
     """
@@ -100,7 +100,7 @@ class pyborg:
     import cfgfile
 
     ver_string = "I am a version 1.1.0 PyBorg"
-    saves_version = "1.1.0"
+    saves_version = "1.2.0"
 
     # Main command list
     commandlist = "Pyborg commands:\n!checkdict, !contexts, !help, !known, !learning, !rebuilddict, \
@@ -1061,7 +1061,7 @@ class pyborg:
             cleanbody = " ".join(words)
 
             # Hash collisions we don't care about. 2^32 is big :-)
-            hashval = hash(cleanbody)
+            hashval = crc32(cleanbody)
 
             # Check context isn't already known
             if not hashval in self.lines:
