@@ -163,11 +163,12 @@ class pyborg:
                 print "no zip found"
             try:
                 with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
-                    if vers is not self.saves_version:
+                    x = vers.read()
+                    if x != self.saves_version:
                         print "Error loading dictionary\nPlease convert it before launching pyborg"
                         sys.exit(1)
-                    self.words = marshal.loads(words)
-                    self.lines = marshal.loads(s)
+                    self.words = marshal.loads(words.read())
+                    self.lines = marshal.loads(lines.read())
             except (EOFError, IOError), e:
                 # Create mew database
                 self.words = {}
