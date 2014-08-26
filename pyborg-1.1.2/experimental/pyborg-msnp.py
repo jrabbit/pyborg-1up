@@ -24,8 +24,8 @@
 
 import time
 import sys
-import pyborg
-import cfgfile
+from pyborg import pyborg
+from pyborg import cfgfile
 import traceback
 import thread
 try:
