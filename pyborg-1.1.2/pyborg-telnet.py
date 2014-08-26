@@ -25,7 +25,7 @@ import string
 import socket
 import SocketServer
 
-import pyborg
+from pyborg import pyborg
 
 class handler(SocketServer.BaseRequestHandler):
     # Command list for this module

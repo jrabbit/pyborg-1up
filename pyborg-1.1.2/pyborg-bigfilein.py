@@ -23,7 +23,7 @@ import string
 import sys
 import fileinput
 import os
-import pyborg
+from pyborg import pyborg
 
 class ModFileIn:
     """

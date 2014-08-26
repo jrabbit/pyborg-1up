@@ -10,3 +10,4 @@ pyborg-1.1.2/words.txt
 pyborg-1.1.2/lines.dat
 pyborg-1.1.2/words.dat
 pyborg-1.1.2/version
+*.pyc

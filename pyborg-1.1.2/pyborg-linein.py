@@ -22,7 +22,7 @@
 import string
 import sys
 
-import pyborg
+from pyborg import pyborg
 
 class ModLineIn:
     """

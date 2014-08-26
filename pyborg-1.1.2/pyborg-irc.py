@@ -37,7 +37,7 @@ def my_remove_connection(self, connection):
 IRC._remove_connection = my_remove_connection
 
 import os
-import pyborg
+from pyborg import pyborg
 import cfgfile
 import random
 import time
