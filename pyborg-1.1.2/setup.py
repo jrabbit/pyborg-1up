@@ -2,7 +2,7 @@
 
 from setuptools import setup
 setup(name="pyborg",
-      version="1.2",
+      version="1.2.0b1",
       py_modules=["pyborg"],
       scripts=['pyborg-reddit.py',
 	 'pyborg-filein.py',
