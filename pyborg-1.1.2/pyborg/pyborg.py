@@ -99,7 +99,7 @@ def filter_message(message, bot):
 class pyborg:
     import cfgfile
 
-    ver_string = "I am a version 1.1.0 PyBorg"
+    ver_string = "I am a version 1.2.0 PyBorg"
     saves_version = "1.2.0"
 
     # Main command list
@@ -162,24 +162,12 @@ class pyborg:
             except (EOFError, IOError), e:
                 print "no zip found"
             try:
-
-                f = open("version", "rb")
-                s = f.read()
-                f.close()
-                if s != self.saves_version:
-                    print "Error loading dictionary\Please convert it before launching pyborg"
-                    sys.exit(1)
-
-                f = open("words.dat", "rb")
-                s = f.read()
-                f.close()
-                self.words = marshal.loads(s)
-                del s
-                f = open("lines.dat", "rb")
-                s = f.read()
-                f.close()
-                self.lines = marshal.loads(s)
-                del s
+                with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
+                    if vers is not self.saves_version:
+                        print "Error loading dictionary\nPlease convert it before launching pyborg"
+                        sys.exit(1)
+                    self.words = marshal.loads(words)
+                    self.lines = marshal.loads(s)
             except (EOFError, IOError), e:
                 # Create mew database
                 self.words = {}
