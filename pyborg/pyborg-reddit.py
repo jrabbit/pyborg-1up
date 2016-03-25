@@ -25,7 +25,6 @@ from urllib2 import urlopen
 import simplejson as json
 import time
 from pyborg import pyborg
-import pdb
 
 class ModRedditIn:
     """
