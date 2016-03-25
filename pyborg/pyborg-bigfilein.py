@@ -19,13 +19,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-import string
 import sys
 import fileinput
-import os
 from pyborg import pyborg
 
-class ModFileIn:
+class ModFileIn(object):
     """
     Module for file input. Learning from ASCII text files.
     """
@@ -46,12 +44,12 @@ class ModFileIn:
         #if limit == 0:
         #   limit = 40
         for line in fileinput.input(args[1]):
-            buffer = pyborg.filter_message(line, Borg)
+            buff = pyborg.filter_message(line, Borg)
             counter = counter + 1
             try:
-                Borg.learn(buffer)
+                Borg.learn(buff)
                 
-            except KeyboardInterrupt, e:
+            except KeyboardInterrupt:
                 # Close database cleanly
                 print "Premature termination :-("
             if counter > 1000000:
