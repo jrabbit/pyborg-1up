@@ -56,11 +56,11 @@ class ModRedditIn(object):
         #   cm['body'] = buffer
             for k in bodies:
                 #print cm['id'], k
-                buffer = pyborg.filter_message(bodies[cm['id']], Borg)
+                buff = pyborg.filter_message(bodies[cm['id']], Borg)
             # Learn from input
                 try:
-                    print buffer
-                    Borg.learn(buffer)
+                    print buff
+                    Borg.learn(buff)
                 except KeyboardInterrupt, e:
                 # Close database cleanly
                     print "Premature termination :-("
