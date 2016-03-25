@@ -23,8 +23,8 @@
 import sys
 
 try:
-    from ircbot import *
-    from irclib import *
+    from pyborg.ircbot import *
+    from pyborg.irclib import *
 except:
     print "ERROR !!!!\nircbot.py and irclib.py not found, please install them\n( http://python-irclib.sourceforge.net/ )"
     sys.exit(1)
