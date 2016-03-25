@@ -22,11 +22,11 @@
 import string
 import sys
 from urllib2 import urlopen
-import simplejson as json
+import json
 import time
 from pyborg import pyborg
 
-class ModRedditIn:
+class ModRedditIn(object):
     """
     Module for reddit input. Learning from reddit, is that even possible?
     """

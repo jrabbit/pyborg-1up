@@ -24,7 +24,7 @@ import sys
 
 from pyborg import pyborg
 
-class ModLineIn:
+class ModLineIn(object):
     """
     Module to interface console input and output with the PyBorg learn
     and reply modules. Allows offline chat with PyBorg.
