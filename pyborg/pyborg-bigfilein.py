@@ -49,7 +49,6 @@ class ModFileIn:
             buffer = pyborg.filter_message(line, Borg)
             counter = counter + 1
             try:
-                #print buffer
                 Borg.learn(buffer)
                 
             except KeyboardInterrupt, e:
@@ -58,8 +57,6 @@ class ModFileIn:
             if counter > 1000000:
                 my_pyborg.save_all()
                 counter = 0
-                # growling for development
-                #os.system("growlnotify -m Pyborg Saving Dictionary")
         
         # Learn from input
         print "I know "+`Borg.settings.num_words`+" words ("+`len(Borg.lines)`+" lines) now."
