@@ -1,15 +1,14 @@
 .DS_Store
-pyborg-1.1.2/experimental/pyborg-twisted.py
-pyborg-1.1.2/answers.txt
-pyborg-1.1.2/archive.zip
-pyborg-1.1.2/cfgfile.pyc
-pyborg-1.1.2/pyborg.cfg
-pyborg-1.1.2/pyborg.pyc
-pyborg-1.1.2/sentences.txt
-pyborg-1.1.2/words.txt
-pyborg-1.1.2/lines.dat
-pyborg-1.1.2/words.dat
-pyborg-1.1.2/version
+pyborg/answers.txt
+pyborg/archive.zip
+pyborg/cfgfile.pyc
+pyborg/pyborg.cfg
+pyborg/pyborg.pyc
+pyborg/sentences.txt
+pyborg/words.txt
+pyborg/lines.dat
+pyborg/words.dat
+pyborg/version
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -63,3 +62,4 @@ docs/_build/
 
 # PyBuilder
 target/
+venv/
