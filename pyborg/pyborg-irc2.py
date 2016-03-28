@@ -13,14 +13,19 @@ import pyborg.pyborg
 class ModIRC(irc.bot.SingleServerIRCBot):
 
     def __init__(self, my_pyborg, channel, nickname, server, port, **connect_params):
+        self.settings = toml.load("example.irc.toml")
+        server = self.settings['server']['server']
+        port = self.settings['server']['port']
+        nickname = self.settings['nickname']
+        realname = self.settings['realname']
         super(ModIRC, self).__init__(
-            [(server, port)], nickname, nickname, **connect_params)
+            [(server, port)], nickname, realname, **connect_params)
         self.my_pyborg = my_pyborg
         self.channel = channel
 
     def on_welcome(self, c, e):
-        # TODO Join channels from toml config
-        c.join(self.channel)
+        for chan_dict in self.settings['server']['channels']:
+            c.join(chan_dict['chan'])
 
     def on_pubmsg(self, c, e):
         a = e.arguments[0].split(":", 1)

@@ -1,0 +1,36 @@
+# pyborg irc module config file
+# Reported "real name"
+realname = "Pyborg"
+# The bot"s nickname
+nickname = "PyBorg"
+
+# Hide the fact we are a bot
+stealth = false
+
+# Channels to speak in always
+speakingchans = ["#test"]
+# password for control the bot (Edit manually !)
+password = ""
+# Reply to ignored people
+reply2ignored = false
+# Allow the bot to talk on channels
+speaking = true
+# IRC quit message
+quitmsg = "Bye :-("
+
+[server]
+    server = "chat.freenode.net"
+    port = 6697
+    ssl = true
+    # Owner(s) nickname
+    owners = ["jrabbit"]
+    # Ignore these nicknames:
+    ignorelist  = []
+    # Channels to auto-join
+    [[server.channels]]
+        chan = "#ranarchism"
+        speaking = true
+        # Chance of reply (%) per message
+        reply_chance = 33
+
+
