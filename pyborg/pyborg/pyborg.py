@@ -2,7 +2,7 @@
 #
 # PyBorg: The python AI bot.
 #
-# Copyright (c) 2000, 2006 Tom Morton, Sebastien Dailly
+# Copyright (c) 2000, 2006, 2013-2016 Tom Morton, Sebastien Dailly, Jack Laxson
 #
 #
 # This bot was inspired by the PerlBorg, by Eric Bock.
@@ -96,7 +96,7 @@ def filter_message(message, bot):
     return message
 
 
-class pyborg:
+class pyborg(object):
     import cfgfile
 
     ver_string = "I am a version 1.2.0 PyBorg"
@@ -815,7 +815,7 @@ class pyborg:
         # Find rarest word (excluding those unknown)
         index = []
         known = -1
-        #The word has to bee seen in already 3 contexts differents for being choosen
+        #The word has to have been seen in already 3 contexts differents for being choosen
         known_min = 3
         for x in xrange(0, len(words)):
             if words[x] in self.words:
@@ -1006,7 +1006,8 @@ class pyborg:
             if len(words) < 1:
                 return
 
-            voyelles = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
+            # voyelles = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
+            voyelles = "aeiouy"
             for x in xrange(0, len(words)):
 
                 nb_voy = 0

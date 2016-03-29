@@ -1,5 +1,5 @@
 import ssl
-
+import logging
 
 import baker
 import irc.bot
@@ -12,25 +12,37 @@ import pyborg.pyborg
 
 class ModIRC(irc.bot.SingleServerIRCBot):
 
-    def __init__(self, my_pyborg, channel, nickname, server, port, **connect_params):
+    def __init__(self, my_pyborg, channel=None, nickname=None, server=None, port=None, **connect_params):
         self.settings = toml.load("example.irc.toml")
-        server = self.settings['server']['server']
-        port = self.settings['server']['port']
-        nickname = self.settings['nickname']
-        realname = self.settings['realname']
-        super(ModIRC, self).__init__(
-            [(server, port)], nickname, realname, **connect_params)
+        server = server or self.settings['server']['server']
+        port = port or self.settings['server']['port']
+        nickname = nickname or self.settings['nickname']
+        realname = nickname or self.settings['realname']
+        if self.settings['server']['ssl']:
+            ssl_factory = irc.connection.Factory(wrapper=ssl.wrap_socket)
+            super(ModIRC, self).__init__(
+                [(server, port)], nickname, realname, connect_factory=ssl_factory, **connect_params)
+        else:
+            super(ModIRC, self).__init__(
+                [(server, port)], nickname, realname, **connect_params)
         self.my_pyborg = my_pyborg
-        self.channel = channel
 
     def on_welcome(self, c, e):
+        logging.info("Connected to IRC server.")
         for chan_dict in self.settings['server']['channels']:
             c.join(chan_dict['chan'])
+            logging.info("Joined channel: {}".format(chan_dict['chan']))
 
     def on_pubmsg(self, c, e):
         a = e.arguments[0].split(":", 1)
         if len(a) > 1 and irc.strings.lower(a[0]) == irc.strings.lower(self.connection.get_nickname()):
-            self.do_command(e, a[1].strip())
+            # TODO: Learn from input
+            # self.do_command(e, a[1].strip())
+            self.my_pyborg.learn(a[1])
+            msg = self.my_pyborg.reply(a[1])
+            if msg:
+                logging.info("Response: %s", msg)
+                c.privmsg(e.target, msg)
         return
 
     def do_command(self, e, cmd):
@@ -40,10 +52,11 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 
 @baker.command(default=True)
-def start_irc_bot(channel, nickname, server, port=6697):
+def start_irc_bot(verbose=True):
+    if verbose:
+        logging.basicConfig(level=logging.INFO)
     pyb = pyborg.pyborg.pyborg()
-    ssl_factory = irc.connection.Factory(wrapper=ssl.wrap_socket)
-    bot = ModIRC(pyb, channel, nickname, server, port, connect_factory=ssl_factory)
+    bot = ModIRC(pyb)
     try:
         bot.start()
     except KeyboardInterrupt:
