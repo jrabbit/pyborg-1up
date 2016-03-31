@@ -38,7 +38,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         if len(a) > 1 and irc.strings.lower(a[0]) == irc.strings.lower(self.connection.get_nickname()):
             # TODO: Learn from input
             # self.do_command(e, a[1].strip())
-            self.my_pyborg.learn(a[1])
+
+            self.my_pyborg.learn(a[1].encode('utf-8'))
             msg = self.my_pyborg.reply(a[1])
             if msg:
                 logging.info("Response: %s", msg)
