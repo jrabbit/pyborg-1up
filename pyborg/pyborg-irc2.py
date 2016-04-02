@@ -44,6 +44,9 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             if msg:
                 logging.info("Response: %s", msg)
                 c.privmsg(e.target, msg)
+        else:
+            self.my_pyborg.learn(e.arguments[0].encode('utf-8'))
+
         return
 
     def do_command(self, e, cmd):
