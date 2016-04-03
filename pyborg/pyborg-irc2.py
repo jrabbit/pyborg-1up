@@ -29,6 +29,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
     def on_welcome(self, c, e):
         logging.info("Connected to IRC server.")
+        # stops timeouts
+        c.set_keepalive(5)
         for chan_dict in self.settings['server']['channels']:
             c.join(chan_dict['chan'])
             logging.info("Joined channel: {}".format(chan_dict['chan']))
