@@ -33,6 +33,8 @@ import struct
 import time
 import zipfile
 import re
+import logging
+
 from zlib import crc32
 
 def filter_message(message, bot):
@@ -891,6 +893,7 @@ class pyborg(object):
                 x += 1
                 if x >= len(liste) -1:
                     mot = ''
+                logging.info("the choosening: %s", liste[x])
                 mot = liste[x][0]
 
             mot = mot.split(" ")
@@ -989,7 +992,7 @@ class pyborg(object):
                 sentence[x-1] = ""
 
         #return as string..
-        return "".join(sentence)
+        return u"".join(sentence)
 
     def learn(self, body, num_context=1):
         """
