@@ -33,7 +33,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         c.set_keepalive(5)
         for chan_dict in self.settings['server']['channels']:
             c.join(chan_dict['chan'])
-            logging.info("Joined channel: %s" , chan_dict['chan'])
+            logging.info("Joined channel: %s", chan_dict['chan'])
 
     def on_pubmsg(self, c, e):
         a = e.arguments[0].split(":", 1)
@@ -65,6 +65,9 @@ def start_irc_bot(verbose=True):
     except KeyboardInterrupt:
         pyb.save_all()
         bot.disconnect("Default disconnect message")
+    except Exception as e:
+        pyb.save_all()
+        raise e
 
 if __name__ == '__main__':
     baker.run()
