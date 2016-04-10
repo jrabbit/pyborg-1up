@@ -85,14 +85,13 @@ def filter_message(message, bot):
 #   message = message.replace("..  ..  .. ", ".... ")
 
     words = message.split()
-    if bot.settings.process_with == "pyborg":
-        for x in xrange(0, len(words)):
-            #is there aliases ?
-            for z in bot.settings.aliases.keys():
-                for alias in bot.settings.aliases[z]:
-                    pattern = "^%s$" % alias
-                    if re.search(pattern, words[x]):
-                        words[x] = z
+    for x in xrange(0, len(words)):
+        #is there aliases ?
+        for z in bot.settings.aliases.keys():
+            for alias in bot.settings.aliases[z]:
+                pattern = "^%s$" % alias
+                if re.search(pattern, words[x]):
+                    words[x] = z
 
     message = " ".join(words)
     return message
@@ -141,7 +140,6 @@ class pyborg(object):
               "censored":   ("Don't learn the sentence if one of those words is found", []),
               "num_aliases":("Total of aliases known", 0),
               "aliases":    ("A list of similars words", {}),
-              "process_with":("Wich way for generate the reply ( pyborg|megahal)", "pyborg"),
               "no_save" :("If True, Pyborg don't saves the dictionary and configuration on disk", "False")
             } )
 
@@ -152,89 +150,88 @@ class pyborg(object):
         self.unfilterd = {}
 
         # Read the dictionary
-        if self.settings.process_with == "pyborg":
-            print "Reading dictionary..."
-            try:
-                zfile = zipfile.ZipFile('archive.zip','r')
-                for filename in zfile.namelist():
-                    data = zfile.read(filename)
-                    file = open(filename, 'w+b')
-                    file.write(data)
-                    file.close()
-            except (EOFError, IOError), e:
-                print "no zip found"
-            try:
-                with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
-                    x = vers.read()
-                    if x != self.saves_version:
-                        print "Error loading dictionary\nPlease convert it before launching pyborg"
-                        sys.exit(1)
-                    self.words = marshal.loads(words.read())
-                    self.lines = marshal.loads(lines.read())
-            except (EOFError, IOError), e:
-                # Create mew database
-                self.words = {}
-                self.lines = {}
-                print "Error reading saves. New database created."
+        print "Reading dictionary..."
+        try:
+            zfile = zipfile.ZipFile('archive.zip','r')
+            for filename in zfile.namelist():
+                data = zfile.read(filename)
+                file = open(filename, 'w+b')
+                file.write(data)
+                file.close()
+        except (EOFError, IOError), e:
+            print "no zip found"
+        try:
+            with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
+                x = vers.read()
+                if x != self.saves_version:
+                    print "Error loading dictionary\nPlease convert it before launching pyborg"
+                    sys.exit(1)
+                self.words = marshal.loads(words.read())
+                self.lines = marshal.loads(lines.read())
+        except (EOFError, IOError), e:
+            # Create mew database
+            self.words = {}
+            self.lines = {}
+            print "Error reading saves. New database created."
 
-            # Is a resizing required?
-            if len(self.words) != self.settings.num_words:
-                print "Updating dictionary information..."
-                self.settings.num_words = len(self.words)
-                num_contexts = 0
-                # Get number of contexts
-                for x in self.lines.keys():
-                    num_contexts += len(self.lines[x][0].split())
-                self.settings.num_contexts = num_contexts
-                # Save new values
-                self.settings.save()
-                
-            # Is an aliases update required ?
-            compteur = 0
-            for x in self.settings.aliases.keys():
-                compteur += len(self.settings.aliases[x])
-            if compteur != self.settings.num_aliases:
-                print "check dictionary for new aliases"
-                self.settings.num_aliases = compteur
+        # Is a resizing required?
+        if len(self.words) != self.settings.num_words:
+            print "Updating dictionary information..."
+            self.settings.num_words = len(self.words)
+            num_contexts = 0
+            # Get number of contexts
+            for x in self.lines.keys():
+                num_contexts += len(self.lines[x][0].split())
+            self.settings.num_contexts = num_contexts
+            # Save new values
+            self.settings.save()
+            
+        # Is an aliases update required ?
+        compteur = 0
+        for x in self.settings.aliases.keys():
+            compteur += len(self.settings.aliases[x])
+        if compteur != self.settings.num_aliases:
+            print "check dictionary for new aliases"
+            self.settings.num_aliases = compteur
 
-                for x in self.words.keys():
-                    #is there aliases ?
-                    if x[0] != '~':
-                        for z in self.settings.aliases.keys():
-                            for alias in self.settings.aliases[z]:
-                                pattern = "^%s$" % alias
-                                if self.re.search(pattern, x):
-                                    print "replace %s with %s" %(x, z)
-                                    self.replace(x, z)
+            for x in self.words.keys():
+                #is there aliases ?
+                if x[0] != '~':
+                    for z in self.settings.aliases.keys():
+                        for alias in self.settings.aliases[z]:
+                            pattern = "^%s$" % alias
+                            if self.re.search(pattern, x):
+                                print "replace %s with %s" %(x, z)
+                                self.replace(x, z)
 
-                for x in self.words.keys():
-                    if not (x in self.settings.aliases.keys()) and x[0] == '~':
-                        print "unlearn %s" % x
-                        self.settings.num_aliases -= 1
-                        self.unlearn(x)
-                        print "unlearned aliases %s" % x
+            for x in self.words.keys():
+                if not (x in self.settings.aliases.keys()) and x[0] == '~':
+                    print "unlearn %s" % x
+                    self.settings.num_aliases -= 1
+                    self.unlearn(x)
+                    print "unlearned aliases %s" % x
 
 
-            #unlearn words in the unlearn.txt file.
-            try:
-                f = open("unlearn.txt", "r")
-                while 1:
-                    word = f.readline().strip('\n')
-                    if word == "":
-                        break
-                    if word in self.words:
-                        self.unlearn(word)
-                f.close()
-            except (EOFError, IOError), e:
-                # No words to unlearn
-                pass
+        #unlearn words in the unlearn.txt file.
+        try:
+            f = open("unlearn.txt", "r")
+            while 1:
+                word = f.readline().strip('\n')
+                if word == "":
+                    break
+                if word in self.words:
+                    self.unlearn(word)
+            f.close()
+        except (EOFError, IOError), e:
+            # No words to unlearn
+            pass
 
         self.settings.save()
 
 
 
     def save_all(self):
-        if self.settings.process_with == "pyborg" and self.settings.no_save != "True":
+        if self.settings.no_save != "True":
             print "Writing dictionary..."
 
             try:
@@ -307,14 +304,6 @@ class pyborg(object):
         If owner==1 allow owner commands.
         """
 
-        try:
-            if self.settings.process_with == "megahal": import mh_python
-        except:
-            self.settings.process_with = "pyborg"
-            self.settings.save()
-            print "Could not find megahal python library\nProgram ending"
-            sys.exit(1)
-
         # add trailing space so sentences are broken up correctly
         body = body + " "
 
@@ -328,10 +317,8 @@ class pyborg(object):
     
         # Learn from input
         if learn == 1:
-            if self.settings.process_with == "pyborg":
-                self.learn(body)
-            elif self.settings.process_with == "megahal" and self.settings.learning == 1:
-                mh_python.learn(body)
+            self.learn(body)
+
 
 
         # Make a reply if desired
@@ -352,10 +339,7 @@ class pyborg(object):
                         self.unfilterd[body] = 0
 
             if message == "":
-                if self.settings.process_with == "pyborg":
-                    message = self.reply(body)
-                elif self.settings.process_with == "megahal":
-                    message = mh_python.doreply(body)
+                message = self.reply(body)
 
             # single word reply: always output
             if len(message.split()) == 1:
@@ -384,7 +368,7 @@ class pyborg(object):
             msg = self.ver_string
 
         # How many words do we know?
-        elif command_list[0] == "!words" and self.settings.process_with == "pyborg":
+        elif command_list[0] == "!words":
             num_w = self.settings.num_words
             num_c = self.settings.num_contexts
             num_l = len(self.lines)
@@ -395,7 +379,7 @@ class pyborg(object):
             msg = "I know %d words (%d contexts, %.2f per word), %d lines." % (num_w, num_c, num_cpw, num_l)
                 
         # Do i know this word
-        elif command_list[0] == "!known" and self.settings.process_with == "pyborg":
+        elif command_list[0] == "!known":
             if len(command_list) == 2:
                 # single word specified
                 word = command_list[1].lower()
@@ -446,7 +430,7 @@ class pyborg(object):
                         io_module.output(i, args)
 
             # Change the max_words setting
-            elif command_list[0] == "!limit" and self.settings.process_with == "pyborg":
+            elif command_list[0] == "!limit":
                 msg = "The max limit is "
                 if len(command_list) == 1:
                     msg += str(self.settings.max_words)
@@ -457,7 +441,7 @@ class pyborg(object):
 
             
             # Check for broken links in the dictionary
-            elif command_list[0] == "!checkdict" and self.settings.process_with == "pyborg":
+            elif command_list[0] == "!checkdict":
                 t = time.time()
                 num_broken = 0
                 num_bad = 0
@@ -493,7 +477,7 @@ class pyborg(object):
 
             # Rebuild the dictionary by discarding the word links and
             # re-parsing each line
-            elif command_list[0] == "!rebuilddict" and self.settings.process_with == "pyborg":
+            elif command_list[0] == "!rebuilddict":
                 if self.settings.learning == 1:
                     t = time.time()
 
@@ -517,7 +501,7 @@ class pyborg(object):
                             self.settings.num_contexts - old_num_contexts)
 
             #Remove rares words
-            elif command_list[0] == "!purge" and self.settings.process_with == "pyborg":
+            elif command_list[0] == "!purge":
                 t = time.time()
 
                 liste = []
@@ -564,7 +548,7 @@ class pyborg(object):
                         compteur)
                 
             # Change a typo in the dictionary
-            elif command_list[0] == "!replace" and self.settings.process_with == "pyborg":
+            elif command_list[0] == "!replace":
                 if len(command_list) < 3:
                     return
                 old = command_list[1].lower()
@@ -572,7 +556,7 @@ class pyborg(object):
                 msg = self.replace(old, new)
 
             # Print contexts [flooding...:-]
-            elif command_list[0] == "!contexts" and self.settings.process_with == "pyborg":
+            elif command_list[0] == "!contexts":
                 # This is a large lump of data and should
                 # probably be printed, not module.output XXX
 
@@ -616,7 +600,7 @@ class pyborg(object):
                     x += 1
 
             # Remove a word from the vocabulary [use with care]
-            elif command_list[0] == "!unlearn" and self.settings.process_with == "pyborg":
+            elif command_list[0] == "!unlearn":
                 # build context we are looking for
                 context = " ".join(command_list[1:])
                 context = context.lower()
@@ -648,7 +632,7 @@ class pyborg(object):
                         self.settings.learning = 0
 
             # add a word to the 'censored' list
-            elif command_list[0] == "!censor" and self.settings.process_with == "pyborg":
+            elif command_list[0] == "!censor":
                 # no arguments. list censored words
                 if len(command_list) == 1:
                     if len(self.settings.censored) == 0:
@@ -667,7 +651,7 @@ class pyborg(object):
                         msg += "\n"
 
             # remove a word from the censored list
-            elif command_list[0] == "!uncensor" and self.settings.process_with == "pyborg":
+            elif command_list[0] == "!uncensor":
                 # Remove everyone listed from the ignore list
                 # eg !unignore tom dick harry
                 for x in xrange(1, len(command_list)):
@@ -677,7 +661,7 @@ class pyborg(object):
                     except ValueError, e:
                         pass
 
-            elif command_list[0] == "!alias" and self.settings.process_with == "pyborg":
+            elif command_list[0] == "!alias":
                 # no arguments. list aliases words
                 if len(command_list) == 1:
                     if len(self.settings.aliases) == 0:
