@@ -235,68 +235,61 @@ class pyborg(object):
             print "Writing dictionary..."
 
             try:
-                zfile = zipfile.ZipFile('archive.zip','r')
+                zfile = zipfile.ZipFile('archive.zip', 'r')
                 for filename in zfile.namelist():
                     data = zfile.read(filename)
                     file = open(filename, 'w+b')
                     file.write(data)
                     file.close()
-            except (OSError, IOError), e:
+            except OSError, IOError:
                 print "no zip found. Is the programm launch for first time ?"
 
+            with open("words.dat", "wb") as f:
+                f.write(marshal.dumps(self.words))
 
-            f = open("words.dat", "wb")
-            s = marshal.dumps(self.words)
-            f.write(s)
-            f.close()
-            f = open("lines.dat", "wb")
-            s = marshal.dumps(self.lines)
-            f.write(s)
-            f.close()
+            with open("lines.dat", "wb") as f:
+                f.write(marshal.dumps(self.lines))
 
-            #save the version
-            f = open("version", "w")
-            f.write(self.saves_version)
-            f.close()
+            # save the version
+            with open('version', 'w') as f:
+                f.write(self.saves_version)
 
-
-            #zip the files
-            f = zipfile.ZipFile('archive.zip','w',zipfile.ZIP_DEFLATED)
-            f.write('words.dat')
-            f.write('lines.dat')
-            f.write('version')
-            f.close()
+            # zip the files
+            with zipfile.ZipFile("archive.zip", "w") as f:
+                f.write('words.dat')
+                f.write('lines.dat')
+                f.write('version')
 
             try:
                 os.remove('words.dat')
                 os.remove('lines.dat')
                 os.remove('version')
-            except (OSError, IOError), e:
+            except OSError, IOError:
                 print "could not remove the files"
 
             f = open("words.txt", "w")
             # write each words known
             wordlist = []
-            #Sort the list befor to export
+            # Sort the list befor to export
             for key in self.words.keys():
                 wordlist.append([key, len(self.words[key])])
-            wordlist.sort(lambda x,y: cmp(x[1],y[1]))
-            map( (lambda x: f.write(str(x[0])+"\n\r") ), wordlist)
+            wordlist.sort(lambda x, y: cmp(x[1], y[1]))
+            map((lambda x: f.write(str(x[0])+"\n\r")), wordlist)
             f.close()
 
             f = open("sentences.txt", "w")
             # write each words known
             wordlist = []
-            #Sort the list befor to export
+            # Sort the list befor to export
             for key in self.unfilterd.keys():
                 wordlist.append([key, self.unfilterd[key]])
-            wordlist.sort(lambda x,y: cmp(y[1],x[1]))
-            map( (lambda x: f.write(str(x[0])+"\n") ), wordlist)
+            wordlist.sort(lambda x, y: cmp(y[1], x[1]))
+            map((lambda x: f.write(str(x[0])+"\n")), wordlist)
             f.close()
-
 
             # Save settings
             self.settings.save()
+
 
     def process_msg(self, io_module, body, replyrate, learn, args, owner=0):
         """
