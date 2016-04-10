@@ -65,9 +65,9 @@ def start_irc_bot(verbose=True):
     except KeyboardInterrupt:
         pyb.save_all()
         bot.disconnect("Default disconnect message")
-    except Exception as e:
+    except Exception:
         pyb.save_all()
-        raise e
+        raise
 
 if __name__ == '__main__':
     baker.run()
