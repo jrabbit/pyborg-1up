@@ -48,11 +48,6 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
         return
 
-    def do_command(self, e, cmd):
-        nick = e.source.nick
-        c = self.connection
-        c.notice(nick, "Hello {}".format(nick))
-
 
 @baker.command(default=True)
 def start_irc_bot(verbose=True):
