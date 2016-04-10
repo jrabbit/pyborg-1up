@@ -1051,7 +1051,7 @@ class pyborg(object):
             else :
                 self.lines[hashval][1] += num_context
 
-            #is max_words reached, don't learn more
+            # if max_words reached, don't learn more
             if self.settings.num_words >= self.settings.max_words: self.settings.learning = 0
 
         # Split body text into sentences and parse them
