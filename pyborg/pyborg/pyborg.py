@@ -25,7 +25,7 @@
 # Seb Dailly <seb.dailly@gmail.com>
 #
 
-from random import *
+from random import randint
 import sys
 import os
 import marshal  # buffered marshal is bloody fast. wish i'd found this before :)
@@ -155,9 +155,9 @@ class pyborg(object):
             zfile = zipfile.ZipFile('archive.zip','r')
             for filename in zfile.namelist():
                 data = zfile.read(filename)
-                file = open(filename, 'w+b')
-                file.write(data)
-                file.close()
+                f = open(filename, 'w+b')
+                f.write(data)
+                f.close()
         except (EOFError, IOError), e:
             print "no zip found"
         try:
@@ -238,10 +238,10 @@ class pyborg(object):
                 zfile = zipfile.ZipFile('archive.zip', 'r')
                 for filename in zfile.namelist():
                     data = zfile.read(filename)
-                    file = open(filename, 'w+b')
-                    file.write(data)
-                    file.close()
-            except OSError, IOError:
+                    f = open(filename, 'w+b')
+                    f.write(data)
+                    f.close()
+            except (OSError, IOError):
                 print "no zip found. Is the programm launch for first time ?"
 
             with open("words.dat", "wb") as f:
@@ -264,7 +264,7 @@ class pyborg(object):
                 os.remove('words.dat')
                 os.remove('lines.dat')
                 os.remove('version')
-            except OSError, IOError:
+            except (OSError, IOError):
                 print "could not remove the files"
 
             f = open("words.txt", "w")
@@ -307,23 +307,22 @@ class pyborg(object):
 
         # Filter out garbage and do some formatting
         body = filter_message(body, self)
-    
+
         # Learn from input
         if learn == 1:
             self.learn(body)
 
-
-
         # Make a reply if desired
         if randint(0, 99) < replyrate:
 
-            message  = ""
+            message = ""
 
-            #Look if we can find a prepared answer
+            # Look if we can find a prepared answer
             for sentence in self.answers.sentences.keys():
                 pattern = "^%s$" % sentence
                 if re.search(pattern, body):
-                    message = self.answers.sentences[sentence][randint(0, len(self.answers.sentences[sentence])-1)]
+                    message = self.answers.sentences[sentence][
+                        randint(0, len(self.answers.sentences[sentence])-1)]
                     break
                 else:
                     if body in self.unfilterd:
@@ -342,8 +341,10 @@ class pyborg(object):
             if message == "":
                 return
             # else output
-            if owner==0: time.sleep(.2*len(message))
+            if owner == 0:
+                time.sleep(.2*len(message))
             io_module.output(message, args)
+
     
     def do_commands(self, io_module, body, args, owner):
         """
@@ -445,7 +446,7 @@ class pyborg(object):
                         line_idx, word_num = struct.unpack("iH", wlist[i])
 
                         # Nasty critical error we should fix
-                        if not line_idx in self.lines:
+                        if line_idx not in self.lines:
                             print "Removing broken link '%s' -> %d" % (w, line_idx)
                             num_broken = num_broken + 1
                             del wlist[i]
@@ -501,7 +502,7 @@ class pyborg(object):
                 compteur = 0
 
                 if len(command_list) == 2:
-                # limite d occurences a effacer
+                    # limite d occurences a effacer
                     c_max = command_list[1].lower()
                 else:
                     c_max = 0
@@ -753,7 +754,7 @@ class pyborg(object):
                 wlist = self.lines[x][0].split()
                 # add touched words to list
                 for w in wlist:
-                    if not w in wordlist:
+                    if w not in wordlist:
                         wordlist.append(w)
                 dellist.append(x)
                 del self.lines[x]
@@ -841,7 +842,7 @@ class pyborg(object):
                         look_for = cwords[w-2]+" "+look_for
 
                     #saves how many times we can found each word
-                    if not look_for in pre_words:
+                    if look_for not in pre_words:
                         pre_words[look_for] = num_context
                     else :
                         pre_words[look_for] += num_context
@@ -914,7 +915,7 @@ class pyborg(object):
                     if look_for in self.settings.ignore_list and w < len(cwords) -2:
                         look_for = look_for+" "+cwords[w+2]
 
-                    if not look_for in post_words:
+                    if look_for not in post_words:
                         post_words[look_for] = num_context
                     else :
                         post_words[look_for] += num_context
@@ -1034,7 +1035,7 @@ class pyborg(object):
             hashval = crc32(cleanbody)
 
             # Check context isn't already known
-            if not hashval in self.lines:
+            if  hashval not in self.lines:
                 if not(num_cpw > 100 and self.settings.learning == 0):
                     
                     self.lines[hashval] = [cleanbody, num_context]
