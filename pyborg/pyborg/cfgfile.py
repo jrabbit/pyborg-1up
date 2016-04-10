@@ -133,7 +133,7 @@ class cfgset:
             # reserved
             if i == "_defaults" or i == "_filename":
                 continue
-            if self._defaults.has_key(i):
+            if i in self._defaults:
                 comment = self._defaults[i][0]
             else:
                 comment = ""
