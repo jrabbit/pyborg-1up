@@ -970,7 +970,9 @@ class pyborg(object):
                 sentence[x-1] = ""
 
         #return as string..
-        return u"".join(sentence)
+        # yolo
+        l = [x.decode('utf-8') for x in sentence]
+        return u"".join(l)
 
     def learn(self, body, num_context=1):
         """
