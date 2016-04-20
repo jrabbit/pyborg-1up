@@ -1,6 +1,14 @@
 PyBorg ChangeLog
 ~~~~~~~~~~~~~~~~
 
+v1.2.0b - 20/4/2016
+~~~~~~~~~~~~~~~~~~~
+
+* Removed MegaHal.
+* Lots of modernization like 64 bit support, python 2.7 goodies
+* New IRC module pyborg_irc2.py, using modern `irc` library.
+* Expermiental tumblr module: pyborg_tumblr.py
+
 v1.1.1 - 19/9/2006
 ~~~~~~~~~~~~~~~~~~
 
