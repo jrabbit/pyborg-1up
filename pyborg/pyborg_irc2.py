@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import random
 import ssl
 import logging
 
@@ -45,13 +46,26 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                 logging.info("Response: %s", msg)
                 c.privmsg(e.target, msg)
         else:
+            if self.settings['speaking']:
+                chans = {z['chan']:z for z in self.settings['server']['channels']}
+                reply_chance_inverse = 100 - chans[e.target.lower()]['reply_chance']
+                logging.debug("Inverse Reply Chance = %d", reply_chance_inverse)
+                if random.uniform(0,100) < reply_chance_inverse:
+                    msg = self.my_pyborg.reply(e.arguments[0].encode('utf-8'))
+                    if msg:
+                        logging.info("Response: %s", msg)
+                        c.privmsg(e.target, msg)
+
             self.my_pyborg.learn(e.arguments[0].encode('utf-8'))
 
         return
 
 
-@baker.command(default=True)
-def start_irc_bot(verbose=True):
+@baker.command(default=True, shortopts={"verbose": "v", "debug": "d"})
+def start_irc_bot(verbose=True, debug=False):
+    if debug:
+        logging.basicConfig(level=logging.DEBUG)
+        # only the first basicConfig() is respected.
     if verbose:
         logging.basicConfig(level=logging.INFO)
     pyb = pyborg.pyborg.pyborg()
