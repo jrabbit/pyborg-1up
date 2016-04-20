@@ -2,14 +2,14 @@
 
 from setuptools import setup
 setup(name="pyborg",
-      version="1.2.0b1",
+      version="1.2.0b2",
       packages=["pyborg"],
       scripts=['pyborg-reddit.py',
 	 'pyborg-filein.py',
 	 'pyborg-telnet.py',
 	 'pyborg-linein.py',
 	 'pyborg-irc.py',
-	 'pyborg-bigfilein.py'
+	 'pyborg-bigfilein.py',
        'pyborg_irc2.py',
        'pyborg_tumblr.py'],
       author="Jack Laxson",

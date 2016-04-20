@@ -1,6 +1,6 @@
 include *.py
-include *.toml
-include *.txt
+include example.irc.toml
+include copying.txt
 include ChangeLog
 recursive-include experimental *.py
 recursive-include experimental *.sh
