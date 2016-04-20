@@ -10,7 +10,9 @@ import toml
 import pyborg.pyborg
 
 class PyborgTumblr(object):
+
     """Takes a toml config file path and a pyborg.pyborg.pyborg instance."""
+
     def __init__(self, toml_file, pyb):
         self.toml_file = toml_file
         self.settings = toml.load(toml_file)
@@ -26,8 +28,9 @@ class PyborgTumblr(object):
         # setattr(self, "date-%s" %)
         new_posts = filter( lambda x: arrow.get(x['date']) > self.last_look, posts)
         self.last_look = arrow.utcnow()
-        logging.info("loaded new posts")
+        logging.debug("loaded new posts")
         return new_posts
+
     def start(self):
         while True:
             new_posts = self.load_new_from_tag("hello bill")
@@ -37,8 +40,11 @@ class PyborgTumblr(object):
 
                 logging.info("found post: \n%s", post['summary'])
                 msg =  self.pyborg.reply(post['summary'])
-                logging.info("Reblogging with comment: %s", msg)
-                self.client.reblog(self.settings['tumblr']['blog'], id=post['id'], reblog_key=post['reblog_key'], comment=msg)
+                if msg:
+                    logging.info("Reblogging with comment: %s", msg)
+                    self.client.reblog(self.settings['tumblr']['blog'], id=post['id'], reblog_key=post['reblog_key'], comment=msg)
+                else:
+                    logging.info("No comment.")
 
             time.sleep(self.settings['tumblr']['cooldown'])
     def teardown(self):
