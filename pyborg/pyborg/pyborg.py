@@ -38,6 +38,11 @@ from zlib import crc32
 
 import marshal  # buffered marshal is bloody fast. wish i'd found this before :)
 
+try:
+    import nltk
+except ImportError:
+    nltk = None
+
 def filter_message(message, bot):
     """
     Filter a message body so it is suitable for learning from and
@@ -784,34 +789,34 @@ class pyborg(object):
         words = []
         for i in _words:
             words += i.split()
-        del _words
 
         if len(words) == 0:
+            logging.debug("Did not find any words to reply to.")
             return ""
         
-        #remove words on the ignore list
-        #words = filter((lambda x: x not in self.settings.ignore_list and not x.isdigit() ), words)
+        # remove words on the ignore list
         words = [x for x in words if x not in self.settings.ignore_list and not x.isdigit()]
 
         # Find rarest word (excluding those unknown)
         index = []
         known = -1
-        #The word has to have been seen in already 3 contexts differents for being choosen
+        # The word has to have been seen in already 3 contexts differents for being choosen
         known_min = 3
-        for x in xrange(0, len(words)):
-            if words[x] in self.words:
-                k = len(self.words[words[x]])
+        for w in words:
+            if w in self.words:
+                k = len(self.words[w])
             else:
                 continue
             if (known == -1 or k < known) and k > known_min:
-                index = [words[x]]
+                index = [w]
                 known = k
                 continue
             elif k == known:
-                index.append(words[x])
+                index.append(w)
                 continue
         # Index now contains list of rarest known words in sentence
         if len(index)==0:
+            logging.debug("No words with atleast 3 contexts were found.")
             return ""
         word = index[randint(0, len(index)-1)]
 
@@ -970,9 +975,9 @@ class pyborg(object):
             if sentence[x] == ",":
                 sentence[x-1] = ""
 
-        #return as string..
         # yolo
         l = [x.decode('utf-8') for x in sentence]
+        # return as string..
         return u"".join(l)
 
     def learn(self, body, num_context=1):
