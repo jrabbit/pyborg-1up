@@ -818,7 +818,27 @@ class pyborg(object):
         if len(index)==0:
             logging.debug("No words with atleast 3 contexts were found.")
             return ""
-        word = index[randint(0, len(index)-1)]
+
+        # Begin experimental NLP code
+        def weight(pos):
+            "Takes a POS tag and assigns a weight"
+            lookup = {"NN": 4, "NNP": 5, "RB": 2, "NNS": 3,
+                     }
+            try:
+                ret = lookup[pos]
+            except KeyError:
+                ret = 1
+            return ret
+        if nltk:
+            tokenized = nltk.word_tokenize(body)
+            tagged = nltk.pos_tag(tokenized)
+            weighted_choices = [(word, weight(pos)) for word, pos in tagged]
+            population = [val for val, cnt in weighted_choices for i in xrange(cnt)]
+            word = random.choice(population)
+            # make sure the word is known
+            assert index[word]
+        else:
+            word = index[randint(0, len(index)-1)]
 
         # Build sentence backwards from "chosen" word
         sentence = [word]
