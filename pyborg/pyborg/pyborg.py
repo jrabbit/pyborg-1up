@@ -25,17 +25,18 @@
 # Seb Dailly <seb.dailly@gmail.com>
 #
 
-from random import randint
-import sys
+import logging
 import os
-import marshal  # buffered marshal is bloody fast. wish i'd found this before :)
+import random
+import re
 import struct
+import sys
 import time
 import zipfile
-import re
-import logging
-
+from random import randint
 from zlib import crc32
+
+import marshal  # buffered marshal is bloody fast. wish i'd found this before :)
 
 def filter_message(message, bot):
     """
