@@ -822,8 +822,7 @@ class pyborg(object):
         # Begin experimental NLP code
         def weight(pos):
             "Takes a POS tag and assigns a weight"
-            lookup = {"NN": 4, "NNP": 5, "RB": 2, "NNS": 3,
-                     }
+            lookup = {"NN": 4, "NNP": 5, "RB": 2, "NNS": 3,}
             try:
                 ret = lookup[pos]
             except KeyError:
@@ -832,11 +831,13 @@ class pyborg(object):
         if nltk:
             tokenized = nltk.word_tokenize(body)
             tagged = nltk.pos_tag(tokenized)
+            logging.info(tagged)
             weighted_choices = [(word, weight(pos)) for word, pos in tagged]
             population = [val for val, cnt in weighted_choices for i in xrange(cnt)]
             word = random.choice(population)
             # make sure the word is known
-            assert index[word]
+            while word not in index:
+                word = random.choice(population)
         else:
             word = index[randint(0, len(index)-1)]
 
