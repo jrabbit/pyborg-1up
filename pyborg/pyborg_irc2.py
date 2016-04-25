@@ -35,11 +35,19 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         for chan_dict in self.settings['server']['channels']:
             c.join(chan_dict['chan'])
             logging.info("Joined channel: %s", chan_dict['chan'])
-
+    
+    def strip_nicks(self, body, e):
+        "takes a utf-8 body and replaces all nicknames with #nick"
+        # copied from irc mod 1
+        for x in self.channels[e.target].users():
+            body = body.replace(x, "#nick")
+        logging.debug("Replaced nicks: %s", body)
+        return body
+        
     def on_pubmsg(self, c, e):
         a = e.arguments[0].split(":", 1)
         if len(a) > 1 and irc.strings.lower(a[0]) == irc.strings.lower(self.connection.get_nickname()):
-            self.my_pyborg.learn(a[1].encode('utf-8'))
+            self.my_pyborg.learn(self.strip_nicks(a[1].encode('utf-8'), e))
             msg = self.my_pyborg.reply(a[1])
             if msg:
                 logging.info("Response: %s", msg)
@@ -56,8 +64,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                     if msg:
                         logging.info("Response: %s", msg)
                         c.privmsg(e.target, msg)
-
-            self.my_pyborg.learn(e.arguments[0].encode('utf-8'))
+            body = self.strip_nicks(e.arguments[0].encode('utf-8'), e)
+            self.my_pyborg.learn(body)
 
         return
 
