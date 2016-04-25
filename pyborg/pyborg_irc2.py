@@ -1,15 +1,14 @@
 #!/usr/bin/env python
+import logging
 import random
 import ssl
-import logging
 
 import baker
+import irc
 import irc.bot
 import irc.strings
-import irc
-import toml
-
 import pyborg.pyborg
+import toml
 
 
 class ModIRC(irc.bot.SingleServerIRCBot):
