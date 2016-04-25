@@ -822,7 +822,7 @@ class pyborg(object):
         # Begin experimental NLP code
         def weight(pos):
             "Takes a POS tag and assigns a weight"
-            lookup = {"NN": 4, "NNP": 5, "RB": 2, "NNS": 3,}
+            lookup = {"NN": 4, "NNP": 5, "RB": 2, "NNS": 3, "NNPS": 5}
             try:
                 ret = lookup[pos]
             except KeyError:
