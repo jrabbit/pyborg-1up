@@ -17,7 +17,8 @@ reply2ignored = false
 speaking = true
 # IRC quit message
 quitmsg = "Bye :-("
-
+# Connect to pyborg instance over http for shared db?
+multiplex = true
 [server]
     server = "chat.freenode.net"
     port = 6697
@@ -31,6 +32,11 @@ quitmsg = "Bye :-("
         chan = "#ranarchism"
         speaking = true
         # Chance of reply (%) per message
-        reply_chance = 33
+        reply_chance = 5
+    [[server.channels]]
+        chan = "#queertoo"
+        speaking = false
+        # Chance of reply (%) per message
+        reply_chance = 5
 
 

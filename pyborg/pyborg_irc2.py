@@ -10,6 +10,10 @@ import irc.strings
 import pyborg.pyborg
 import toml
 
+try:
+    import requests
+except ImportError:
+    requests = None
 
 class ModIRC(irc.bot.SingleServerIRCBot):
 
@@ -43,12 +47,34 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             body = body.replace(x, "#nick")
         logging.debug("Replaced nicks: %s", body)
         return body
-        
+
+    def learn(self, body):
+        "thin wrapper for learn to switch to multiplex mode"
+        if not self.settings['multiplex']:
+            self.my_pyborg.learn(body)
+        elif requests:
+            ret = requests.post("http://localhost:2001/learn", data={"body": body})
+            ret.raise_for_status()
+        else:
+            pass
+
+    def reply(self, body):
+        "thin wrapper for reply to switch to multiplex mode"
+        if not self.settings['multiplex']:
+            return self.my_pyborg.reply(body)
+        elif requests:
+            ret = requests.post("http://localhost:2001/reply", data={"body": body})
+            ret.raise_for_status()
+            return ret.text
+        else:
+            raise NotImplementedError
+
+
     def on_pubmsg(self, c, e):
         a = e.arguments[0].split(":", 1)
         if len(a) > 1 and irc.strings.lower(a[0]) == irc.strings.lower(self.connection.get_nickname()):
-            self.my_pyborg.learn(self.strip_nicks(a[1].encode('utf-8'), e))
-            msg = self.my_pyborg.reply(a[1])
+            self.learn(self.strip_nicks(a[1], e).encode('utf-8'))
+            msg = self.reply(a[1].encode('utf-8'))
             if msg:
                 logging.info("Response: %s", msg)
                 c.privmsg(e.target, msg)
@@ -60,14 +86,14 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                 rnd = random.uniform(0,100)
                 logging.debug("Random float: %d", rnd)
                 if rnd > reply_chance_inverse:
-                    msg = self.my_pyborg.reply(e.arguments[0].encode('utf-8'))
+                    msg = self.reply(e.arguments[0].encode('utf-8'))
                     if msg:
                         logging.info("Response: %s", msg)
                         c.privmsg(e.target, msg)
-            body = self.strip_nicks(e.arguments[0].encode('utf-8'), e)
-            self.my_pyborg.learn(body)
-
+            body = self.strip_nicks(e.arguments[0], e).encode('utf-8')
+            self.learn(body)
         return
+
 
 
 @baker.command(default=True, shortopts={"verbose": "v", "debug": "d"})
