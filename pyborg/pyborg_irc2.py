@@ -30,7 +30,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         else:
             super(ModIRC, self).__init__(
                 [(server, port)], nickname, realname, **connect_params)
-        self.my_pyborg = my_pyborg
+        if not self.settings['multiplex']:
+            self.my_pyborg = my_pyborg()
 
     def on_welcome(self, c, e):
         logging.info("Connected to IRC server.")
@@ -61,13 +62,15 @@ class ModIRC(irc.bot.SingleServerIRCBot):
     def reply(self, body):
         "thin wrapper for reply to switch to multiplex mode"
         if not self.settings['multiplex']:
-            return self.my_pyborg.reply(body)
+            reply = self.my_pyborg.reply(body)
         elif requests:
             ret = requests.post("http://localhost:2001/reply", data={"body": body})
             ret.raise_for_status()
-            return ret.text
+            reply = ret.text
         else:
             raise NotImplementedError
+        # replace #nicks here
+        return reply
 
 
     def on_pubmsg(self, c, e):
@@ -103,7 +106,7 @@ def start_irc_bot(verbose=True, debug=False):
         # only the first basicConfig() is respected.
     if verbose:
         logging.basicConfig(level=logging.INFO)
-    pyb = pyborg.pyborg.pyborg()
+    pyb = pyborg.pyborg.pyborg
     bot = ModIRC(pyb)
     try:
         bot.start()

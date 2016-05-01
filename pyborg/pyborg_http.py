@@ -25,3 +25,4 @@ def index():
 
 if __name__ == '__main__':
     bottle.run(host="localhost", port=2001, reloader=True)
+    our_pyborg.save_all()
