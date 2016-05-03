@@ -112,10 +112,17 @@ def start_irc_bot(verbose=True, debug=False):
         bot.start()
     except KeyboardInterrupt:
         pyb.save_all()
-        bot.disconnect("Default disconnect message")
-    except Exception:
+        bot.disconnect("Killed at terminal.")
+    except IOError as e:
+        if bot.settings['multiplex']:
+            logging.error(e)
+            logging.info("Is pyborg_http running?")
+        else:
+            raise
+    except Exception as e:
+        logging.exception(e)
         pyb.save_all()
-        raise
+        bot.disconnect("Caught exception")
 
 if __name__ == '__main__':
     baker.run()
