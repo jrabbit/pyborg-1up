@@ -111,7 +111,7 @@ def start_irc_bot(verbose=True, debug=False):
     try:
         bot.start()
     except KeyboardInterrupt:
-        pyb.save_all()
+        bot.my_pyborg.save_all()
         bot.disconnect("Killed at terminal.")
     except IOError as e:
         if bot.settings['multiplex']:
@@ -121,7 +121,7 @@ def start_irc_bot(verbose=True, debug=False):
             raise
     except Exception as e:
         logging.exception(e)
-        pyb.save_all()
+        bot.my_pyborg.save_all()
         bot.disconnect("Caught exception")
 
 if __name__ == '__main__':
