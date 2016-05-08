@@ -14,7 +14,7 @@ class PyborgTumblr(object):
 
     """Takes a toml config file path and a pyborg.pyborg.pyborg instance."""
 
-    def __init__(self, toml_file, pyb):
+    def __init__(self, toml_file):
         self.toml_file = toml_file
         self.settings = toml.load(toml_file)
         self.client = pytumblr.TumblrRestClient(self.settings['auth']['consumer_key'], 
@@ -22,7 +22,11 @@ class PyborgTumblr(object):
                                                 self.settings['auth']['oauth_token'], 
                                                 self.settings['auth']['oauth_secret'])
         self.last_look = arrow.get(self.settings['tumblr']['last_look'])
-        self.pyborg = pyb
+        self.multiplexing = self.settings['pyborg']['multiplex']
+        if not self.multiplexing:
+            self.pyborg = pyborg.pyborg.pyborg()
+        else:
+            self.pyborg = None
 
     def load_new_from_tag(self, tag):
         posts = self.client.tagged(tag)
@@ -52,22 +56,22 @@ class PyborgTumblr(object):
         self.settings['tumblr']['last_look'] = self.last_look
         with open(self.toml_file, "w") as f:
             toml.dump(self.settings, f)
+        if not self.multiplexing:
+            self.pyborg.save_all()
 
 
-@baker.command(default=True)
-def start_irc_bot(verbose=True):
+@baker.command(default=True, shortopts={"toml_conf": "f"})
+def start_irc_bot(verbose=True, toml_conf="example.tumblr.toml"):
     if verbose:
         logging.basicConfig(level=logging.INFO)
-    pyb = pyborg.pyborg.pyborg()
-    bot = PyborgTumblr("example.tumblr.toml", pyb)
+    bot = PyborgTumblr(toml_conf)
     try:
         bot.start()
     except KeyboardInterrupt:
-        pyb.save_all()
         bot.teardown()
         sys.exit()
     except Exception:
-        pyb.save_all()
+        bot.teardown()
         raise
 
 if __name__ == '__main__':
