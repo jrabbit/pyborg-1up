@@ -836,8 +836,11 @@ class pyborg(object):
             population = [val for val, cnt in weighted_choices for i in xrange(cnt)]
             word = random.choice(population)
             # make sure the word is known
-            while word not in index:
+            counter = 0
+            while word not in index and counter < 200:
                 word = random.choice(population)
+                counter += 1
+            logging.debug("Ran choice %d times", counter)
         else:
             word = index[randint(0, len(index)-1)]
 

@@ -17,8 +17,8 @@ except ImportError:
 
 class ModIRC(irc.bot.SingleServerIRCBot):
 
-    def __init__(self, my_pyborg, channel=None, nickname=None, server=None, port=None, **connect_params):
-        self.settings = toml.load("example.irc.toml")
+    def __init__(self, my_pyborg, settings, channel=None, nickname=None, server=None, port=None, **connect_params):
+        self.settings = settings
         server = server or self.settings['server']['server']
         port = port or self.settings['server']['port']
         nickname = nickname or self.settings['nickname']
@@ -83,6 +83,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                 c.privmsg(e.target, msg)
         else:
             chans = {z['chan']:z for z in self.settings['server']['channels']}
+            logging.info(type(e.target))
             if self.settings['speaking'] and chans[e.target.lower()]['speaking']:                
                 reply_chance_inverse = 100 - chans[e.target.lower()]['reply_chance']
                 logging.debug("Inverse Reply Chance = %d", reply_chance_inverse)
@@ -99,19 +100,21 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 
 
-@baker.command(default=True, shortopts={"verbose": "v", "debug": "d"})
-def start_irc_bot(verbose=True, debug=False):
+@baker.command(default=True, shortopts={"verbose": "v", "debug": "d", "conffile": 'f'})
+def start_irc_bot(verbose=True, debug=False, conffile="example.irc.toml"):
     if debug:
         logging.basicConfig(level=logging.DEBUG)
         # only the first basicConfig() is respected.
     if verbose:
         logging.basicConfig(level=logging.INFO)
     pyb = pyborg.pyborg.pyborg
-    bot = ModIRC(pyb)
+    settings = toml.load(conffile)
+    bot = ModIRC(pyb, settings)
     try:
         bot.start()
     except KeyboardInterrupt:
-        bot.my_pyborg.save_all()
+        if not bot.settings['multiplex']:
+            bot.my_pyborg.save_all()
         bot.disconnect("Killed at terminal.")
     except IOError as e:
         if bot.settings['multiplex']:
@@ -121,7 +124,8 @@ def start_irc_bot(verbose=True, debug=False):
             raise
     except Exception as e:
         logging.exception(e)
-        bot.my_pyborg.save_all()
+        if not bot.settings['multiplex']:
+            bot.my_pyborg.save_all()
         bot.disconnect("Caught exception")
 
 if __name__ == '__main__':

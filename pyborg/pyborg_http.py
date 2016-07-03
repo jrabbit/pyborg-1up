@@ -1,6 +1,9 @@
+import logging
+
 import bottle
 import baker
 from bottle import request
+
 from pyborg.pyborg import pyborg
 
 our_pyborg = pyborg()
@@ -48,5 +51,6 @@ def process():
         return ""
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     bottle.run(host="localhost", port=2001, reloader=True)
     our_pyborg.save_all()
