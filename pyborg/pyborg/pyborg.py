@@ -38,10 +38,14 @@ from zlib import crc32
 
 import marshal  # buffered marshal is bloody fast. wish i'd found this before :)
 
+logger = logging.getLogger(__name__)
+
 try:
     import nltk
+    logger.debug("Got nltk!")
 except ImportError:
     nltk = None
+    logger.debug("No nltk, won't be useing advanced part of speech tagging.")
 
 def filter_message(message, bot):
     """
