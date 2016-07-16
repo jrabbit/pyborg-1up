@@ -58,9 +58,10 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             self.my_pyborg.learn(body)
         elif requests:
             ret = requests.post("http://localhost:2001/learn", data={"body": body})
-            ret.raise_for_status()
-        else:
-            pass
+            if ret.status_code > 499:
+                logging.error("Internal Server Error in pyborg_http. see logs.")
+            else:
+                ret.raise_for_status()
 
     def reply(self, body):
         "thin wrapper for reply to switch to multiplex mode"
@@ -68,11 +69,16 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             reply = self.my_pyborg.reply(body)
         elif requests:
             ret = requests.post("http://localhost:2001/reply", data={"body": body})
-            ret.raise_for_status()
-            reply = ret.text
+            if ret.status_code == requests.codes.ok:
+                reply = ret.text
+            elif ret.status_code > 499:
+                logging.error("Internal Server Error in pyborg_http. see logs.")
+            else:
+                ret.raise_for_status()
+
         else:
             raise NotImplementedError
-        # replace #nicks here
+        # TODO: replace #nicks here
         return reply
 
 
