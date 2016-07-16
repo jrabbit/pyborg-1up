@@ -10,6 +10,8 @@ import toml
 
 import pyborg.pyborg
 
+logger = logging.getLogger(__name__)
+
 class PyborgTumblr(object):
 
     """Takes a toml config file path and a pyborg.pyborg.pyborg instance."""
@@ -33,7 +35,7 @@ class PyborgTumblr(object):
         # setattr(self, "date-%s" %)
         new_posts = filter( lambda x: arrow.get(x['date']) > self.last_look, posts)
         self.last_look = arrow.utcnow()
-        logging.debug("loaded new posts")
+        logger.debug("loaded new posts")
         return new_posts
 
     def start(self):
@@ -43,13 +45,13 @@ class PyborgTumblr(object):
                 if self.settings['tumblr']['learning']:
                     self.pyborg.learn(post['body'])
 
-                logging.info("found post: \n%s", post['summary'])
+                logger.info("found post: \n%s", post['summary'])
                 msg =  self.pyborg.reply(post['summary'])
                 if msg:
-                    logging.info("Reblogging with comment: %s", msg)
+                    logger.info("Reblogging with comment: %s", msg)
                     self.client.reblog(self.settings['tumblr']['blog'], id=post['id'], reblog_key=post['reblog_key'], comment=msg)
                 else:
-                    logging.info("No comment.")
+                    logger.info("No comment.")
 
             time.sleep(self.settings['tumblr']['cooldown'])
     def teardown(self):
@@ -61,7 +63,7 @@ class PyborgTumblr(object):
 
 
 @baker.command(default=True, shortopts={"toml_conf": "f"})
-def start_irc_bot(verbose=True, toml_conf="example.tumblr.toml"):
+def start_tumblr_bot(verbose=True, toml_conf="example.tumblr.toml"):
     if verbose:
         logging.basicConfig(level=logging.INFO)
     bot = PyborgTumblr(toml_conf)
