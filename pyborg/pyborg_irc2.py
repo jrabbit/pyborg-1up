@@ -41,6 +41,9 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             c.join(chan_dict['chan'])
             logging.info("Joined channel: %s", chan_dict['chan'])
     
+    def on_nicknameinuse(self, c, e):
+        c.nick(c.get_nickname() + "_")
+
     def strip_nicks(self, body, e):
         "takes a utf-8 body and replaces all nicknames with #nick"
         # copied from irc mod 1
