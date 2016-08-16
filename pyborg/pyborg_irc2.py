@@ -15,6 +15,9 @@ try:
 except ImportError:
     requests = None
 
+logger = logging.getLogger(__name__)
+
+
 class ModIRC(irc.bot.SingleServerIRCBot):
 
     def __init__(self, my_pyborg, settings, channel=None, nickname=None, server=None, port=None, **connect_params):
@@ -34,12 +37,12 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             self.my_pyborg = my_pyborg()
 
     def on_welcome(self, c, e):
-        logging.info("Connected to IRC server.")
+        logger.info("Connected to IRC server.")
         # stops timeouts
         c.set_keepalive(5)
         for chan_dict in self.settings['server']['channels']:
             c.join(chan_dict['chan'])
-            logging.info("Joined channel: %s", chan_dict['chan'])
+            logger.info("Joined channel: %s", chan_dict['chan'])
     
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
@@ -49,7 +52,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         # copied from irc mod 1
         for x in self.channels[e.target].users():
             body = body.replace(x, "#nick")
-        logging.debug("Replaced nicks: %s", body)
+        logger.debug("Replaced nicks: %s", body)
         return body
 
     def learn(self, body):
@@ -59,7 +62,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         elif requests:
             ret = requests.post("http://localhost:2001/learn", data={"body": body})
             if ret.status_code > 499:
-                logging.error("Internal Server Error in pyborg_http. see logs.")
+                logger.error("Internal Server Error in pyborg_http. see logs.")
             else:
                 ret.raise_for_status()
 
@@ -72,7 +75,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             if ret.status_code == requests.codes.ok:
                 reply = ret.text
             elif ret.status_code > 499:
-                logging.error("Internal Server Error in pyborg_http. see logs.")
+                logger.error("Internal Server Error in pyborg_http. see logs.")
+                return
             else:
                 ret.raise_for_status()
 
@@ -88,20 +92,20 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             self.learn(self.strip_nicks(a[1], e).encode('utf-8'))
             msg = self.reply(a[1].encode('utf-8'))
             if msg:
-                logging.info("Response: %s", msg)
+                logger.info("Response: %s", msg)
                 c.privmsg(e.target, msg)
         else:
             chans = {z['chan']:z for z in self.settings['server']['channels']}
-            logging.info(type(e.target))
+            logger.debug(type(e.target))
             if self.settings['speaking'] and chans[e.target.lower()]['speaking']:                
                 reply_chance_inverse = 100 - chans[e.target.lower()]['reply_chance']
-                logging.debug("Inverse Reply Chance = %d", reply_chance_inverse)
+                logger.debug("Inverse Reply Chance = %d", reply_chance_inverse)
                 rnd = random.uniform(0,100)
-                logging.debug("Random float: %d", rnd)
+                logger.debug("Random float: %d", rnd)
                 if rnd > reply_chance_inverse:
                     msg = self.reply(e.arguments[0].encode('utf-8'))
                     if msg:
-                        logging.info("Response: %s", msg)
+                        logger.info("Response: %s", msg)
                         c.privmsg(e.target, msg)
             body = self.strip_nicks(e.arguments[0], e).encode('utf-8')
             self.learn(body)
@@ -127,12 +131,12 @@ def start_irc_bot(verbose=True, debug=False, conffile="example.irc.toml"):
         bot.disconnect("Killed at terminal.")
     except IOError as e:
         if bot.settings['multiplex']:
-            logging.error(e)
-            logging.info("Is pyborg_http running?")
+            logger.error(e)
+            logger.info("Is pyborg_http running?")
         else:
             raise
     except Exception as e:
-        logging.exception(e)
+        logger.exception(e)
         if not bot.settings['multiplex']:
             bot.my_pyborg.save_all()
         bot.disconnect("Caught exception")
