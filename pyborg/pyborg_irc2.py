@@ -55,6 +55,14 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         logger.debug("Replaced nicks: %s", body)
         return body
 
+    def replace_nicks(self, body, e):
+        if "#nick" in body:
+            #wtf do we want here
+            randuser = random.choice(self.channels[e.target].users())
+            body = body.replace("#nick", randuser)
+            logger.debug("Replaced #nicks: %s", body)
+        return body
+
     def learn(self, body):
         "thin wrapper for learn to switch to multiplex mode"
         if not self.settings['multiplex']:
@@ -82,7 +90,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
         else:
             raise NotImplementedError
-        # TODO: replace #nicks here
+
         return reply
 
 
@@ -106,6 +114,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                     msg = self.reply(e.arguments[0].encode('utf-8'))
                     if msg:
                         logger.info("Response: %s", msg)
+                        #replacenicks
+                        msg = self.replace_nicks(msg,e)
                         c.privmsg(e.target, msg)
             body = self.strip_nicks(e.arguments[0], e).encode('utf-8')
             self.learn(body)
