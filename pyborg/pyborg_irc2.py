@@ -100,6 +100,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             self.learn(self.strip_nicks(a[1], e).encode('utf-8'))
             msg = self.reply(a[1].encode('utf-8'))
             if msg:
+                msg = self.replace_nicks(msg,e)
                 logger.info("Response: %s", msg)
                 c.privmsg(e.target, msg)
         else:
