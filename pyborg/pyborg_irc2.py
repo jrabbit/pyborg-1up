@@ -2,6 +2,7 @@
 import logging
 import random
 import ssl
+import sys
 
 import baker
 import irc
@@ -122,7 +123,9 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             self.learn(body)
         return
 
-
+def check_server():
+    response = requests.get("http://localhost:2001/")
+    response.raise_for_status()
 
 @baker.command(default=True, shortopts={"verbose": "v", "debug": "d", "conffile": 'f'})
 def start_irc_bot(verbose=True, debug=False, conffile="example.irc.toml"):
@@ -133,6 +136,14 @@ def start_irc_bot(verbose=True, debug=False, conffile="example.irc.toml"):
         logging.basicConfig(level=logging.INFO)
     pyb = pyborg.pyborg.pyborg
     settings = toml.load(conffile)
+    if settings['multiplex']:
+        try:
+            check_server()
+        except requests.exceptions.ConnectionError:
+            logger.error("Connection to pyborg server failed!")
+            print("Is pyborg_http running?")
+            sys.exit(2)
+
     bot = ModIRC(pyb, settings)
     try:
         bot.start()
