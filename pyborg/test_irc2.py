@@ -61,3 +61,18 @@ class TestReplys(unittest.TestCase):
         learn.assert_called_with(
             our_event.arguments[0].split(":")[1].encode('utf-8'))
         reply.assert_called_with(u" yolo swagins")
+
+    def test_nick_replace(self):
+        mod = pyborg_irc2.ModIRC(pyborg.pyborg.pyborg, self.settings)
+        our_event = irc.client.Event(type=None, source=None, target="#botally")
+        mocked_channel = mock.Mock()
+        mocked_channel.users = mock.Mock()
+        mocked_channel.users.return_value = ["jrabbit"]
+        mod.channels = {"#botally": mocked_channel}
+        msg = "#nick is the best bot maker!"
+        output = mod.replace_nicks(msg, our_event)
+        mocked_channel.users.assert_called_with()
+        self.assertEqual(output, "jrabbit is the best bot maker!")
+
+    # def test_nick_strip(self):
+    #     mod = pyborg_irc2.ModIRC(pyborg.pyborg.pyborg, self.settings)
