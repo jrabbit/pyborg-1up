@@ -27,7 +27,7 @@ def _load_config(filename):
     """
     try:
         f = open(filename, "r")
-    except IOError, e:
+    except IOError as e:
         return None
 
     stuff = {}
@@ -58,8 +58,8 @@ def _load_config(filename):
         try:
             stuff[string.strip(s[0])] = eval(string.strip(string.join(s[1:], "=")))
         except:
-            print "Malformed line in %s line %d" % (filename, line)
-            print "\t%s" %s
+            print("Malformed line in %s line %d" % (filename, line))
+            print("\t%s" %s)
             continue
     return stuff
         

@@ -75,7 +75,7 @@ def filter_message(message, bot):
             message = message[0:i]+message[i+1:]
             # And remove the (
             message = message[0:index]+message[index+1:]
-    except ValueError, e:
+    except ValueError as e:
         pass
 
     message = message.replace(";", ",")
@@ -108,7 +108,7 @@ def filter_message(message, bot):
 
 
 class pyborg(object):
-    import cfgfile
+    from . import cfgfile
 
     ver_string = "I am a version 1.2.0 PyBorg"
     saves_version = "1.2.0"
@@ -160,7 +160,7 @@ class pyborg(object):
         self.unfilterd = {}
 
         # Read the dictionary
-        print "Reading dictionary..."
+        print("Reading dictionary...")
         try:
             zfile = zipfile.ZipFile('archive.zip','r')
             for filename in zfile.namelist():
@@ -168,25 +168,25 @@ class pyborg(object):
                 f = open(filename, 'w+b')
                 f.write(data)
                 f.close()
-        except (EOFError, IOError), e:
-            print "no zip found"
+        except (EOFError, IOError) as e:
+            print("no zip found")
         try:
             with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
                 x = vers.read()
                 if x != self.saves_version:
-                    print "Error loading dictionary\nPlease convert it before launching pyborg"
+                    print("Error loading dictionary\nPlease convert it before launching pyborg")
                     sys.exit(1)
                 self.words = marshal.loads(words.read())
                 self.lines = marshal.loads(lines.read())
-        except (EOFError, IOError), e:
+        except (EOFError, IOError) as e:
             # Create mew database
             self.words = {}
             self.lines = {}
-            print "Error reading saves. New database created."
+            print("Error reading saves. New database created.")
 
         # Is a resizing required?
         if len(self.words) != self.settings.num_words:
-            print "Updating dictionary information..."
+            print("Updating dictionary information...")
             self.settings.num_words = len(self.words)
             num_contexts = 0
             # Get number of contexts
@@ -201,7 +201,7 @@ class pyborg(object):
         for x in self.settings.aliases.keys():
             compteur += len(self.settings.aliases[x])
         if compteur != self.settings.num_aliases:
-            print "check dictionary for new aliases"
+            print("check dictionary for new aliases")
             self.settings.num_aliases = compteur
 
             for x in self.words.keys():
@@ -211,15 +211,15 @@ class pyborg(object):
                         for alias in self.settings.aliases[z]:
                             pattern = "^%s$" % alias
                             if self.re.search(pattern, x):
-                                print "replace %s with %s" %(x, z)
+                                print("replace %s with %s" %(x, z))
                                 self.replace(x, z)
 
             for x in self.words.keys():
                 if not (x in self.settings.aliases.keys()) and x[0] == '~':
-                    print "unlearn %s" % x
+                    print("unlearn %s" % x)
                     self.settings.num_aliases -= 1
                     self.unlearn(x)
-                    print "unlearned aliases %s" % x
+                    print("unlearned aliases %s" % x)
 
 
         #unlearn words in the unlearn.txt file.
@@ -232,7 +232,7 @@ class pyborg(object):
                 if word in self.words:
                     self.unlearn(word)
             f.close()
-        except (EOFError, IOError), e:
+        except (EOFError, IOError) as e:
             # No words to unlearn
             pass
 
@@ -242,7 +242,7 @@ class pyborg(object):
 
     def save_all(self):
         if self.settings.no_save != "True":
-            print "Writing dictionary..."
+            print("Writing dictionary...")
 
             try:
                 zfile = zipfile.ZipFile('archive.zip', 'r')
@@ -252,7 +252,7 @@ class pyborg(object):
                     f.write(data)
                     f.close()
             except (OSError, IOError):
-                print "no zip found. Is the programm launch for first time ?"
+                print("no zip found. Is the programm launch for first time ?")
 
             with open("words.dat", "wb") as f:
                 f.write(marshal.dumps(self.words))
@@ -275,7 +275,7 @@ class pyborg(object):
                 os.remove('lines.dat')
                 os.remove('version')
             except (OSError, IOError):
-                print "could not remove the files"
+                print("could not remove the files")
 
             f = open("words.txt", "w")
             # write each words known
@@ -457,22 +457,22 @@ class pyborg(object):
 
                         # Nasty critical error we should fix
                         if line_idx not in self.lines:
-                            print "Removing broken link '%s' -> %d" % (w, line_idx)
+                            print("Removing broken link '%s' -> %d" % (w, line_idx))
                             num_broken = num_broken + 1
                             del wlist[i]
                         else:
                             # Check pointed to word is correct
                             split_line = self.lines[line_idx][0].split()
                             if split_line[word_num] != w:
-                                print "Line '%s' word %d is not '%s' as expected." % \
+                                print("Line '%s' word %d is not '%s' as expected." % \
                                     (self.lines[line_idx][0],
-                                    word_num, w)
+                                    word_num, w))
                                 num_bad = num_bad + 1
                                 del wlist[i]
                     if len(wlist) == 0:
                         del self.words[w]
                         self.settings.num_words = self.settings.num_words - 1
-                        print "\"%s\" vaped totally" % w
+                        print("\"%s\" vaped totally" % w)
 
                 msg = "Checked dictionary in %0.2fs. Fixed links: %d broken, %d bad." % \
                     (time.time()-t,
@@ -595,7 +595,7 @@ class pyborg(object):
                 if len(c) == 5:
                     return
                 if len(c) > 10:
-                    io_module.output("...("+`len(c)-10`+" skipped)...", args)
+                    io_module.output("...({} skipped)...".format(len(c)-10), args)
                 x = len(c) - 5
                 if x < 5:
                     x = 5
@@ -610,7 +610,7 @@ class pyborg(object):
                 context = context.lower()
                 if context == "":
                     return
-                print "Looking for: "+context
+                print("Looking for: "+context)
                 # Unlearn contexts containing 'context'
                 t = time.time()
                 self.unlearn(context)
@@ -662,7 +662,7 @@ class pyborg(object):
                     try:
                         self.settings.censored.remove(command_list[x].lower())
                         msg = "done"
-                    except ValueError, e:
+                    except ValueError as e:
                         pass
 
             elif command_list[0] == "!alias":
@@ -715,7 +715,7 @@ class pyborg(object):
         """
         try:
             pointers = self.words[old]
-        except KeyError, e:
+        except KeyError as e:
             return old+" not known."
         changed = 0
 
@@ -726,7 +726,7 @@ class pyborg(object):
             number = self.lines[l][1]
             if line[w] != old:
                 # fucked dictionary
-                print "Broken link: %s %s" % (x, self.lines[l][0] )
+                print("Broken link: %s %s" % (x, self.lines[l][0] ))
                 continue
             else:
                 line[w] = new
@@ -782,7 +782,7 @@ class pyborg(object):
             if len(words[x]) == 0:
                 del words[x]
                 self.settings.num_words = self.settings.num_words - 1
-                print "\"%s\" vaped totally" %x
+                print("\"%s\" vaped totally" %x)
 
     def reply(self, body):
         """
@@ -863,7 +863,7 @@ class pyborg(object):
                 cwords = context.split()
                 #if the word is not the first of the context, look the previous one
                 if cwords[w] != word:
-                    print context
+                    print(context)
                 if w:
                     #look if we can found a pair with the choosen word, and the previous one
                     if len(sentence) > 1 and len(cwords) > w+1:
@@ -1041,7 +1041,7 @@ class pyborg(object):
                 for censored in self.settings.censored:
                     pattern = "^%s$" % censored
                     if re.search(pattern, words[x]):
-                        print "Censored word %s" %words[x]
+                        print("Censored word %s" %words[x])
                         return
 
                 if len(words[x]) > 13 \

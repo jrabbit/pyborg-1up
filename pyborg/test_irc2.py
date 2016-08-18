@@ -60,7 +60,7 @@ class TestReplys(unittest.TestCase):
         mod.on_pubmsg(c, our_event)
         learn.assert_called_with(
             our_event.arguments[0].split(":")[1].encode('utf-8'))
-        reply.assert_called_with(u" yolo swagins")
+        reply.assert_called_with(b" yolo swagins")
 
     @mock.patch('random.choice')
     def test_nick_replace(self, patched_choice):
