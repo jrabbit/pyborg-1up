@@ -14,7 +14,6 @@ Notes
 
 Ancient original tarballs may be found at http://download.gna.org/pyborg/
 
-Uses the pure python irc library "irclib" http://python-irclib.sourceforge.net/ (Known to to work with 1.30 {I'm not actually sure of this now})
 
 
 Todo:
