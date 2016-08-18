@@ -21,7 +21,7 @@
 #
 import string
 import sys
-from urllib2 import urlopen
+import requests
 import json
 import time
 from pyborg import pyborg
@@ -39,9 +39,11 @@ class ModRedditIn(object):
         #begin copypasta thanks http://github.com/ketralnis/redditron/blob/master/redditron.py
         url = 'http://www.reddit.com/comments.json?limit=100'
         while True:
-            s = urlopen(url).read().decode('utf8')
+            print("get url")
+            ret = requests.get(url)
+            ret.raise_for_status()
+            js = ret.json
 
-            js = json.loads(s)
             cms = js['data']['children']
             bodies = {}
 
