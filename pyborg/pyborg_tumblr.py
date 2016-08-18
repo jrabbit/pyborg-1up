@@ -38,22 +38,25 @@ class PyborgTumblr(object):
         logger.debug("loaded new posts")
         return new_posts
 
+    def handle_post(self, post):
+        if self.settings['tumblr']['learning']:
+            self.pyborg.learn(post['body'])
+
+        logger.info("found post: \n%s", post['summary'])
+        msg =  self.pyborg.reply(post['summary'])
+        if msg:
+            logger.info("Reblogging with comment: %s", msg)
+            self.client.reblog(self.settings['tumblr']['blog'], id=post['id'], reblog_key=post['reblog_key'], comment=msg)
+        else:
+            logger.info("No comment.")
+
     def start(self):
         while True:
             new_posts = self.load_new_from_tag("hello bill")
             for post in new_posts:
-                if self.settings['tumblr']['learning']:
-                    self.pyborg.learn(post['body'])
-
-                logger.info("found post: \n%s", post['summary'])
-                msg =  self.pyborg.reply(post['summary'])
-                if msg:
-                    logger.info("Reblogging with comment: %s", msg)
-                    self.client.reblog(self.settings['tumblr']['blog'], id=post['id'], reblog_key=post['reblog_key'], comment=msg)
-                else:
-                    logger.info("No comment.")
-
+                self.handle_post()
             time.sleep(self.settings['tumblr']['cooldown'])
+
     def teardown(self):
         self.settings['tumblr']['last_look'] = self.last_look
         with open(self.toml_file, "w") as f:
