@@ -19,9 +19,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-import sys
 import fileinput
+import sys
+
 from pyborg import pyborg
+
 
 class ModFileIn(object):
     """
@@ -51,6 +53,7 @@ class ModFileIn(object):
                 
             except KeyboardInterrupt:
                 # Close database cleanly
+                my_pyborg.save_all()
                 print "Premature termination :-("
             if counter > 1000000:
                 my_pyborg.save_all()
@@ -78,4 +81,3 @@ if __name__ == "__main__":
     ModFileIn(my_pyborg, sys.argv)
     my_pyborg.save_all()
     del my_pyborg
-
