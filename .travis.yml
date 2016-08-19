@@ -6,3 +6,6 @@ python:
 install: pip install tox-travis
 # command to run tests, e.g. python setup.py test
 script:  tox
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
