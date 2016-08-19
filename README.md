@@ -2,6 +2,9 @@
 
 It was originally developed by Tom Morton and Sébastien Dailly.
 
+[![codecov](https://codecov.io/gh/jrabbit/pyborg-1up/branch/master/graph/badge.svg)](https://codecov.io/gh/jrabbit/pyborg-1up)
+[![CIstatus](https://travis-ci.org/jrabbit/pyborg-1up.svg)](https://travis-ci.org/jrabbit/pyborg-1up)
+
 Install
 --------
 We're now on the cheeseshop!
