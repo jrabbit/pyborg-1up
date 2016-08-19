@@ -3,7 +3,7 @@ python:
   - "2.7"
   - "3.5"
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
-install: pip install tox-travis
+install: pip install tox-travis coverage
 # command to run tests, e.g. python setup.py test
 script:  tox
 
