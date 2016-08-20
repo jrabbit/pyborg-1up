@@ -4,7 +4,7 @@ from setuptools import setup
 setup(name="pyborg",
       version="1.2.0b3",
       packages=["pyborg"],
-      scripts=['pyborg-reddit.py',
+      scripts=['pyborg_reddit.py',
                'pyborg-filein.py',
                'pyborg-telnet.py',
                'pyborg-linein.py',
