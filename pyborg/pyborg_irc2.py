@@ -27,27 +27,22 @@ def command(internals=False):
     """Wraps a python function into an irc command"""
     def decorator(wrapped):
         def callback(scanner, name, ob):
-            scanner.registry.add(name, ob)
+            scanner.registry.add(name, ob, internals)
         venusian.attach(wrapped, callback)
-
-        # if internals:
-        #     return partial(wrapped, self.settings['multiplex'],  multi_server="http://localhost:2001/")
-        # else:
-        #     return wrapped
         return wrapped
     return decorator
 
 class Registry(object):
     """Command registry of decorated irc commands"""
-    def __init__(self,):
+    def __init__(self, mod_irc):
         self.registered = {}
-        # self.mod_irc = mod_irc
+        self.mod_irc = mod_irc
 
-    def add(self, name, ob):
-        # if 'internals' in extra:
-        #     self.registered[name] = partial(ob, self.mod_irc.settings['multiplex'],  multi_server="http://localhost:2001/")
-        # else:
-        self.registered[name] = ob
+    def add(self, name, ob, internals):
+        if internals:
+            self.registered[name] = partial(ob, self.mod_irc.settings['multiplex'],  multi_server="http://localhost:2001/")
+        else:
+            self.registered[name] = ob
 
 class ModIRC(irc.bot.SingleServerIRCBot):
 
@@ -68,7 +63,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             self.my_pyborg = my_pyborg()
 
         # IRC Commands setup
-        self.registry = Registry()
+        self.registry = Registry(self)
 
     def scan(self, module=irc_commands):
         self.scanner = venusian.Scanner(registry=self.registry)
@@ -86,7 +81,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         c.nick(c.get_nickname() + "_")
 
     def strip_nicks(self, body, e):
-        "takes a utf-8 body and replaces all nicknames with #nick"
+        """takes a utf-8 body and replaces all nicknames with #nick"""
         # copied from irc mod 1
         for x in self.channels[e.target].users():
             body = body.replace(x, "#nick")
@@ -102,7 +97,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         return body
 
     def learn(self, body):
-        "thin wrapper for learn to switch to multiplex mode"
+        """thin wrapper for learn to switch to multiplex mode"""
         if not self.settings['multiplex']:
             self.my_pyborg.learn(body)
         elif requests:
@@ -199,7 +194,7 @@ def start_irc_bot(verbose=True, debug=False, conffile="example.irc.toml"):
     bot = ModIRC(pyb, settings)
     # Tell the bot to load commands
     bot.scan()
-    logging.info("Command Registry: %s", bot.registry.registered)
+    logging.debug("Command Registry: %s", bot.registry.registered)
     try:
         bot.start()
     except KeyboardInterrupt:
