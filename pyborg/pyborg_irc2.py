@@ -25,20 +25,16 @@ logger = logging.getLogger(__name__)
 
 def command(wrapped):
     """Wraps a python function into an irc command"""
-    def decorator(wrapped):
-        def callback(scanner, name, ob):
-            scanner.registry.add(name, ob)
-        venusian.attach(wrapped, callback)
-        # if internals:
-        #     return partial(wrapped, self.settings['multiplex'],  multi_server="http://localhost:2001/")
-        # else:
-        #     return wrapped
-        return wrapped
-    return decorator
+    def callback(scanner, name, ob):
+        scanner.registry.add(name, ob)
+    venusian.attach(wrapped, callback)
 
-@command
-def func():
-    pass
+    # if internals:
+    #     return partial(wrapped, self.settings['multiplex'],  multi_server="http://localhost:2001/")
+    # else:
+    #     return wrapped
+    return wrapped
+
 
 class Registry(object):
     """Command registry of decorated irc commands"""
