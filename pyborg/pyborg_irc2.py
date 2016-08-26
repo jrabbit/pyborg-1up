@@ -23,18 +23,19 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-def command(wrapped):
+def command(internals=False):
     """Wraps a python function into an irc command"""
-    def callback(scanner, name, ob):
-        scanner.registry.add(name, ob)
-    venusian.attach(wrapped, callback)
+    def decorator(wrapped):
+        def callback(scanner, name, ob):
+            scanner.registry.add(name, ob)
+        venusian.attach(wrapped, callback)
 
-    # if internals:
-    #     return partial(wrapped, self.settings['multiplex'],  multi_server="http://localhost:2001/")
-    # else:
-    #     return wrapped
-    return wrapped
-
+        # if internals:
+        #     return partial(wrapped, self.settings['multiplex'],  multi_server="http://localhost:2001/")
+        # else:
+        #     return wrapped
+        return wrapped
+    return decorator
 
 class Registry(object):
     """Command registry of decorated irc commands"""
@@ -71,10 +72,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
     def scan(self, module=irc_commands):
         self.scanner = venusian.Scanner(registry=self.registry)
-        self.scanner.scan(irc_commands)
+        self.scanner.scan(module)
     
-
-
     def on_welcome(self, c, e):
         logger.info("Connected to IRC server.")
         # stops timeouts

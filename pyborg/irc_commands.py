@@ -9,12 +9,12 @@ from pyborg.pyborg import pyborg
 settings = toml.load("example.irc.toml")
 # modirc = ModIRC(pyb, settings)
 
-@command
+@command()
 def info():
     """Returns version number and source code link"""
     return "{}. My source can be found at https://github.com/jrabbit/pyborg-1up".format(pyborg.ver_string)
 
-@command
+@command(internals=True)
 def words():
     """Returns the number of words known and contexts per word"""
     if settings['multiplex']:
