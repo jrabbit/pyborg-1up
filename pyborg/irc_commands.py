@@ -1,6 +1,6 @@
 import requests
 
-from pyborg_irc2 import command
+from pyborg.util.irc import command
 from pyborg.pyborg import pyborg
 
 
