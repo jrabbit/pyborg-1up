@@ -3,21 +3,39 @@ import logging
 import random
 import ssl
 import sys
+from functools import partial
 
 import baker
 import irc
 import irc.bot
 import irc.strings
+import irc_commands
 import pyborg.pyborg
 import toml
+import venusian
 
 try:
     import requests
 except ImportError:
     requests = None
 
+
 logger = logging.getLogger(__name__)
 
+
+
+
+class Registry(object):
+    """Command registry of decorated irc commands"""
+    def __init__(self, mod_irc):
+        self.registered = {}
+        self.mod_irc = mod_irc
+
+    def add(self, name, ob, internals):
+        if internals:
+            self.registered[name] = partial(ob, self.mod_irc.settings['multiplex'],  multi_server="http://localhost:2001/")
+        else:
+            self.registered[name] = ob
 
 class ModIRC(irc.bot.SingleServerIRCBot):
 
@@ -37,6 +55,13 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         if not self.settings['multiplex']:
             self.my_pyborg = my_pyborg()
 
+        # IRC Commands setup
+        self.registry = Registry(self)
+
+    def scan(self, module=irc_commands):
+        self.scanner = venusian.Scanner(registry=self.registry)
+        self.scanner.scan(module)
+    
     def on_welcome(self, c, e):
         logger.info("Connected to IRC server.")
         # stops timeouts
@@ -49,7 +74,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         c.nick(c.get_nickname() + "_")
 
     def strip_nicks(self, body, e):
-        "takes a utf-8 body and replaces all nicknames with #nick"
+        """takes a utf-8 body and replaces all nicknames with #nick"""
         # copied from irc mod 1
         for x in self.channels[e.target].users():
             body = body.replace(x, "#nick")
@@ -65,7 +90,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         return body
 
     def learn(self, body):
-        "thin wrapper for learn to switch to multiplex mode"
+        """thin wrapper for learn to switch to multiplex mode"""
         if not self.settings['multiplex']:
             self.my_pyborg.learn(body)
         elif requests:
@@ -96,7 +121,21 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 
     def on_pubmsg(self, c, e):
+        if e.arguments[0][0] == "!":
+            command_name = e.arguments[0][1:]
+            if command_name in  ["list", "help"]:
+                help_text = "I have a bunch of commands: "
+                for k, v in self.registry.registered.items():
+                    help_text += "!{}".format(k)
+                c.privmsg(e.target, help_text)
+            else:
+                command = self.registry.registered[command_name]
+                logger.info("Running command %s", command)
+                c.privmsg(e.target, command())
+
         a = e.arguments[0].split(":", 1)
+        # if talked to directly respond
+        # e.g. Pyborg: hello
         if len(a) > 1 and irc.strings.lower(a[0]) == irc.strings.lower(self.connection.get_nickname()):
             self.learn(self.strip_nicks(a[1], e).encode('utf-8'))
             msg = self.reply(a[1].encode('utf-8'))
@@ -105,6 +144,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                 logger.info("Response: %s", msg)
                 c.privmsg(e.target, msg)
         else:
+            # check if we should reply anyways
             chans = {z['chan']:z for z in self.settings['server']['channels']}
             logger.debug(type(e.target))
             if self.settings['speaking'] and chans[e.target.lower()]['speaking']:                
@@ -145,6 +185,9 @@ def start_irc_bot(verbose=True, debug=False, conffile="example.irc.toml"):
             sys.exit(2)
 
     bot = ModIRC(pyb, settings)
+    # Tell the bot to load commands
+    bot.scan()
+    logging.debug("Command Registry: %s", bot.registry.registered)
     try:
         bot.start()
     except KeyboardInterrupt:

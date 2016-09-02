@@ -8,6 +8,7 @@ from pyborg.pyborg import pyborg
 
 our_pyborg = pyborg()
 
+logger = logging.getLogger(__name__)
 
 @bottle.route("/")
 def index():
@@ -49,6 +50,12 @@ def process():
         return io.message
     else:
         return ""
+
+@bottle.route("/words.json")
+def words_json():
+    return {"words": our_pyborg.settings.num_words,
+            "contexts": our_pyborg.settings.num_contexts,
+            "lines": len(our_pyborg.lines)}
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
