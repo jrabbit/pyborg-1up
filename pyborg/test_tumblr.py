@@ -3,9 +3,9 @@ import json
 import sys
 import unittest
 
-import mock
 
 if sys.version_info < (3,):
+    import mock
     import pyborg_tumblr
     class TestLaunch(unittest.TestCase):
         @mock.patch('pyborg_tumblr.PyborgTumblr')
