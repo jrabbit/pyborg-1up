@@ -21,12 +21,14 @@ if sys.version_info < (3,):
             # with self.assertRaises(KeyboardInterrupt):
             pyborg_tumblr.start_tumblr_bot()
             patched_exit.assert_called_once_with()
+            patched_pyb_tumblr.return_value.teardown.assert_called_once_with()
 
         @mock.patch('pyborg_tumblr.PyborgTumblr')
         def test_handle_exception(self, patched_pyb_tumblr):
             patched_pyb_tumblr.return_value.start.side_effect = Exception
             with self.assertRaises(Exception):
                 pyborg_tumblr.start_tumblr_bot()
+            patched_pyb_tumblr.return_value.teardown.assert_called_once_with()
 
             
 

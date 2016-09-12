@@ -86,3 +86,49 @@ class TestReplys(unittest.TestCase):
         msg = "jrabbit is the best bot maker!"
         self.assertEqual(mod.strip_nicks(msg, our_event), "#nick is the best bot maker!")
 
+class TestLaunch(unittest.TestCase):
+    settings = {'multiplex': True,
+            'nickname': 'PyBorg',
+            'password': '',
+            'quitmsg': 'Bye :-(',
+            'realname': 'Pyborg',
+            'reply2ignored': False,
+            'server': {'channels': [{'chan': '#ranarchism',
+                                     'reply_chance': 5,
+                                     'speaking': True},
+                                    {'chan': '#queertoo', 'reply_chance': 5, 'speaking': False}],
+                       'ignorelist': [],
+                       'owners': ['jrabbit'],
+                       'port': 6697,
+                       'server': 'chat.freenode.net',
+                       'ssl': True},
+            'speaking': True,
+            'speakingchans': ['#test'],
+            'stealth': False}
+
+    @mock.patch('pyborg.pyborg.pyborg')
+    @mock.patch('pyborg_irc2.ModIRC')
+    def test_launch(self, patched_pyb_irc, patched_pyb):
+        pyborg_irc2.start_irc_bot()
+        patched_pyb_irc.assert_called_with(patched_pyb, self.settings)
+        patched_pyb_irc.return_value.start.assert_called_with()
+
+    @mock.patch('pyborg_irc2.ModIRC')
+    def test_ctrl_c(self, patched_pyb_irc):
+        patched_pyb_irc.return_value.start.side_effect = KeyboardInterrupt()
+        # with self.assertRaises(KeyboardInterrupt):
+        pyborg_irc2.start_irc_bot()
+        patched_pyb_irc.return_value.teardown.assert_called_once_with()
+        patched_pyb_irc.return_value.disconnect.assert_called_with("Killed at terminal.")
+
+
+    @mock.patch('pyborg_irc2.ModIRC')
+    def test_handle_exception(self, patched_pyb_irc):
+        patched_pyb_irc.return_value.start.side_effect = Exception
+        with self.assertRaises(Exception):
+            pyborg_irc2.start_irc_bot()
+        patched_pyb_irc.return_value.teardown.assert_called_once_with()
+        patched_pyb_irc.return_value.disconnect.assert_called_with("Caught exception")
+
+
+

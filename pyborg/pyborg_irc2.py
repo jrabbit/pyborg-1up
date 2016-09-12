@@ -163,6 +163,11 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             self.learn(body)
         return
 
+    def teardown(self):
+        if not self.settings['multiplex']:
+            bot.my_pyborg.save_all()
+
+
 def check_server():
     response = requests.get("http://localhost:2001/")
     response.raise_for_status()
@@ -191,8 +196,7 @@ def start_irc_bot(verbose=True, debug=False, conffile="example.irc.toml"):
     try:
         bot.start()
     except KeyboardInterrupt:
-        if not bot.settings['multiplex']:
-            bot.my_pyborg.save_all()
+        bot.teardown()
         bot.disconnect("Killed at terminal.")
     except IOError as e:
         if bot.settings['multiplex']:
@@ -202,9 +206,9 @@ def start_irc_bot(verbose=True, debug=False, conffile="example.irc.toml"):
             raise
     except Exception as e:
         logger.exception(e)
-        if not bot.settings['multiplex']:
-            bot.my_pyborg.save_all()
+        bot.teardown()
         bot.disconnect("Caught exception")
+        raise e
 
 if __name__ == '__main__':
     baker.run()
