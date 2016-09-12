@@ -71,6 +71,9 @@ class PyborgDiscord(discord.Client):
                 ret.raise_for_status()
             return reply
 
+    def teardown(self):
+        pass
+
 
 @baker.command(default=True, shortopts={"toml_conf": "f"})
 def start_discord_bot(verbose=True, toml_conf="example.discord.toml"):
