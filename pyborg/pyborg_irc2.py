@@ -129,9 +129,10 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                     help_text += "!{}".format(k)
                 c.privmsg(e.target, help_text)
             else:
-                command = self.registry.registered[command_name]
-                logger.info("Running command %s", command)
-                c.privmsg(e.target, command())
+                if command_name in self.registry.registered:
+                    command = self.registry.registered[command_name]
+                    logger.info("Running command %s", command)
+                    c.privmsg(e.target, command())
 
         a = e.arguments[0].split(":", 1)
         # if talked to directly respond
