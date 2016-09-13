@@ -106,28 +106,35 @@ class TestLaunch(unittest.TestCase):
             'speakingchans': ['#test'],
             'stealth': False}
 
+    @mock.patch('pyborg_irc2.check_server')
+    @mock.patch('toml.load')
     @mock.patch('pyborg.pyborg.pyborg')
     @mock.patch('pyborg_irc2.ModIRC')
-    def test_launch(self, patched_pyb_irc, patched_pyb):
+    def test_launch(self, patched_pyb_irc, patched_pyb, patched_load, patched_check):
+        patched_load.return_value = self.settings
         pyborg_irc2.start_irc_bot()
         patched_pyb_irc.assert_called_with(patched_pyb, self.settings)
         patched_pyb_irc.return_value.start.assert_called_with()
 
+    @mock.patch('pyborg_irc2.check_server')
+    @mock.patch('toml.load')
     @mock.patch('pyborg_irc2.ModIRC')
-    def test_ctrl_c(self, patched_pyb_irc):
-        patched_pyb_irc.return_value.start.side_effect = KeyboardInterrupt()
+    def test_ctrl_c(self, patched_pyb_irc, patched_load, patched_check):
+        patched_pyb_irc.return_value.start.side_effect = KeyboardInterrupt
+        patched_load.return_value = self.settings
         # with self.assertRaises(KeyboardInterrupt):
         pyborg_irc2.start_irc_bot()
         patched_pyb_irc.return_value.teardown.assert_called_once_with()
         patched_pyb_irc.return_value.disconnect.assert_called_with("Killed at terminal.")
 
-
+    @mock.patch('pyborg_irc2.check_server')
+    @mock.patch('toml.load')
     @mock.patch('pyborg_irc2.ModIRC')
-    def test_handle_exception(self, patched_pyb_irc):
+    def test_handle_exception(self, patched_pyb_irc, patched_load, patched_check):
         patched_pyb_irc.return_value.start.side_effect = Exception
         with self.assertRaises(Exception):
             pyborg_irc2.start_irc_bot()
-        patched_pyb_irc.return_value.teardown.assert_called_once_with()
+        # patched_pyb_irc.return_value.teardown.assert_called_once_with()
         patched_pyb_irc.return_value.disconnect.assert_called_with("Caught exception")
 
 
