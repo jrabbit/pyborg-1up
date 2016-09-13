@@ -83,3 +83,27 @@ class TestReplys(unittest.TestCase):
         msg = "jrabbit is the best bot maker!"
         self.assertEqual(mod.strip_nicks(msg, our_event), "#nick is the best bot maker!")
 
+class TestCommandResolution(unittest.TestCase):
+    settings = {'multiplex': True,
+            'nickname': 'PyBorg',
+            'password': '',
+            'quitmsg': 'Bye :-(',
+            'realname': 'Pyborg',
+            'reply2ignored': False,
+            'server': {'channels': [{'chan': '#ranarchism',
+                                     'reply_chance': 5,
+                                     'speaking': True},
+                                    {'chan': '#queertoo', 'reply_chance': 5, 'speaking': False}],
+                       'ignorelist': [],
+                       'owners': ['jrabbit'],
+                       'port': 6697,
+                       'server': 'chat.freenode.net',
+                       'ssl': True},
+            'speaking': True,
+            'speakingchans': ['#test'],
+            'stealth': False}
+
+    def test_bang_bang(self):
+        mod = pyborg_irc2.ModIRC(pyborg.pyborg.pyborg, self.settings)
+        mod.scan()
+        print(mod.registry.registered)
