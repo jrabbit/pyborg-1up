@@ -13,6 +13,8 @@ import pyborg.pyborg
 
 #https://github.com/Rapptz/discord.py/blob/master/discord/ext/commands/bot.py#L146
 
+logger = logging.getLogger(__name__)
+
 class PyborgDiscord(discord.Client):
     """docstring for PyborgDiscord"""
     def __init__(self, toml_file):
@@ -37,12 +39,14 @@ class PyborgDiscord(discord.Client):
         print('------')
 
     async def on_message(self, message):
-        print(message.content)
+        """message.content  ~= <@221134985560588289> you should play dota"""
+        logger.debug(message.content)
+
         if self.settings['discord']['learning']:
             self.learn(message.content)
         if message.content.startswith("<@{}>".format(self.user.id)):
             msg = self.reply(message.content)
-            print(" on message: %s" % msg)
+            logger.debug("on message: %s" % msg)
             if msg:
                 print("Sending message...")
                 await self.send_message(message.channel, msg)
@@ -57,13 +61,12 @@ class PyborgDiscord(discord.Client):
                 ret.raise_for_status()
 
     def reply(self, body):
-        "thin wrapper for reply to switch to multiplex mode"
+        """thin wrapper for reply to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
             ret = requests.post("http://localhost:2001/reply", data={"body": body})
             if ret.status_code == requests.codes.ok:
                 reply = ret.text
-                print("got reply")
-                print(reply)
+                logger.debug("got reply: %s", reply)
             elif ret.status_code > 499:
                 logger.error("Internal Server Error in pyborg_http. see logs.")
                 return
@@ -75,8 +78,10 @@ class PyborgDiscord(discord.Client):
         pass
 
 
-@baker.command(default=True, shortopts={"toml_conf": "f"})
-def start_discord_bot(verbose=True, toml_conf="example.discord.toml"):
+@baker.command(default=True, shortopts={"debug": "d", "verbose": "v", "toml_conf": "f"})
+def start_discord_bot(verbose=True, debug=False, toml_conf="example.discord.toml"):
+    if debug:
+        logging.basicConfig(level=logging.DEBUG)
     if verbose:
         logging.basicConfig(level=logging.INFO)
     bot = PyborgDiscord(toml_conf)

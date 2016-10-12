@@ -1,7 +1,11 @@
+import logging
+
 import requests
 
 from pyborg.util.irc import command
 from pyborg.pyborg import pyborg
+
+logger = logging.getLogger(__name__)
 
 
 @command()
