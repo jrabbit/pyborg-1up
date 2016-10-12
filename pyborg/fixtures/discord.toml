@@ -1,0 +1,5 @@
+[discord]
+learning = true
+token = "FAKETOKEN"
+[pyborg]
+multiplex = true

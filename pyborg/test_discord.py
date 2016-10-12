@@ -1,5 +1,7 @@
 import sys
 import unittest
+import logging
+import asyncio
 
 try:
     from unittest import mock
@@ -8,6 +10,8 @@ except ImportError:
 
 if sys.version_info >= (3,):
     import pyborg_discord
+    logging.basicConfig(level=logging.INFO)
+
     class TestLaunch(unittest.TestCase):
         @mock.patch('pyborg_discord.PyborgDiscord')
         def test_launch(self, patched_pyb_discord):
@@ -34,20 +38,29 @@ if sys.version_info >= (3,):
 
     class TestOnMessage(unittest.TestCase):
         @mock.patch('pyborg_discord.PyborgDiscord')
-        def test_no_reply(self, patched_pyb_discord):
+        async def test_no_reply(self, patched_pyb_discord):
             msg = mock.Mock()
             msg.return_value.content = "Yolo!"
-            our_pybd = pyborg_discord.PyborgDiscord("afake.toml")
-            our_pybd.on_message(msg)
+            our_pybd = pyborg_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
+            await our_pybd.on_message(msg)
             patched_pyb_discord.learn.assert_not_called()
         
-        @mock.patch('pyborg_discord.PyborgDiscord')
-        def test_reply(self, patched_pyb_discord):
+        @mock.patch('pyborg_discord.PyborgDiscord.user', create=True)
+        @mock.patch('pyborg_discord.PyborgDiscord.learn')
+        @mock.patch('pyborg_discord.PyborgDiscord.reply')
+        async def test_reply(self, patched_reply, patched_learn, patched_user):
             msg = mock.Mock()
-            msg.return_value.content = "<@221134985560588289> you should play dota!"
-            our_pybd = pyborg_discord.PyborgDiscord("afake.toml")
-            patched_pyb_discord.user.id = "221134985560588289"
-            our_pybd.on_message(msg)
-            print(our_pybd.settings, our_pybd.toml_file)
+            msg.content = "<@221134985560588289> you should play dota!"
+            patched_user.return_value.id = "221134985560588289"
+            our_pybd = pyborg_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
+            # loop = asyncio.get_event_loop()
+            # loop.run_until_complete(our_pybd.on_message(msg))
+            # loop.close()
+            await our_pybd.on_message(msg)
+            # print(our_pybd.user.id)
             # patched_pyb_discord.user.id.assert_called_once_with()
-            print(patched_pyb_discord.return_value.mock_calls)
+            print(patched_user.mock_calls, patched_user.mock_calls)
+            print(msg.content)
+            patched_learn.assert_called_once_with(msg.content)
+            patched_reply.assert_called_once_with(msg.content)
+

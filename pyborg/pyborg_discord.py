@@ -39,9 +39,10 @@ class PyborgDiscord(discord.Client):
         print('------')
 
     async def on_message(self, message):
+        print("enter on_message")
         """message.content  ~= <@221134985560588289> you should play dota"""
         logger.debug(message.content)
-
+        print(message.content)
         if self.settings['discord']['learning']:
             self.learn(message.content)
         if message.content.startswith("<@{}>".format(self.user.id)):
