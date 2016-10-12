@@ -43,5 +43,11 @@ if sys.version_info >= (3,):
         
         @mock.patch('pyborg_discord.PyborgDiscord')
         def test_reply(self, patched_pyb_discord):
-            pass
-            
+            msg = mock.Mock()
+            msg.return_value.content = "<@221134985560588289> you should play dota!"
+            our_pybd = pyborg_discord.PyborgDiscord("afake.toml")
+            patched_pyb_discord.user.id = "221134985560588289"
+            our_pybd.on_message(msg)
+            print(our_pybd.settings, our_pybd.toml_file)
+            # patched_pyb_discord.user.id.assert_called_once_with()
+            print(patched_pyb_discord.return_value.mock_calls)
