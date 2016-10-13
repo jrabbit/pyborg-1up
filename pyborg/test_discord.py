@@ -1,7 +1,6 @@
 import sys
 import unittest
 import logging
-import asyncio
 
 try:
     from unittest import mock
@@ -10,6 +9,8 @@ except ImportError:
 
 if sys.version_info >= (3,):
     import pyborg_discord
+    import asyncio
+
     logging.basicConfig(level=logging.INFO)
 
     class TestLaunch(unittest.TestCase):
@@ -37,30 +38,38 @@ if sys.version_info >= (3,):
             patched_pyb_discord.return_value.teardown.assert_called_once_with()
 
     class TestOnMessage(unittest.TestCase):
-        @mock.patch('pyborg_discord.PyborgDiscord')
-        async def test_no_reply(self, patched_pyb_discord):
+        def setUp(self):
+           self.loop = asyncio.new_event_loop()
+           asyncio.set_event_loop(self.loop)
+        
+        def tearDown(self):
+            self.loop.close()
+
+        @mock.patch('pyborg_discord.PyborgDiscord.user', create=True)
+        @mock.patch('pyborg_discord.PyborgDiscord.learn')
+        @mock.patch('pyborg_discord.PyborgDiscord.reply')
+        def test_no_reply(self, patched_reply, patched_learn, patched_user):
             msg = mock.Mock()
-            msg.return_value.content = "Yolo!"
+            msg.content = "Yolo!"
             our_pybd = pyborg_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
-            await our_pybd.on_message(msg)
-            patched_pyb_discord.learn.assert_not_called()
+            self.loop.run_until_complete(our_pybd.on_message(msg))
+            patched_reply.assert_not_called()
         
         @mock.patch('pyborg_discord.PyborgDiscord.user', create=True)
         @mock.patch('pyborg_discord.PyborgDiscord.learn')
         @mock.patch('pyborg_discord.PyborgDiscord.reply')
-        async def test_reply(self, patched_reply, patched_learn, patched_user):
+        def test_reply(self, patched_reply, patched_learn, patched_user):
             msg = mock.Mock()
             msg.content = "<@221134985560588289> you should play dota!"
             patched_user.return_value.id = "221134985560588289"
             our_pybd = pyborg_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
-            # loop = asyncio.get_event_loop()
-            # loop.run_until_complete(our_pybd.on_message(msg))
-            # loop.close()
-            await our_pybd.on_message(msg)
+            patched_reply.return_value = "I should play dota!"
+            self.loop.run_until_complete(our_pybd.on_message(msg))
+            # await our_pybd.on_message(msg)
             # print(our_pybd.user.id)
             # patched_pyb_discord.user.id.assert_called_once_with()
             print(patched_user.mock_calls, patched_user.mock_calls)
             print(msg.content)
-            patched_learn.assert_called_once_with(msg.content)
-            patched_reply.assert_called_once_with(msg.content)
+            patched_learn.assert_called_once_with("you should play dota!")
+            patched_reply.assert_called_once_with("you should play dota!")
 
