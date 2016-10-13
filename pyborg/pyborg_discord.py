@@ -38,15 +38,17 @@ class PyborgDiscord(discord.Client):
         print(self.user.id)
         print('------')
 
+    def clean_msg(self, message):
+        return ' '.join(message.content.split()[1:])
+
     async def on_message(self, message):
-        print("enter on_message")
         """message.content  ~= <@221134985560588289> you should play dota"""
         logger.debug(message.content)
-        print(message.content)
         if self.settings['discord']['learning']:
             self.learn(message.content)
         if message.content.startswith("<@{}>".format(self.user.id)):
-            msg = self.reply(message.content)
+            clean = self.clean_msg(message)
+            msg = self.reply(clean)
             logger.debug("on message: %s" % msg)
             if msg:
                 print("Sending message...")

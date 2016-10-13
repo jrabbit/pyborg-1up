@@ -37,6 +37,9 @@ if sys.version_info >= (3,):
                 pyborg_discord.start_discord_bot()
             patched_pyb_discord.return_value.teardown.assert_called_once_with()
 
+    async def do_nothing(channel, msg):
+        await asyncio.sleep(1)
+
     class TestOnMessage(unittest.TestCase):
         def setUp(self):
            self.loop = asyncio.new_event_loop()
@@ -55,21 +58,25 @@ if sys.version_info >= (3,):
             self.loop.run_until_complete(our_pybd.on_message(msg))
             patched_reply.assert_not_called()
         
+        @mock.patch('pyborg_discord.PyborgDiscord.clean_msg')
         @mock.patch('pyborg_discord.PyborgDiscord.user', create=True)
         @mock.patch('pyborg_discord.PyborgDiscord.learn')
         @mock.patch('pyborg_discord.PyborgDiscord.reply')
-        def test_reply(self, patched_reply, patched_learn, patched_user):
-            msg = mock.Mock()
-            msg.content = "<@221134985560588289> you should play dota!"
+        def test_reply(self, patched_reply, patched_learn, patched_user, patched_clean):
+            msg = mock.MagicMock()
+            msg.content.return_value = "<@221134985560588289> you should play dota!"
+            msg.channel.return_value = "maketotaldestroy"
             patched_user.return_value.id = "221134985560588289"
-            our_pybd = pyborg_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
             patched_reply.return_value = "I should play dota!"
+
+            our_pybd = pyborg_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
+            our_pybd.send_message = do_nothing
+            
             self.loop.run_until_complete(our_pybd.on_message(msg))
-            # await our_pybd.on_message(msg)
             # print(our_pybd.user.id)
-            # patched_pyb_discord.user.id.assert_called_once_with()
-            print(patched_user.mock_calls, patched_user.mock_calls)
-            print(msg.content)
-            patched_learn.assert_called_once_with("you should play dota!")
-            patched_reply.assert_called_once_with("you should play dota!")
+            # patched_user.id.assert_called_once_with()
+            print(patched_reply.mock_calls, patched_learn.mock_calls)
+            # print(patched_send.mock_calls)
+            patched_learn.assert_called_once_with(msg.content)
+            patched_reply.assert_called_once_with(patched_clean.return_value)
 
