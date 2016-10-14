@@ -7,7 +7,7 @@ It was originally developed by Tom Morton and Sébastien Dailly.
 
 Install
 --------
-We're now on the cheeseshop!
+We're now on the cheeseshop! Yay!
 
 `pip install pyborg`
 
