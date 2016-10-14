@@ -8,8 +8,10 @@ except ImportError:
     import mock
 
 if sys.version_info >= (3,):
-    import pyborg_discord
     import asyncio
+
+    import pyborg_discord
+    from pyborg.util.utils_testing import do_nothing
 
     logging.basicConfig(level=logging.INFO)
 
@@ -37,8 +39,6 @@ if sys.version_info >= (3,):
                 pyborg_discord.start_discord_bot()
             patched_pyb_discord.return_value.teardown.assert_called_once_with()
 
-    async def do_nothing(channel, msg):
-        await asyncio.sleep(1)
 
     class TestOnMessage(unittest.TestCase):
         def setUp(self):
