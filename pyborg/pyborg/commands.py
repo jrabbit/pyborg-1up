@@ -22,8 +22,14 @@ def words(multiplex, multi_server):
         ret = requests.get(multi_server+"words.json")
         ret.raise_for_status()
         words = ret.json()
-        contexts_per_word = float(words["words"]) / float(words["contexts"])
+        try:
+            contexts_per_word = float(words["words"]) / float(words["contexts"])
+
+        except ZeroDivisionError:
+            contexts_per_word = 0
+
         msg = "I know %d words (%d contexts, %.2f per word), %d lines." % (words["words"], words["contexts"], contexts_per_word, words["lines"])
         return msg
+
     else:
         raise NotImplementedError
