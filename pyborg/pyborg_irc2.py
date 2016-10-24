@@ -9,7 +9,7 @@ import baker
 import irc
 import irc.bot
 import irc.strings
-import irc_commands
+import pyborg.commands
 import pyborg.pyborg
 import toml
 import venusian
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class Registry(object):
-    """Command registry of decorated irc commands"""
+    """Command registry of decorated pyborg commands"""
     def __init__(self, mod_irc):
         self.registered = {}
         self.mod_irc = mod_irc
@@ -58,7 +58,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         # IRC Commands setup
         self.registry = Registry(self)
 
-    def scan(self, module=irc_commands):
+    def scan(self, module=pyborg.commands):
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
     

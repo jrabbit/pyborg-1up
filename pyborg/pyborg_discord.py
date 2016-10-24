@@ -1,19 +1,33 @@
-import sys
+import asyncio
 import logging
+import sys
+from functools import partial
 
 import arrow
-import requests
 import baker
-import toml
-
 import discord
-import asyncio
+import requests
+import toml
+import venusian
 
-import pyborg.pyborg
+import pyborg.commands
 
 #https://github.com/Rapptz/discord.py/blob/master/discord/ext/commands/bot.py#L146
 
 logger = logging.getLogger(__name__)
+
+class Registry(object):
+    """Command registry of decorated pyborg commands"""
+    def __init__(self, mod):
+        self.registered = {}
+        self.mod = mod
+
+    def add(self, name, ob, internals):
+        if internals:
+            self.registered[name] = partial(ob, self.mod.multiplexing,  multi_server="http://localhost:2001/")
+        else:
+            self.registered[name] = ob
+
 
 class PyborgDiscord(discord.Client):
     """docstring for PyborgDiscord"""
@@ -22,6 +36,7 @@ class PyborgDiscord(discord.Client):
         self.toml_file = toml_file
         self.settings = toml.load(self.toml_file)
         self.multiplexing = self.settings['pyborg']['multiplex']
+        self.registry = Registry(self)
         if not self.multiplexing:
             # self.pyborg = pyborg.pyborg.pyborg()
             # pyb config parsing isn't ready for python 3.
@@ -30,6 +45,7 @@ class PyborgDiscord(discord.Client):
             self.pyborg = None
 
     def our_start(self):
+        self.scan()
         self.run(self.settings['discord']['token'])
 
     async def on_ready(self):
@@ -44,6 +60,19 @@ class PyborgDiscord(discord.Client):
     async def on_message(self, message):
         """message.content  ~= <@221134985560588289> you should play dota"""
         logger.debug(message.content)
+        if message.content[0] == "!":
+            command_name = message.content[1:]
+            if command_name in  ["list", "help"]:
+                help_text = "I have a bunch of commands: "
+                for k, v in self.registry.registered.items():
+                    help_text += "!{}".format(k)
+                await self.send_message(message.channel, help_text)
+            else:
+                if command_name in self.registry.registered:
+                    command = self.registry.registered[command_name]
+                    logger.info("Running command %s", command)
+                    await self.send_message(message.channel, command())
+        
         if self.settings['discord']['learning']:
             self.learn(message.content)
         if message.content.startswith("<@{}>".format(self.user.id)):
@@ -80,6 +109,9 @@ class PyborgDiscord(discord.Client):
     def teardown(self):
         pass
 
+    def scan(self, module=pyborg.commands):
+        self.scanner = venusian.Scanner(registry=self.registry)
+        self.scanner.scan(module)
 
 @baker.command(default=True, shortopts={"debug": "d", "verbose": "v", "toml_conf": "f"})
 def start_discord_bot(verbose=True, debug=False, toml_conf="example.discord.toml"):
