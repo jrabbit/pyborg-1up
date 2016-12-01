@@ -66,8 +66,11 @@ if sys.version_info >= (3,):
             msg = mock.MagicMock()
             msg.content.return_value = "<@221134985560588289> you should play dota!"
             msg.channel.return_value = "maketotaldestroy"
+            msg.author.mention.return_value = "<@42303631157544375>"
+
             patched_user.return_value.id = "221134985560588289"
             patched_reply.return_value = "I should play dota!"
+            patched_reply.replace.return_value = "I should play dota!" 
 
             our_pybd = pyborg_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
             our_pybd.send_message = do_nothing

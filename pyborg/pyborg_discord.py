@@ -80,9 +80,8 @@ class PyborgDiscord(discord.Client):
             msg = self.reply(clean)
             logger.debug("on message: %s" % msg)
             if msg:
-                print("Sending message...")
-
-                msg = msg.replace("#nick", message.author.mention)
+                logger.debug("Sending message...")
+                msg = msg.replace("#nick", str(message.author.mention))
                 await self.send_message(message.channel, msg)
 
     def learn(self, body):
