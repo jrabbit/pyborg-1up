@@ -58,6 +58,9 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         # IRC Commands setup
         self.registry = Registry(self)
 
+        # load per server settings
+        self.chans = {z['chan']:z for z in self.settings['server']['channels']}
+
     def scan(self, module=pyborg.commands):
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
@@ -121,6 +124,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
 
     def on_pubmsg(self, c, e):
+        if e.source.nick in  self.settings['server']['ignorelist']:
+            return
         if e.arguments[0][0] == "!":
             command_name = e.arguments[0][1:]
             if command_name in  ["list", "help"]:
@@ -146,10 +151,10 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                 c.privmsg(e.target, msg)
         else:
             # check if we should reply anyways
-            chans = {z['chan']:z for z in self.settings['server']['channels']}
+            
             logger.debug(type(e.target))
-            if self.settings['speaking'] and chans[e.target.lower()]['speaking']:                
-                reply_chance_inverse = 100 - chans[e.target.lower()]['reply_chance']
+            if self.settings['speaking'] and self.chans[e.target.lower()]['speaking']:                
+                reply_chance_inverse = 100 - self.chans[e.target.lower()]['reply_chance']
                 logger.debug("Inverse Reply Chance = %d", reply_chance_inverse)
                 rnd = random.uniform(0,100)
                 logger.debug("Random float: %d", rnd)

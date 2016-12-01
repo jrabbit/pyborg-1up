@@ -29,11 +29,12 @@ class TestReplys(unittest.TestCase):
                                          'reply_chance': 5,
                                          'speaking': True},
                                         {'chan': '#queertoo', 'reply_chance': 5, 'speaking': False}],
-                           'ignorelist': [],
                            'owners': ['jrabbit'],
                            'port': 6697,
                            'server': 'chat.freenode.net',
-                           'ssl': True},
+                           'ssl': True,
+                           'ignorelist': ['title'],
+                           },
                 'speaking': True,
                 'speakingchans': ['#test'],
                 'stealth': False}
@@ -43,8 +44,10 @@ class TestReplys(unittest.TestCase):
     @mock.patch('irc.connection')
     def test_respond(self, c, learn, stripnicks):
         mod = pyborg_irc2.ModIRC(pyborg.pyborg.pyborg, self.settings)
+        src = mock.Mock()
+        src.nick.return_value = "foobar"
         our_event = irc.client.Event(
-            type=None, source=None, target=u"#ranarchism", arguments=[u"Hello Pyborg"])
+            type=None, source=src, target=u"#ranarchism", arguments=[u"Hello Pyborg"])
         mod.on_pubmsg(c, our_event)
         learn.assert_called_with(our_event.arguments[0].encode('utf-8'))
 
@@ -58,12 +61,33 @@ class TestReplys(unittest.TestCase):
         nick = 'steve'
         # c.get_nickname.return_value = "steve"
         mod.connection.real_nickname = nick
+        src = mock.Mock()
+        src.nick.return_value = "foobar"
         our_event = irc.client.Event(
-            type=None, source=None, target=None, arguments=[u'%s: yolo swagins' % nick])
+            type=None, source=src, target=None, arguments=[u'%s: yolo swagins' % nick])
         mod.on_pubmsg(c, our_event)
         learn.assert_called_with(
             our_event.arguments[0].split(":")[1].encode('utf-8'))
         reply.assert_called_with(b" yolo swagins")
+
+
+    @mock.patch('pyborg_irc2.ModIRC.strip_nicks', side_effect=lambda x, _: x)
+    @mock.patch('pyborg_irc2.ModIRC.reply')
+    @mock.patch('pyborg_irc2.ModIRC.learn')
+    @mock.patch('irc.connection')
+    def test_ignore_reply(self, c, learn, reply, stripnicks):
+        mod = pyborg_irc2.ModIRC(pyborg.pyborg.pyborg, self.settings)
+        # nick = mod.connection.get_nickname()
+        nick = 'steve'
+        # c.get_nickname.return_value = "steve"
+        mod.connection.real_nickname = nick
+        src = mock.Mock()
+        src.nick = "title"
+        our_event = irc.client.Event(
+            type=None, source=src, target="#ranarchism", arguments=[u'yolo swagins'])
+        mod.on_pubmsg(c, our_event)
+        learn.assert_not_called()
+        reply.assert_not_called()
 
     @mock.patch('random.choice')
     def test_nick_replace(self, patched_choice):
@@ -85,6 +109,8 @@ class TestReplys(unittest.TestCase):
         mod.channels = {"#botally": mocked_channel}
         msg = "jrabbit is the best bot maker!"
         self.assertEqual(mod.strip_nicks(msg, our_event), "#nick is the best bot maker!")
+
+
 
 class TestLaunch(unittest.TestCase):
     settings = {'multiplex': True,
