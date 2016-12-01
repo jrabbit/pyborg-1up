@@ -78,8 +78,29 @@ if sys.version_info >= (3,):
             self.loop.run_until_complete(our_pybd.on_message(msg))
             # print(our_pybd.user.id)
             # patched_user.id.assert_called_once_with()
-            print(patched_reply.mock_calls, patched_learn.mock_calls)
+            # print(patched_reply.mock_calls, patched_learn.mock_calls)
             # print(patched_send.mock_calls)
             patched_learn.assert_called_once_with(msg.content)
             patched_reply.assert_called_once_with(patched_clean.return_value)
 
+
+        @mock.patch('pyborg_discord.PyborgDiscord.clean_msg')
+        @mock.patch('pyborg_discord.PyborgDiscord.user', create=True)
+        @mock.patch('pyborg_discord.PyborgDiscord.learn')
+        @mock.patch('pyborg_discord.PyborgDiscord.reply')
+        def test_nick_replace(self, patched_reply, patched_learn, patched_user, patched_clean):
+            msg = mock.MagicMock()
+            msg.content.return_value = "<@221134985560588289> you should play dota!"
+            msg.channel.return_value = "maketotaldestroy"
+            msg.author.mention.return_value = "<@42303631157544375>"
+
+            patched_user.return_value.id = "221134985560588289"
+            patched_reply.return_value = "I should play dota! #nick"
+            patched_reply.replace.return_value = "I should play dota! <@42303631157544375>" 
+
+            our_pybd = pyborg_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
+            our_pybd.send_message = do_nothing
+            
+            self.loop.run_until_complete(our_pybd.on_message(msg))
+            patched_learn.assert_called_once_with(msg.content)
+            patched_reply.assert_called_once_with(patched_clean.return_value)
