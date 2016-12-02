@@ -38,6 +38,8 @@ from zlib import crc32
 
 import marshal  # buffered marshal is bloody fast. wish i'd found this before :)
 
+import toml
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -107,6 +109,22 @@ def filter_message(message, bot):
     return message
 
 
+class FakeCfg(object):
+    """fake it until you make it"""
+    def __init__(self):
+        self.num_words = 6003
+        self.aliases = {}
+        self.num_aliases = 0
+        self.censored = []
+        self.no_save = False
+        self.num_contexts = 26505
+        self.max_words = 6000
+        self.ignore_list = []
+
+    def save(*args):
+        pass
+        
+
 class pyborg(object):
     from . import cfgfile
 
@@ -140,23 +158,24 @@ class pyborg(object):
         Open the dictionary. Resize as required.
         """
         # Attempt to load settings
-        self.settings = self.cfgfile.cfgset()
-        self.settings.load("pyborg.cfg",
-            { "num_contexts": ("Total word contexts", 0),
-              "num_words":  ("Total unique words known", 0),
-              "max_words":  ("max limits in the number of words known", 6000),
-              "learning":   ("Allow the bot to learn", 1),
-              "ignore_list":("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
-              "censored":   ("Don't learn the sentence if one of those words is found", []),
-              "num_aliases":("Total of aliases known", 0),
-              "aliases":    ("A list of similars words", {}),
-              "no_save" :("If True, Pyborg don't saves the dictionary and configuration on disk", "False")
-            } )
-
-        self.answers = self.cfgfile.cfgset()
-        self.answers.load("answers.txt",
-            { "sentences":  ("A list of prepared answers", {})
-            } )
+        # self.settings = toml.load("example.pyborg.toml")
+        # self.settings = self.cfgfile.cfgset()
+        # self.settings.load("pyborg.cfg",
+        #     { "num_contexts": ("Total word contexts", 0),
+        #       "num_words":  ("Total unique words known", 0),
+        #       "max_words":  ("max limits in the number of words known", 6000),
+        #       "learning":   ("Allow the bot to learn", 1),
+        #       "ignore_list":("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
+        #       "censored":   ("Don't learn the sentence if one of those words is found", []),
+        #       "num_aliases":("Total of aliases known", 0),
+        #       "aliases":    ("A list of similars words", {}),
+        #       "no_save" :("If True, Pyborg don't saves the dictionary and configuration on disk", "False")
+        #     } )
+        self.settings = FakeCfg()
+        # self.answers = self.cfgfile.cfgset()
+        # self.answers.load("answers.txt",
+        #     { "sentences":  ("A list of prepared answers", {})
+        #     } )
         self.unfilterd = {}
 
         # Read the dictionary
@@ -283,7 +302,7 @@ class pyborg(object):
             # Sort the list befor to export
             for key in self.words.keys():
                 wordlist.append([key, len(self.words[key])])
-            wordlist.sort(lambda x, y: cmp(x[1], y[1]))
+            wordlist.sort(key=lambda x, y: cmp(x[1], y[1]))
             map((lambda x: f.write(str(x[0])+"\n\r")), wordlist)
             f.close()
 
