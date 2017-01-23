@@ -120,6 +120,7 @@ class FakeCfg(object):
         self.num_contexts = 26505
         self.max_words = 6000
         self.ignore_list = []
+        self.learning = True
 
     def save(*args):
         pass
@@ -192,8 +193,10 @@ class pyborg(object):
         try:
             with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
                 x = vers.read()
+                logger.debug("Saves Version: %s", x)
                 if x != self.saves_version:
                     print("Error loading dictionary\nPlease convert it before launching pyborg")
+                    logger.debug("Pyborg version: %s", self.saves_version)
                     sys.exit(1)
                 self.words = marshal.loads(words.read())
                 self.lines = marshal.loads(lines.read())
@@ -852,7 +855,9 @@ class pyborg(object):
                 ret = 1
             return ret
         if nltk:
+            # uses punkt 
             tokenized = nltk.word_tokenize(body)
+            # uses averaged_perceptron_tagger
             tagged = nltk.pos_tag(tokenized)
             logging.info(tagged)
             weighted_choices = [(word, weight(pos)) for word, pos in tagged]

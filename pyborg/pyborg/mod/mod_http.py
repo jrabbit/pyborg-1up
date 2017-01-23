@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 our_pyborg = pyborg()
 
-
 @bottle.route("/")
 def index():
     return "<h1>Welcome to Pyborg/http</h1>"
@@ -58,7 +57,10 @@ def words_json():
             "contexts": our_pyborg.settings.num_contexts,
             "lines": len(our_pyborg.lines)}
 
+def save():
+    our_pyborg.save_all()
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     bottle.run(host="localhost", port=2001, reloader=True)
-    our_pyborg.save_all()
+    save()
