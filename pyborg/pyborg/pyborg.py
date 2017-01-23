@@ -305,7 +305,7 @@ class pyborg(object):
             # Sort the list befor to export
             for key in self.words.keys():
                 wordlist.append([key, len(self.words[key])])
-            wordlist.sort(key=lambda x, y: cmp(x[1], y[1]))
+            wordlist.sort(key=lambda x: x[1])
             map((lambda x: f.write(str(x[0])+"\n\r")), wordlist)
             f.close()
 
@@ -315,7 +315,8 @@ class pyborg(object):
             # Sort the list befor to export
             for key in self.unfilterd.keys():
                 wordlist.append([key, self.unfilterd[key]])
-            wordlist.sort(lambda x, y: cmp(y[1], x[1]))
+            # wordlist.sort(lambda x, y: cmp(y[1], x[1]))
+            wordlist.sort(key=lambda x: x[1])
             map((lambda x: f.write(str(x[0])+"\n")), wordlist)
             f.close()
 
