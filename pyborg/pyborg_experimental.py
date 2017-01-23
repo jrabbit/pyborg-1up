@@ -1,5 +1,6 @@
 import logging
 import sys
+import os
 
 import click
 import toml
@@ -33,7 +34,7 @@ def check_server():
     response.raise_for_status()
 
 @cli_base.command()
-@click.option("--conf-file", default="example.irc.toml")
+@click.option("--conf-file", type=click.Path(), default=os.path.join(folder,"example.irc.toml"))
 def irc(conf_file):
     pyb = pyborg.pyborg.pyborg
     settings = toml.load(conf_file)
@@ -66,7 +67,7 @@ def irc(conf_file):
         raise e
 
 @cli_base.command()
-@click.option("--conf-file", default="example.tumblr.toml")
+@click.option("--conf-file", type=click.Path(), default=os.path.join(folder,"example.tumblr.toml"))
 def tumblr(conf_file):
     bot = PyborgTumblr(conf_file)
     try:
@@ -87,7 +88,7 @@ def http(reloader, port, host):
     save()
 
 @cli_base.command()
-@click.option("--conf-file", default="example.discord.toml")
+@click.option("--conf-file", type=click.Path() default=os.path.join(folder,"example.discord.toml"))
 def discord(conf_file):
     bot = PyborgDiscord(conf_file)
     try:
