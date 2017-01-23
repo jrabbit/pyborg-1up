@@ -97,11 +97,11 @@ def discord(conf_file):
         raise
 
 @cli_base.command()
-def reddit()
+def reddit():
     pass
 
 @cli_base.command()
-def linein()
+def linein():
     pass
 
 
