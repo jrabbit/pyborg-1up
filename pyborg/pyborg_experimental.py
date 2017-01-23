@@ -16,6 +16,7 @@ if sys.version_info >= (3,):
 
 logger = logging.getLogger(__name__)
 
+folder = click.get_app_dir("Pyborg")
 
 @click.group()
 @click.option('--debug', default=False)
@@ -78,9 +79,11 @@ def tumblr(conf_file):
         raise
 
 @cli_base.command()
+@click.option("--host", default="localhost")
+@click.option("--port", default=2001)
 @click.option("--reloader", default=False)
-def http(reloader):
-    bottle.run(host="localhost", port=2001, reloader=reloader)
+def http(reloader, port, host):
+    bottle.run(host=host, port=port, reloader=reloader)
     save()
 
 @cli_base.command()
