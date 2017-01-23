@@ -7,7 +7,12 @@ import requests
 import pyborg
 import pyborg.pyborg
 from pyborg.mod.mod_irc import ModIRC
-from pyborg.mod.mod_http import bottle, save
+if sys.version_info <= (3,):
+    from pyborg.mod.mod_http import bottle, save
+    from pyborg.mod.mod_tumblr import PyborgTumblr
+
+if sys.version_info >= (3,):
+    from pyborg.mod.mod_discord import PyborgDiscord
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +64,18 @@ def irc(conf_file):
         bot.disconnect("Caught exception")
         raise e
 
+@cli_base.command()
+@click.option("--conf-file", default="example.tumblr.toml")
+def tumblr(conf_file):
+    bot = PyborgTumblr(conf_file)
+    try:
+        bot.start()
+    except KeyboardInterrupt:
+        bot.teardown()
+        sys.exit()
+    except Exception:
+        bot.teardown()
+        raise
 
 @cli_base.command()
 @click.option("--reloader", default=False)
@@ -66,6 +83,26 @@ def http(reloader):
     bottle.run(host="localhost", port=2001, reloader=reloader)
     save()
 
+@cli_base.command()
+@click.option("--conf-file", default="example.discord.toml")
+def discord(conf_file):
+    bot = PyborgDiscord(conf_file)
+    try:
+        bot.our_start()
+    except KeyboardInterrupt:
+        bot.teardown()
+        sys.exit()
+    except Exception:
+        bot.teardown()
+        raise
+
+@cli_base.command()
+def reddit()
+    pass
+
+@cli_base.command()
+def linein()
+    pass
 
 
 if __name__ == '__main__':

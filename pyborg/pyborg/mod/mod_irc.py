@@ -82,7 +82,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
     def replace_nicks(self, body, e):
         if "#nick" in body:
             #wtf do we want here
-            randuser = random.choice(self.channels[e.target].users())
+            randuser = random.choice(list(self.channels[e.target].users()))
             body = body.replace("#nick", randuser)
             logger.debug("Replaced #nicks: %s", body)
         return body
