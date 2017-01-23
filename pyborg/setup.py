@@ -20,6 +20,10 @@ setup(name="pyborg",
       install_requires=["irc==14.2.2", "toml", "baker==1.3",
                         "arrow==0.7.0", "PyTumblr==0.0.6", "requests", "bottle",
                         "venusian", "click"],
+      entry_points='''
+          [console_scripts]
+          pyborg=pyborg_experimental:cli_base
+      ''',
       url="https://github.com/jrabbit/pyborg-1up/",
       classifiers=["License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
                    "Topic :: Communications :: Chat :: Internet Relay Chat",
