@@ -30,4 +30,3 @@ Todo:
 
 * spelling or better heuristics
 * graphing and visualization of the database
-* Move to irclib? (mutli server capable, or make pyborg thread-able.)
