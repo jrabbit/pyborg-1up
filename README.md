@@ -19,6 +19,12 @@ Ancient original tarballs may be found at http://download.gna.org/pyborg/
 
 
 
+Suggested NLTK data
+-------------------
+
+Pyborg can use nltk tagging and tokenizing when installed and configured. Tagging requires `averaged_perceptron_tagger` and tokenization requires `punkt`.
+
+
 Todo:
 -----
 
