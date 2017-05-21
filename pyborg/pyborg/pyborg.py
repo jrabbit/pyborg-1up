@@ -195,12 +195,14 @@ class pyborg(object):
                 f.close()
         except (EOFError, IOError) as e:
             print("no zip found")
+            logger.info("No archive.zip found.")
         try:
             with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
                 x = vers.read()
                 logger.debug("Saves Version: %s", x)
                 if x != self.saves_version:
                     print("Error loading dictionary\nPlease convert it before launching pyborg")
+                    logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
                     logger.debug("Pyborg version: %s", self.saves_version)
                     sys.exit(1)
                 self.words = marshal.loads(words.read())
