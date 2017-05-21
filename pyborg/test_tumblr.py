@@ -6,31 +6,8 @@ import unittest
 
 if sys.version_info < (3,):
     import mock
-    import pyborg_tumblr
-    class TestLaunch(unittest.TestCase):
-        @mock.patch('pyborg_tumblr.PyborgTumblr')
-        def test_launch(self, patched_pyb_tumblr):
-            pyborg_tumblr.start_tumblr_bot()
-            patched_pyb_tumblr.assert_called_with('example.tumblr.toml')
-            patched_pyb_tumblr.return_value.start.assert_called_with()
-
-        @mock.patch('sys.exit')
-        @mock.patch('pyborg_tumblr.PyborgTumblr')
-        def test_ctrl_c(self, patched_pyb_tumblr, patched_exit):
-            patched_pyb_tumblr.return_value.start.side_effect = KeyboardInterrupt()
-            # with self.assertRaises(KeyboardInterrupt):
-            pyborg_tumblr.start_tumblr_bot()
-            patched_exit.assert_called_once_with()
-            patched_pyb_tumblr.return_value.teardown.assert_called_once_with()
-
-        @mock.patch('pyborg_tumblr.PyborgTumblr')
-        def test_handle_exception(self, patched_pyb_tumblr):
-            patched_pyb_tumblr.return_value.start.side_effect = Exception
-            with self.assertRaises(Exception):
-                pyborg_tumblr.start_tumblr_bot()
-            patched_pyb_tumblr.return_value.teardown.assert_called_once_with()
-
-            
+    import pyborg
+       
 
     class TestBot(unittest.TestCase):
         settings = {'auth': {'consumer_key': 'KEY',
@@ -48,12 +25,12 @@ if sys.version_info < (3,):
             posts = json.load(fixture_f)
 
         @mock.patch('pyborg.pyborg.pyborg')
-        @mock.patch('pyborg_tumblr.logger.info')
+        @mock.patch('pyborg.mod.mod_tumblr.logger.info')
         @mock.patch('pyborg.pyborg.pyborg.reply')
         @mock.patch('toml.load')
         def test_handle_post(self, patched_load, patched_pyborg, patched_info, pybpybpyb):
             patched_load.return_value = self.settings
-            mod = pyborg_tumblr.PyborgTumblr("bogus.toml")
+            mod = pyborg.mod.mod_tumblr.PyborgTumblr("bogus.toml")
 
             # patched_new.return_value = {}
             # mod.start()
@@ -69,30 +46,30 @@ if sys.version_info < (3,):
         def test_load_new(self, patched_load, pybpybpyb, patched_tagged):
             patched_load.return_value = self.settings
             patched_tagged.return_value = self.posts
-            mod = pyborg_tumblr.PyborgTumblr("bogus.toml")
+            mod = pyborg.mod.mod_tumblr.PyborgTumblr("bogus.toml")
             ret = mod.load_new_from_tag("hello bill")
             patched_tagged.assert_called_once_with("hello bill")
             # self.assertEqual(ret, )
 
         @mock.patch('time.sleep')
-        @mock.patch('pyborg_tumblr.PyborgTumblr.load_new_from_tag')
+        @mock.patch('pyborg.mod.mod_tumblr.PyborgTumblr.load_new_from_tag')
         @mock.patch('pyborg.pyborg.pyborg')
         @mock.patch('toml.load')
         def test_start(self, patched_load, pybpybpyb, patched_new, patched_sleep):
             patched_load.return_value = self.settings
-            mod = pyborg_tumblr.PyborgTumblr("bogus.toml")
+            mod = pyborg.mod.mod_tumblr.PyborgTumblr("bogus.toml")
             patched_sleep.side_effect = StopIteration
             with self.assertRaises(StopIteration):
                 mod.start()
             patched_sleep.assert_called_once_with(self.settings['tumblr']['cooldown'])
 
         @mock.patch('toml.dump')
-        @mock.patch('pyborg_tumblr.open')
+        @mock.patch('pyborg.mod.mod_tumblr.open')
         @mock.patch('pyborg.pyborg.pyborg')
         @mock.patch('toml.load')
         def test_teardown(self, patched_load, pybpybpyb, patched_open, patched_dump):
             patched_load.return_value = self.settings
-            mod = pyborg_tumblr.PyborgTumblr("bogus.toml")
+            mod = pyborg.mod.mod_tumblr.PyborgTumblr("bogus.toml")
             mod.teardown()
             patched_open.assert_called_once_with("bogus.toml", "w")
             # patched_dump.assert_called_once_with(self.settings, patched_open)
