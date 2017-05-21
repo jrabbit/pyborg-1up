@@ -2,7 +2,7 @@
 
 from setuptools import setup
 setup(name="pyborg",
-      version="1.2.0b5",
+      version="1.2.0b6",
       packages=["pyborg", "pyborg.util", "pyborg.mod"],
       scripts=['pyborg_reddit.py',
                'pyborg-filein.py',
@@ -17,8 +17,8 @@ setup(name="pyborg",
       author_email="jackjrabbit@gmail.com",
       description="Markov chain bot for irc which generates replies to messages",
       license="GPL v2 or later",
-      install_requires=["irc==14.2.2", "toml", "baker==1.3",
-                        "arrow==0.7.0", "PyTumblr==0.0.6", "requests", "bottle",
+      install_requires=["irc==15.1.1", "toml", "baker==1.3",
+                        "arrow==0.10.0", "PyTumblr==0.0.6", "requests", "bottle",
                         "venusian", "click"],
       entry_points='''
           [console_scripts]
