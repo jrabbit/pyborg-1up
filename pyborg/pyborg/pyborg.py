@@ -124,12 +124,16 @@ class FakeCfg(object):
 
     def save(*args):
         pass
-        
+
+class FakeAns(object):
+    """this is a cool thing"""
+    def __init__(self):
+        self.sentences = {}
 
 class pyborg(object):
     from . import cfgfile
 
-    ver_string = "I am a version 1.2.0 PyBorg"
+    ver_string = "I am a version 1.3.0 PyBorg"
     saves_version = "1.2.0"
 
     # Main command list
@@ -177,6 +181,7 @@ class pyborg(object):
         # self.answers.load("answers.txt",
         #     { "sentences":  ("A list of prepared answers", {})
         #     } )
+        self.answers =  FakeAns()
         self.unfilterd = {}
 
         # Read the dictionary

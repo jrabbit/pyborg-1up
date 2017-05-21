@@ -8,6 +8,8 @@ import pyborg
 import pyborg.pyborg
 from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_reddit import PyborgReddit
+from pyborg.mod.mod_linein import ModLineIn
+
 
 if sys.version_info <= (3,):
     from pyborg.mod.mod_http import bottle, save
@@ -115,8 +117,15 @@ def reddit(conf_file):
         raise
 
 @cli_base.command()
-def linein():
-    pass
+@click.option("--multiplex", default=True)
+def linein(multiplex):
+    my_pyborg = pyborg.pyborg
+    try:
+        ModLineIn(my_pyborg, multiplex)
+    except SystemExit:
+        pass
+    if not multiplex:
+        my_pyborg.save_all()
 
 
 if __name__ == '__main__':
