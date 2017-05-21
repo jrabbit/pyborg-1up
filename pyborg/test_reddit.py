@@ -7,6 +7,7 @@ except ImportError:
 
 import pyborg_reddit
 
+@unittest.skip
 class TestLaunch(unittest.TestCase):
     @mock.patch('pyborg_reddit.PyborgReddit')
     def test_launch(self, patched_pyb_reddit):

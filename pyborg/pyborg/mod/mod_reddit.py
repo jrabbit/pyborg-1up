@@ -1,8 +1,7 @@
-#!/usr/bin/env python
 #
 # PyBorg reddit file input module
 #
-# Copyright (c) 2000, 2006, 2010 Tom Morton, Sebastien Dailly, Jrabbit
+# Copyright (c) 2000, 2006, 2010-2017 Tom Morton, Sebastien Dailly, Jrabbit
 #
 #
 # This program is free software; you can redistribute it and/or
@@ -33,7 +32,6 @@ from pyborg import pyborg
 
 logger = logging.getLogger(__name__)
 
-
 class PyborgReddit(object):
 
     """Takes a toml config file path"""
@@ -45,7 +43,7 @@ class PyborgReddit(object):
         self.last_look = arrow.get(self.settings['reddit']['last_look'])
         self.multiplexing = self.settings['pyborg']['multiplex']
         self.url = 'http://www.reddit.com/comments.json?limit=100'
-        self.headers = {'user-agent': 'pyborg for reddit/0.0.2 pyborg/1.2.0'}
+        self.headers = {'user-agent': 'pyborg for reddit/0.0.2 pyborg/1.3.0'}
 
         if not self.multiplexing:
             self.pyborg = pyborg.pyborg()
@@ -66,7 +64,8 @@ class PyborgReddit(object):
     def handle_post(self, post):
         if self.settings['reddit']['learning']:
             if not self.multiplexing:
-                post_clean = pyborg.filter_message(post['body'], self.pyborg)
+                post_extract = post['data']['body'].encode('utf8')
+                post_clean = pyborg.filter_message(post_extract, self.pyborg) # this expects a clean ascii string?
                 self.pyborg.learn(post_clean)
             else:
                 raise NotImplementedError
@@ -88,23 +87,3 @@ class PyborgReddit(object):
             self.pyborg.save_all()
             print("I know {} words ({} lines) now.".format(self.pyborg.settings.num_words, len(self.pyborg.lines)))
 
-
-
-
-
-@baker.command(default=True, shortopts={"toml_conf": "f"})
-def start_reddit_bot(verbose=True, toml_conf="pyborg.reddit.toml"):
-    if verbose:
-        logging.basicConfig(level=logging.INFO)
-    bot = PyborgReddit(toml_conf)
-    try:
-        bot.start()
-    except KeyboardInterrupt:
-        bot.teardown()
-        sys.exit()
-    except Exception:
-        bot.teardown()
-        raise
-
-if __name__ == '__main__':
-    baker.run()

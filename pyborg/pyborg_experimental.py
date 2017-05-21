@@ -7,6 +7,8 @@ import requests
 import pyborg
 import pyborg.pyborg
 from pyborg.mod.mod_irc import ModIRC
+from pyborg.mod.mod_reddit import PyborgReddit
+
 if sys.version_info <= (3,):
     from pyborg.mod.mod_http import bottle, save
     from pyborg.mod.mod_tumblr import PyborgTumblr
@@ -56,7 +58,7 @@ def irc(conf_file):
     except IOError as e:
         if bot.settings['multiplex']:
             logger.error(e)
-            logger.info("Is pyborg_http running?")
+            logger.info("Is pyborg http running?")
         else:
             raise
     except Exception as e:
@@ -102,7 +104,15 @@ def discord(conf_file):
 @cli_base.command()
 @click.option("--conf-file", default="pyborg.reddit.toml")
 def reddit(conf_file):
-    pass
+    bot = PyborgReddit(conf_file)
+    try:
+        bot.start()
+    except KeyboardInterrupt:
+        bot.teardown()
+        sys.exit()
+    except Exception:
+        bot.teardown()
+        raise
 
 @cli_base.command()
 def linein():
