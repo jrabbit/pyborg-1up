@@ -2,7 +2,7 @@
 
 from setuptools import setup
 setup(name="pyborg",
-      version="1.2.0b6",
+      version="1.3.0b1",
       packages=["pyborg", "pyborg.util", "pyborg.mod"],
       scripts=['pyborg_reddit.py',
                'pyborg-filein.py',
@@ -10,7 +10,6 @@ setup(name="pyborg",
                'pyborg-linein.py',
                'pyborg-irc.py',
                'pyborg-bigfilein.py',
-               'pyborg_irc2.py',
                'pyborg_tumblr.py',
                'pyborg_experimental.py'],
       author="Jack Laxson",

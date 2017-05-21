@@ -100,7 +100,8 @@ def discord(conf_file):
         raise
 
 @cli_base.command()
-def reddit():
+@click.option("--conf-file", default="pyborg.reddit.toml")
+def reddit(conf_file):
     pass
 
 @cli_base.command()
