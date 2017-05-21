@@ -5,7 +5,7 @@ try:
 except ImportError:
     import mock
 
-import pyborg_reddit
+# import pyborg_reddit
 
 @unittest.skip
 class TestLaunch(unittest.TestCase):

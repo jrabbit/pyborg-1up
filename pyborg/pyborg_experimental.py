@@ -93,6 +93,9 @@ def http(reloader, port, host):
 @cli_base.command()
 @click.option("--conf-file", default="example.discord.toml")
 def discord(conf_file):
+    if sys.version_info <= (3,):
+        print("You are trying to run the discord mod under python 2. \nThis won't work. Please use python 3.")
+        sys.exit(6)
     bot = PyborgDiscord(conf_file)
     try:
         bot.our_start()
@@ -126,6 +129,8 @@ def linein(multiplex):
         pass
     if not multiplex:
         my_pyborg.save_all()
+
+
 
 
 if __name__ == '__main__':
