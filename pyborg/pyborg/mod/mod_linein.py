@@ -46,15 +46,15 @@ class ModLineIn(object):
         self.start()
 
     def start(self):
-        print "PyBorg offline chat!\n"
-        print "Type !quit to leave"
-        print "What is your name"
+        print("PyBorg offline chat!\n")
+        print("Type !quit to leave")
+        print("What is your name")
         self.name = raw_input("? ")
         while 1:
             try:
                 body = raw_input("> ")
-            except (KeyboardInterrupt, EOFError), e:
-                print
+            except (KeyboardInterrupt, EOFError) as e:
+                print()
                 return
             if body == "":
                 continue
@@ -82,4 +82,4 @@ class ModLineIn(object):
         Output a line of text.
         """
         message = message.replace("#nick", self.name)
-        print message
+        print(message)
