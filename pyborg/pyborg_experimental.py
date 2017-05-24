@@ -1,15 +1,19 @@
+import json
 import logging
+import os
+import shutil
 import sys
+import time
+import datetime
 
 import click
-import toml
-import requests
 import pyborg
 import pyborg.pyborg
+import requests
+import toml
 from pyborg.mod.mod_irc import ModIRC
-from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.mod.mod_linein import ModLineIn
-
+from pyborg.mod.mod_reddit import PyborgReddit
 
 if sys.version_info <= (3,):
     from pyborg.mod.mod_http import bottle, save
@@ -22,6 +26,8 @@ logger = logging.getLogger(__name__)
 
 folder = click.get_app_dir("Pyborg")
 
+
+
 @click.group()
 @click.option('--debug', default=False)
 @click.option('--verbose/--silent', default=True)
@@ -32,8 +38,37 @@ def cli_base(verbose, debug):
     if verbose:
         logging.basicConfig(level=logging.INFO)
 
-def check_server():
-    response = requests.get("http://localhost:2001/")
+@cli_base.group()
+def brain():
+    "Pyborg brain (archive.zip) utils"
+    pass
+
+@brain.command()
+def list():
+    "print out the pyborg brains (archive.zip)s info"
+    print(os.listdir(os.path.join(folder,"brains")))
+
+@brain.command()
+@click.option('--output', type=click.Path())
+@click.argument('target_brain', default="current")
+def backup(target_brain, output):
+    if target_brain == "current":
+        target = os.path.join(folder, "brains", "archive.zip")
+    backup_name = datetime.datetime.now().strftime("pyborg-%m-%d-%y-archive")
+    if output is None:
+        output  = os.path.join(folder, "brains", "{}.zip".format(backup_name))
+    shutil.copy2(target, output)
+
+@brain.command()
+def stats():
+    pyb = pyborg.pyborg.pyborg()
+    print(json.dumps({"words": pyb.settings.num_words,
+            "contexts": pyb.settings.num_contexts,
+            "lines": len(pyb.lines)}))
+
+
+def check_server(server):
+    response = requests.get("http://{}:2001/".format(server))
     response.raise_for_status()
 
 @cli_base.command()
@@ -43,7 +78,7 @@ def irc(conf_file):
     settings = toml.load(conf_file)
     if settings['multiplex']:
         try:
-            check_server()
+            check_server(settings['multiplex_server'])
         except requests.exceptions.ConnectionError:
             logger.error("Connection to pyborg server failed!")
             print("Is pyborg_http running?")
@@ -134,5 +169,6 @@ def linein(multiplex):
 
 
 if __name__ == '__main__':
-    # cli = click.CommandCollection(sources=[cli_base])
+    # use this if we want to import third party commands or something
+    # cli = click.CommandCollection(sources=[cli_base, brain])
     cli_base()

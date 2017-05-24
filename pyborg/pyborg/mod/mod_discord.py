@@ -24,7 +24,7 @@ class Registry(object):
 
     def add(self, name, ob, internals):
         if internals:
-            self.registered[name] = partial(ob, self.mod.multiplexing,  multi_server="http://localhost:2001/")
+            self.registered[name] = partial(ob, self.mod.multiplexing,  multi_server="http://{}:2001/".format(self.mod.multi_server))
         else:
             self.registered[name] = ob
 
@@ -36,6 +36,7 @@ class PyborgDiscord(discord.Client):
         self.toml_file = toml_file
         self.settings = toml.load(self.toml_file)
         self.multiplexing = self.settings['pyborg']['multiplex']
+        self.multi_server = self.settings['pyborg']['multiplex_server']
         self.registry = Registry(self)
         if not self.multiplexing:
             # self.pyborg = pyborg.pyborg.pyborg()
@@ -46,7 +47,10 @@ class PyborgDiscord(discord.Client):
 
     def our_start(self):
         self.scan()
-        self.run(self.settings['discord']['token'])
+        if 'token' in self.settings['discord']:
+            self.run(self.settings['discord']['token'])
+        else:
+            logger.error("No Token. Set one in your conf file.")
 
     async def on_ready(self):
         print('Logged in as')
@@ -87,7 +91,7 @@ class PyborgDiscord(discord.Client):
     def learn(self, body):
         """thin wrapper for learn to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
-            ret = requests.post("http://localhost:2001/learn", data={"body": body})
+            ret = requests.post("http://{}:2001/learn".format(self.multi_server), data={"body": body})
             if ret.status_code > 499:
                 logger.error("Internal Server Error in pyborg_http. see logs.")
             else:
@@ -96,7 +100,7 @@ class PyborgDiscord(discord.Client):
     def reply(self, body):
         """thin wrapper for reply to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
-            ret = requests.post("http://localhost:2001/reply", data={"body": body})
+            ret = requests.post("http://{}:2001/reply".format(self.multi_server), data={"body": body})
             if ret.status_code == requests.codes.ok:
                 reply = ret.text
                 logger.debug("got reply: %s", reply)
