@@ -16,7 +16,6 @@ from pyborg.mod.mod_linein import ModLineIn
 from pyborg.mod.mod_reddit import PyborgReddit
 
 if sys.version_info <= (3,):
-    from pyborg.mod.mod_http import bottle, save
     from pyborg.mod.mod_tumblr import PyborgTumblr
 
 if sys.version_info >= (3,):
@@ -150,6 +149,7 @@ def tumblr(conf_file):
 @click.option("--port", default=2001)
 @click.option("--reloader", default=False)
 def http(reloader, port, host):
+    from pyborg.mod.mod_http import bottle, save
     bottle.run(host=host, port=port, reloader=reloader)
     save()
 
