@@ -26,7 +26,12 @@ logger = logging.getLogger(__name__)
 
 folder = click.get_app_dir("Pyborg")
 
-
+def mk_folder():
+    try:
+        os.makedirs(os.path.join(folder, "brains"))
+        logger.info("pyborg folder created.")
+    except OSError:
+        logger.info("pyborg folder already exists.")
 
 @click.group()
 @click.option('--debug', default=False)
@@ -46,12 +51,15 @@ def brain():
 @brain.command()
 def list():
     "print out the pyborg brains (archive.zip)s info"
-    print(os.listdir(os.path.join(folder,"brains")))
+    print(os.path.join(folder,"brains")+":")
+    for x in os.listdir(os.path.join(folder,"brains")):
+        print("\t"+x)
 
 @brain.command()
 @click.option('--output', type=click.Path())
 @click.argument('target_brain', default="current")
 def backup(target_brain, output):
+    "Backup a specific brain"
     if target_brain == "current":
         target = os.path.join(folder, "brains", "archive.zip")
     backup_name = datetime.datetime.now().strftime("pyborg-%m-%d-%y-archive")
@@ -60,11 +68,31 @@ def backup(target_brain, output):
     shutil.copy2(target, output)
 
 @brain.command()
-def stats():
-    pyb = pyborg.pyborg.pyborg()
-    print(json.dumps({"words": pyb.settings.num_words,
-            "contexts": pyb.settings.num_contexts,
-            "lines": len(pyb.lines)}))
+@click.argument('target_brain', default="current")
+def stats(target_brain):
+    "Get stats about a brain"
+    if target_brain == "current":
+        pyb = pyborg.pyborg.pyborg()
+        print(json.dumps({"words": pyb.settings.num_words,
+                "contexts": pyb.settings.num_contexts,
+                "lines": len(pyb.lines)}))
+    else:
+        raise NotImplementedError
+
+
+@brain.command("import")
+@click.argument('target_brain', type=click.Path(exists=True), default="archive.zip")
+@click.option('--tag')
+def convert(target_brain, tag):
+    "move your brain to the new central location"
+    mk_folder()
+    if tag == None:
+        tag_name = datetime.datetime.now().strftime("pyborg-%m-%d-%y-import-archive")
+    else:
+        tag_name = tag
+    output  = os.path.join(folder, "brains", "{}.zip".format(tag_name))
+    shutil.copy2(target_brain, output)
+    print("Imported your archive.zip as {}".format(output))
 
 
 def check_server(server):
