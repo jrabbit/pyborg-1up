@@ -22,7 +22,6 @@
 import string
 import sys
 
-import baker
 import requests
 
 from pyborg import pyborg
@@ -76,6 +75,9 @@ class ModLineIn(object):
 
         if command_list[0] == "!quit":
             sys.exit(0)
+
+    def save(self):
+        self.pyborg.save_all()
 
     def output(self, message, args):
         """

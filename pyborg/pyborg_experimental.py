@@ -185,15 +185,15 @@ def reddit(conf_file):
         raise
 
 @cli_base.command()
-@click.option("--multiplex", default=True)
+@click.option("--multiplex", default=True, type=click.BOOL)
 def linein(multiplex):
-    my_pyborg = pyborg.pyborg
+    my_pyborg = pyborg.pyborg.pyborg
     try:
-        ModLineIn(my_pyborg, multiplex)
+        mod = ModLineIn(my_pyborg, multiplex)
     except SystemExit:
         pass
     if not multiplex:
-        my_pyborg.save_all()
+        mod.save()
 
 
 
