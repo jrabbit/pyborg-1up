@@ -149,13 +149,15 @@ def tumblr(conf_file):
 @click.option("--port", default=2001)
 @click.option("--reloader", default=False)
 def http(reloader, port, host):
-    from pyborg.mod.mod_http import bottle, save
+    "Run a server for mutliheaded (multiplex) pyborg"
+    from pyborg.mod.mod_http import bottle, save_all
     bottle.run(host=host, port=port, reloader=reloader)
     save()
 
 @cli_base.command()
 @click.option("--conf-file", default="example.discord.toml")
 def discord(conf_file):
+    "Run the discord client (needs python3)"
     if sys.version_info <= (3,):
         print("You are trying to run the discord mod under python 2. \nThis won't work. Please use python 3.")
         sys.exit(6)

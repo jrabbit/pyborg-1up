@@ -18,14 +18,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
+import json
+import logging
 import string
 import sys
-import requests
-import json
 import time
-import logging
+
 import arrow
-import baker
+import requests
 import toml
 
 from pyborg import pyborg
@@ -42,6 +42,7 @@ class PyborgReddit(object):
 
         self.last_look = arrow.get(self.settings['reddit']['last_look'])
         self.multiplexing = self.settings['pyborg']['multiplex']
+        self.hate_filter_off = self.settings['reddit']['hate_filter_disable']
         self.url = 'http://www.reddit.com/comments.json?limit=100'
         self.headers = {'user-agent': 'pyborg for reddit/0.0.2 pyborg/1.3.0'}
 
@@ -86,4 +87,3 @@ class PyborgReddit(object):
         if not self.multiplexing:
             self.pyborg.save_all()
             print("I know {} words ({} lines) now.".format(self.pyborg.settings.num_words, len(self.pyborg.lines)))
-
