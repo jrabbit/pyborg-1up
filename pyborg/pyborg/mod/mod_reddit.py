@@ -29,6 +29,7 @@ import requests
 import toml
 
 from pyborg import pyborg
+from pyborg.util.hate_filter import SUBREDDIT_HATE_LIST
 
 logger = logging.getLogger(__name__)
 
@@ -52,11 +53,12 @@ class PyborgReddit(object):
             self.pyborg = None
 
     def load_new_comments(self):
+        logger.info("Loading new comments from reddit")
         ret = requests.get(self.url, headers=self.headers)
         ret.raise_for_status()
         js = ret.json()
         comments = js['data']['children']
-        print(comments[0])
+        # print(comments[0])
         new_posts = filter( lambda x: arrow.get(x['data']['created_utc']) > self.last_look, comments)
         self.last_look = arrow.utcnow()
         logger.debug("loaded new comments")
@@ -72,12 +74,24 @@ class PyborgReddit(object):
                 raise NotImplementedError
 
         # replies not supported yet!
+
+    def post_is_clean(self, post):
+        if post['data']['subreddit'] in SUBREDDIT_HATE_LIST:
+            return False
+        else:
+            return True
+
     def start(self):
         print("I knew {} words ({} lines) before reading Reddit.com".format(self.pyborg.settings.num_words, len(self.pyborg.lines)))
         while True:
             new_posts = self.load_new_comments()
             for post in new_posts:
-                self.handle_post(post)
+                if self.hate_filter_off:
+                    self.handle_post(post)
+                elif self.post_is_clean(post):
+                    self.handle_post(post)
+                else:
+                    logger.info("Excluding comment from filtered subreddit")
             time.sleep(self.settings['reddit']['cooldown'])
 
     def teardown(self):
