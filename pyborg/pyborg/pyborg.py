@@ -37,8 +37,6 @@ import zipfile
 from random import randint
 from zlib import crc32
 
-import toml
-
 logger = logging.getLogger(__name__)
 
 try:
@@ -77,7 +75,7 @@ def filter_message(message, bot):
             # And remove the (
             message = message[0:index]+message[index+1:]
     except ValueError as e:
-        pass
+        logger.debug(e)
 
     message = message.replace(";", ",")
     message = message.replace("?", " ? ")
@@ -88,12 +86,12 @@ def filter_message(message, bot):
     message = message.replace(":", " : ")
 
     # Find ! and ? and append full stops.
-#   message = message.replace(". ", ".. ")
-#   message = message.replace("? ", "?. ")
-#   message = message.replace("! ", "!. ")
+    #   message = message.replace(". ", ".. ")
+    #   message = message.replace("? ", "?. ")
+    #   message = message.replace("! ", "!. ")
 
-    #And correct the '...'
-#   message = message.replace("..  ..  .. ", ".... ")
+    #   And correct the '...'
+    #   message = message.replace("..  ..  .. ", ".... ")
 
     words = message.split()
     for x in xrange(0, len(words)):
@@ -121,7 +119,7 @@ class FakeCfg(object):
         self.ignore_list = []
         self.learning = True
 
-    def save(*args):
+    def save(self, *args):
         pass
 
 class FakeAns(object):
@@ -157,7 +155,7 @@ class pyborg(object):
         "owner": "Usage : !owner password\nAdd the user in the owner list"
     }
 
-    def __init__(self):
+    def __init__(self, brain=None):
         """
         Open the dictionary. Resize as required.
         """
@@ -185,16 +183,22 @@ class pyborg(object):
 
         # Read the dictionary
         print("Reading dictionary...")
+        if brain is None:
+            self.brain_path = 'archive.zip'
+        else:
+            self.brain_path = brain
+
         try:
-            zfile = zipfile.ZipFile('archive.zip','r')
+            zfile = zipfile.ZipFile(self.brain_path,'r')
             for filename in zfile.namelist():
                 data = zfile.read(filename)
                 f = open(filename, 'w+b')
                 f.write(data)
                 f.close()
         except (EOFError, IOError) as e:
+            logger.debug(e)
             print("no zip found")
-            logger.info("No archive.zip found.")
+            logger.info("No archive.zip (pyborg brain) found.")
         try:
             with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
                 x = vers.read()
@@ -273,7 +277,7 @@ class pyborg(object):
             print("Writing dictionary...")
 
             try:
-                zfile = zipfile.ZipFile('archive.zip', 'r')
+                zfile = zipfile.ZipFile(self.brain_path, 'r')
                 for filename in zfile.namelist():
                     data = zfile.read(filename)
                     f = open(filename, 'w+b')
@@ -293,7 +297,7 @@ class pyborg(object):
                 f.write(self.saves_version)
 
             # zip the files
-            with zipfile.ZipFile("archive.zip", "w") as f:
+            with zipfile.ZipFile(self.brain_path, "w") as f:
                 f.write('words.dat')
                 f.write('lines.dat')
                 f.write('version')

@@ -4,6 +4,8 @@ import os
 import shutil
 import sys
 import datetime
+import pickle
+import zipfile
 
 import click
 import pyborg
@@ -75,7 +77,11 @@ def stats(target_brain):
                 "contexts": pyb.settings.num_contexts,
                 "lines": len(pyb.lines)}))
     else:
-        raise NotImplementedError
+        brain_path = os.path.join(folder, "brains", target_brain)
+        pyb = pyborg.pyborg.pyborg(brain=brain_path)
+        print(json.dumps({"words": pyb.settings.num_words,
+                "contexts": pyb.settings.num_contexts,
+                "lines": len(pyb.lines)}))
 
 
 @brain.command("import")
@@ -91,6 +97,42 @@ def convert(target_brain, tag):
     output  = os.path.join(folder, "brains", "{}.zip".format(tag_name))
     shutil.copy2(target_brain, output)
     print("Imported your archive.zip as {}".format(output))
+
+@brain.command("upgrade")
+@click.argument('target_brain', default="current")
+def upgrade_to_pickle(target_brain):
+    try:
+        os.makedirs(os.path.join(folder, "tmp"))
+    except OSError:
+        # Do nothing.
+        pass
+    if target_brain == "current":
+        brain_path = "archive.zip"
+    else:
+        brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
+    _pyb = pyborg.pyborg.pyborg(brain=brain_path)
+    words = _pyb.words
+    lines = _pyb.lines
+    # version = ???
+    with open(os.path.join(folder, "tmp", "words.pkl"), 'wb') as w:
+        pickle.dump(words, w)
+    with open(os.path.join(folder, "tmp", "lines.pkl"), 'wb') as l:
+        pickle.dump(lines, l)
+    with open(os.path.join(folder, "tmp", "version.pkl"), 'wb') as v:
+        pickle.dump(_pyb.saves_version, v)
+
+    with zipfile.ZipFile("current.pybrain.zip", "w") as f:
+        f.write(os.path.join(folder, "tmp",'words.pkl'), 'words.pkl')
+        f.write(os.path.join(folder, "tmp",'lines.pkl'), 'lines.pkl')
+        f.write(os.path.join(folder, "tmp",'version.pkl'), 'version.pkl')
+    try:
+        os.remove(os.path.join(folder, "tmp",'words.pkl'))
+        os.remove(os.path.join(folder, "tmp", 'lines.pkl'))
+        os.remove(os.path.join(folder, "tmp",'version.pkl'))
+    except (OSError, IOError):
+        logger.error("could not remove the files")
+
+
 
 
 def check_server(server):
@@ -149,9 +191,9 @@ def tumblr(conf_file):
 @click.option("--reloader", default=False)
 def http(reloader, port, host):
     "Run a server for mutliheaded (multiplex) pyborg"
-    from pyborg.mod.mod_http import bottle, save_all
+    from pyborg.mod.mod_http import bottle, save
     bottle.run(host=host, port=port, reloader=reloader)
-    save_all()
+    save()
 
 @cli_base.command()
 @click.option("--conf-file", default="example.discord.toml")
