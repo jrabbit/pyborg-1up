@@ -11,7 +11,8 @@ our_pyborg = pyborg()
 
 @bottle.route("/")
 def index():
-    return "<h1>Welcome to Pyborg/http</h1>"
+    return """<h1>Welcome to Pyborg/http</h1>
+    <h2>{}</h2>""".format(our_pyborg.ver_string)
 
 # Basic API
 
