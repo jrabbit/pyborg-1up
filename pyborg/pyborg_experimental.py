@@ -3,7 +3,6 @@ import logging
 import os
 import shutil
 import sys
-import time
 import datetime
 
 import click
@@ -47,8 +46,8 @@ def brain():
     "Pyborg brain (archive.zip) utils"
     pass
 
-@brain.command()
-def list():
+@brain.command("list")
+def list_brains():
     "print out the pyborg brains (archive.zip)s info"
     print(os.path.join(folder,"brains")+":")
     for x in os.listdir(os.path.join(folder,"brains")):
@@ -85,7 +84,7 @@ def stats(target_brain):
 def convert(target_brain, tag):
     "move your brain to the new central location"
     mk_folder()
-    if tag == None:
+    if tag is None:
         tag_name = datetime.datetime.now().strftime("pyborg-%m-%d-%y-import-archive")
     else:
         tag_name = tag
@@ -152,7 +151,7 @@ def http(reloader, port, host):
     "Run a server for mutliheaded (multiplex) pyborg"
     from pyborg.mod.mod_http import bottle, save_all
     bottle.run(host=host, port=port, reloader=reloader)
-    save()
+    save_all()
 
 @cli_base.command()
 @click.option("--conf-file", default="example.discord.toml")
@@ -201,4 +200,4 @@ def linein(multiplex):
 if __name__ == '__main__':
     # use this if we want to import third party commands or something
     # cli = click.CommandCollection(sources=[cli_base, brain])
-    cli_base()
+    cli_base() # noqa

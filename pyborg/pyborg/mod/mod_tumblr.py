@@ -1,9 +1,7 @@
 import time
-import sys
 import logging
 
 import arrow
-import baker
 import pytumblr
 import toml
 
@@ -53,7 +51,7 @@ class PyborgTumblr(object):
         while True:
             new_posts = self.load_new_from_tag("hello bill")
             for post in new_posts:
-                self.handle_post()
+                self.handle_post(post)
             time.sleep(self.settings['tumblr']['cooldown'])
 
     def teardown(self):
