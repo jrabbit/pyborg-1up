@@ -18,10 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-import json
 import logging
-import string
-import sys
 import time
 
 import arrow
@@ -78,8 +75,7 @@ class PyborgReddit(object):
     def post_is_clean(self, post):
         if post['data']['subreddit'] in SUBREDDIT_HATE_LIST:
             return False
-        else:
-            return True
+        return True
 
     def start(self):
         print("I knew {} words ({} lines) before reading Reddit.com".format(self.pyborg.settings.num_words, len(self.pyborg.lines)))

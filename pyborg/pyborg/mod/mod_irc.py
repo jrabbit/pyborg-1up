@@ -1,16 +1,13 @@
 import logging
 import random
 import ssl
-import sys
 from functools import partial
 
-import baker
 import irc
 import irc.bot
 import irc.strings
 import pyborg.pyborg
 import pyborg.commands
-import toml
 import venusian
 
 try:
@@ -125,7 +122,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             command_name = e.arguments[0][1:]
             if command_name in  ["list", "help"]:
                 help_text = "I have a bunch of commands: "
-                for k, v in self.registry.registered.items():
+                for k, _ in self.registry.registered.items():
                     help_text += "!{}".format(k)
                 c.privmsg(e.target, help_text)
             else:
@@ -157,7 +154,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
                     msg = self.reply(e.arguments[0].encode('utf-8'))
                     if msg:
                         logger.info("Response: %s", msg)
-                        #replacenicks
+                        # replacenicks
                         msg = self.replace_nicks(msg,e)
                         c.privmsg(e.target, msg)
             body = self.strip_nicks(e.arguments[0], e).encode('utf-8')
@@ -166,5 +163,4 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
     def teardown(self):
         if not self.settings['multiplex']:
-            bot.my_pyborg.save_all()
-
+            self.my_pyborg.save_all()

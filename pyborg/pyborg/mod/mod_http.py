@@ -1,7 +1,6 @@
 import logging
 
 import bottle
-import baker
 from bottle import request
 
 from pyborg.pyborg import pyborg
@@ -48,8 +47,7 @@ def process():
     our_pyborg.process_msg(io, body, reply_rate, learning, None, owner)
     if io.message:
         return io.message
-    else:
-        return ""
+    return ""
 
 @bottle.route("/words.json")
 def words_json():
