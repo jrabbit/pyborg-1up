@@ -32,8 +32,8 @@ def reply():
 # Advanced API
 
 class DumbyIOMod(object):
-    message = None
     """fake IO mod for pyborg interop"""
+    message = None
     def output(self, message, args):
         self.message = message
         self.args = args
