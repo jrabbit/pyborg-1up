@@ -26,6 +26,7 @@
 #
 
 import logging
+import marshal
 import os
 import random
 import re
@@ -35,8 +36,6 @@ import time
 import zipfile
 from random import randint
 from zlib import crc32
-
-import marshal  # buffered marshal is bloody fast. wish i'd found this before :)
 
 import toml
 
