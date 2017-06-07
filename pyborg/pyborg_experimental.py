@@ -111,7 +111,7 @@ def upgrade_to_pickle(target_brain):
         brain_path = "archive.zip"
     else:
         brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
-    words, lines = pyborg.pyborg.pyborg.load_brain(brain_path)
+    words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
     version = pyborg.pyborg.pyborg.saves_version
     # version = ???
     with open(os.path.join(folder, "tmp", "words.pkl"), 'wb') as w:

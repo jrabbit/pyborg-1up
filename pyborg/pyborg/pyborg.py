@@ -158,7 +158,7 @@ class pyborg(object):
     }
 
     @staticmethod
-    def load_brain(brain_path):
+    def load_brain_2(brain_path):
         """1.2.0 marshal.zip loader 
         Returns tuple (words, lines)"""
         saves_version = "1.2.0"
@@ -248,7 +248,7 @@ class pyborg(object):
         else:
             self.brain_path = brain
         try:
-            self.words, self.lines = self.load_brain(self.brain_path)
+            self.words, self.lines = self.load_brain_2(self.brain_path)
         except (EOFError, IOError) as e:
             # Create mew database
             self.words = {}
