@@ -1,6 +1,5 @@
 import json
 import logging
-import marshal
 import os
 import shutil
 import sys

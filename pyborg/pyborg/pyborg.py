@@ -38,6 +38,7 @@ from random import randint
 from zlib import crc32
 
 import marshal
+import click
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +157,7 @@ class pyborg(object):
         "alias": "Owner command. Usage: !alias : Show the differents aliases\n!alias <alias> : show the words attached to this alias\n!alias <alias> <word> : link the word to the alias",
         "owner": "Usage : !owner password\nAdd the user in the owner list"
     }
+    folder = click.get_app_dir("Pyborg")
 
     @staticmethod
     def load_brain_2(brain_path):
@@ -195,7 +197,7 @@ class pyborg(object):
             zfile = zipfile.ZipFile(brain_path,'r')
             for filename in zfile.namelist():
                 data = zfile.read(filename)
-                f = open(filename, 'w+b')
+                f = open(os.path.join(self.folder, "tmp", filename), 'w+b')
                 f.write(data)
                 f.close()
         except (EOFError, IOError) as e:
@@ -203,7 +205,7 @@ class pyborg(object):
             print("no zip found")
             logger.info("No archive.zip (pyborg brain) found.")
         
-        with open("version.pkl", "rb") as vers, open("words.pkl", "rb") as words, open("lines.pkl", "rb") as lines:
+        with open(os.path.join(self.folder, "tmp","version.pkl"), "rb") as vers, open(os.path.join(self.folder, "tmp","words.pkl"), "rb") as words, open(os.path.join(self.folder, "tmp","lines.pkl"), "rb") as lines:
             x = vers.read()
             logger.debug("Saves Version: %s", x)
             if x != saves_version:
