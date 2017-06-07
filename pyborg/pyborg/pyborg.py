@@ -2,7 +2,7 @@
 #
 # PyBorg: The python AI bot.
 #
-# Copyright (c) 2000, 2006, 2013-2016 Tom Morton, Sebastien Dailly, Jack Laxson
+# Copyright (c) 2000, 2006, 2013-2017 Tom Morton, Sebastien Dailly, Jack Laxson
 #
 #
 # This bot was inspired by the PerlBorg, by Eric Bock.
@@ -26,8 +26,8 @@
 #
 
 import logging
-import marshal
 import os
+import pickle
 import random
 import re
 import struct
@@ -36,6 +36,8 @@ import time
 import zipfile
 from random import randint
 from zlib import crc32
+
+import marshal
 
 logger = logging.getLogger(__name__)
 
@@ -155,6 +157,64 @@ class pyborg(object):
         "owner": "Usage : !owner password\nAdd the user in the owner list"
     }
 
+    @staticmethod
+    def load_brain(brain_path):
+        """1.2.0 marshal.zip loader 
+        Returns tuple (words, lines)"""
+        saves_version = "1.2.0"
+        try:
+            zfile = zipfile.ZipFile(brain_path,'r')
+            for filename in zfile.namelist():
+                data = zfile.read(filename)
+                f = open(filename, 'w+b')
+                f.write(data)
+                f.close()
+        except (EOFError, IOError) as e:
+            logger.debug(e)
+            print("no zip found")
+            logger.info("No archive.zip (pyborg brain) found.")
+        
+        with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
+            x = vers.read()
+            logger.debug("Saves Version: %s", x)
+            if x != saves_version:
+                print("Error loading dictionary\nPlease convert it before launching pyborg")
+                logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
+                logger.debug("Pyborg version: %s", saves_version)
+                sys.exit(1)
+            words = marshal.loads(words.read())
+            lines = marshal.loads(lines.read())
+        return words, lines
+
+    @staticmethod
+    def load_brain_3(brain_path):
+        """1.3.0 pickle.zip loader
+        returns tuple(words, lines)"""
+        saves_version = "1.3.0"
+        try:
+            zfile = zipfile.ZipFile(brain_path,'r')
+            for filename in zfile.namelist():
+                data = zfile.read(filename)
+                f = open(filename, 'w+b')
+                f.write(data)
+                f.close()
+        except (EOFError, IOError) as e:
+            logger.debug(e)
+            print("no zip found")
+            logger.info("No archive.zip (pyborg brain) found.")
+        
+        with open("version.pkl", "rb") as vers, open("words.pkl", "rb") as words, open("lines.pkl", "rb") as lines:
+            x = vers.read()
+            logger.debug("Saves Version: %s", x)
+            if x != saves_version:
+                print("Error loading dictionary\nPlease convert it before launching pyborg")
+                logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
+                logger.debug("Pyborg version: %s", saves_version)
+                sys.exit(1)
+            words = pickle.loads(words.read())
+            lines = pickle.loads(lines.read())
+        return words, lines
+
     def __init__(self, brain=None):
         """
         Open the dictionary. Resize as required.
@@ -187,29 +247,8 @@ class pyborg(object):
             self.brain_path = 'archive.zip'
         else:
             self.brain_path = brain
-
         try:
-            zfile = zipfile.ZipFile(self.brain_path,'r')
-            for filename in zfile.namelist():
-                data = zfile.read(filename)
-                f = open(filename, 'w+b')
-                f.write(data)
-                f.close()
-        except (EOFError, IOError) as e:
-            logger.debug(e)
-            print("no zip found")
-            logger.info("No archive.zip (pyborg brain) found.")
-        try:
-            with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
-                x = vers.read()
-                logger.debug("Saves Version: %s", x)
-                if x != self.saves_version:
-                    print("Error loading dictionary\nPlease convert it before launching pyborg")
-                    logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
-                    logger.debug("Pyborg version: %s", self.saves_version)
-                    sys.exit(1)
-                self.words = marshal.loads(words.read())
-                self.lines = marshal.loads(lines.read())
+            self.words, self.lines = self.load_brain(self.brain_path)
         except (EOFError, IOError) as e:
             # Create mew database
             self.words = {}

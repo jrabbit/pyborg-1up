@@ -2,7 +2,7 @@
 
 from setuptools import setup
 setup(name="pyborg",
-      version="1.3.0b1",
+      version="1.3.0b2",
       packages=["pyborg", "pyborg.util", "pyborg.mod"],
       scripts=['pyborg-filein.py',
                'pyborg-telnet.py',

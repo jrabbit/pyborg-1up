@@ -1,5 +1,6 @@
 import json
 import logging
+import marshal
 import os
 import shutil
 import sys
@@ -51,8 +52,8 @@ def brain():
 @brain.command("list")
 def list_brains():
     "print out the pyborg brains (archive.zip)s info"
-    print(os.path.join(folder,"brains")+":")
-    for x in os.listdir(os.path.join(folder,"brains")):
+    print(os.path.join(folder,"brains") + ":")
+    for x in os.listdir(os.path.join(folder, "brains")):
         print("\t"+x)
 
 @brain.command()
@@ -83,7 +84,6 @@ def stats(target_brain):
                 "contexts": pyb.settings.num_contexts,
                 "lines": len(pyb.lines)}))
 
-
 @brain.command("import")
 @click.argument('target_brain', type=click.Path(exists=True), default="archive.zip")
 @click.option('--tag')
@@ -101,6 +101,7 @@ def convert(target_brain, tag):
 @brain.command("upgrade")
 @click.argument('target_brain', default="current")
 def upgrade_to_pickle(target_brain):
+    "Upgrade from a version 1.2 pyborg brain to 1.3"
     try:
         os.makedirs(os.path.join(folder, "tmp"))
     except OSError:
@@ -110,29 +111,26 @@ def upgrade_to_pickle(target_brain):
         brain_path = "archive.zip"
     else:
         brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
-    _pyb = pyborg.pyborg.pyborg(brain=brain_path)
-    words = _pyb.words
-    lines = _pyb.lines
+    words, lines = pyborg.pyborg.pyborg.load_brain(brain_path)
+    version = pyborg.pyborg.pyborg.saves_version
     # version = ???
     with open(os.path.join(folder, "tmp", "words.pkl"), 'wb') as w:
         pickle.dump(words, w)
     with open(os.path.join(folder, "tmp", "lines.pkl"), 'wb') as l:
         pickle.dump(lines, l)
     with open(os.path.join(folder, "tmp", "version.pkl"), 'wb') as v:
-        pickle.dump(_pyb.saves_version, v)
+        pickle.dump(version, v)
 
     with zipfile.ZipFile("current.pybrain.zip", "w") as f:
         f.write(os.path.join(folder, "tmp",'words.pkl'), 'words.pkl')
         f.write(os.path.join(folder, "tmp",'lines.pkl'), 'lines.pkl')
         f.write(os.path.join(folder, "tmp",'version.pkl'), 'version.pkl')
     try:
-        os.remove(os.path.join(folder, "tmp",'words.pkl'))
+        os.remove(os.path.join(folder, "tmp", 'words.pkl'))
         os.remove(os.path.join(folder, "tmp", 'lines.pkl'))
-        os.remove(os.path.join(folder, "tmp",'version.pkl'))
+        os.remove(os.path.join(folder, "tmp", 'version.pkl'))
     except (OSError, IOError):
         logger.error("could not remove the files")
-
-
 
 
 def check_server(server):
