@@ -22,7 +22,7 @@ import logging
 import time
 
 import arrow
-import requests
+import praw
 import toml
 
 from pyborg import pyborg
@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 class PyborgReddit(object):
 
     """Takes a toml config file path"""
+    CHUNKING = 100
 
     def __init__(self, toml_file="pyborg.reddit.toml"):
         self.toml_file = toml_file
@@ -41,30 +42,33 @@ class PyborgReddit(object):
         self.last_look = arrow.get(self.settings['reddit']['last_look'])
         self.multiplexing = self.settings['pyborg']['multiplex']
         self.hate_filter_off = self.settings['reddit']['hate_filter_disable']
-        self.url = 'http://www.reddit.com/comments.json?limit=100'
-        self.headers = {'user-agent': 'pyborg for reddit/0.0.2 pyborg/1.3.0'}
+
+        # script setup, ideal because no oauth browser rigamarole
+        self.auth_app_id = self.settings['reddit']['app_id']
+        self.auth_script_secret = self.settings['reddit']['script_secret']
+
+        self.reddit = praw.Reddit(client_id=self.auth_app_id, 
+                                  client_secret=self.client_secret,
+                                  user_agent='pyborg for reddit/0.0.3 pyborg/1.3.0')
 
         if not self.multiplexing:
             self.pyborg = pyborg.pyborg()
         else:
             self.pyborg = None
 
-    def load_new_comments(self):
-        logger.info("Loading new comments from reddit")
-        ret = requests.get(self.url, headers=self.headers)
-        ret.raise_for_status()
-        js = ret.json()
-        comments = js['data']['children']
-        # print(comments[0])
-        new_posts = filter( lambda x: arrow.get(x['data']['created_utc']) > self.last_look, comments)
+    def load_praw_comments(self):
+        "Pulls comment objects from reddit using our praw instance"
+        listing = self.reddit.get("/comments.json", params={"limit": self.CHUNKING})
+        new_posts = filter(lambda x: arrow.get(x.created_utc) > self.last_look, listing)
         self.last_look = arrow.utcnow()
-        logger.debug("loaded new comments")
+        logger.debug("loaded %s new comments", len(new_posts))
         return new_posts
 
     def handle_post(self, post):
+        logger.debug("entering handle_post")
         if self.settings['reddit']['learning']:
             if not self.multiplexing:
-                post_extract = post['data']['body'].encode('utf8')
+                post_extract = post.body.encode('utf8') # do we still need this with praw?
                 post_clean = pyborg.filter_message(post_extract, self.pyborg) # this expects a clean ascii string?
                 self.pyborg.learn(post_clean)
             else:
@@ -73,6 +77,7 @@ class PyborgReddit(object):
         # replies not supported yet!
 
     def post_is_clean(self, post):
+        logger.debug("entered post_is_clean")
         if post['data']['subreddit'] in SUBREDDIT_HATE_LIST:
             return False
         return True
@@ -80,9 +85,10 @@ class PyborgReddit(object):
     def start(self):
         print("I knew {} words ({} lines) before reading Reddit.com".format(self.pyborg.settings.num_words, len(self.pyborg.lines)))
         while True:
-            new_posts = self.load_new_comments()
+            new_posts = self.load_praw_comments()
             for post in new_posts:
                 if self.hate_filter_off:
+                    logger.info("help me")
                     self.handle_post(post)
                 elif self.post_is_clean(post):
                     self.handle_post(post)
