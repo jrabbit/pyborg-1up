@@ -11,6 +11,7 @@ import click
 import pyborg
 import pyborg.pyborg
 import requests
+import humanize
 import toml
 from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_linein import ModLineIn
@@ -34,7 +35,7 @@ def mk_folder():
         logger.info("pyborg folder already exists.")
 
 @click.group()
-@click.option('--debug', default=False)
+@click.option('--debug', default=False, is_flag=True)
 @click.option('--verbose/--silent', default=True)
 def cli_base(verbose, debug):
     # only the first basicConfig() is respected.
@@ -53,7 +54,8 @@ def list_brains():
     "print out the pyborg brains (archive.zip)s info"
     print(os.path.join(folder,"brains") + ":")
     for x in os.listdir(os.path.join(folder, "brains")):
-        print("\t"+x)
+        brain_size = os.path.getsize(os.path.join(folder, "brains", x))
+        print("\t {0} {1}".format(x, humanize.naturalsize(brain_size)))
 
 @brain.command()
 @click.option('--output', type=click.Path())
