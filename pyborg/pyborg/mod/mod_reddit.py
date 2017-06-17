@@ -23,6 +23,7 @@ import time
 
 import arrow
 import praw
+import requests
 import toml
 
 from pyborg import pyborg
@@ -41,6 +42,9 @@ class PyborgReddit(object):
 
         self.last_look = arrow.get(self.settings['reddit']['last_look'])
         self.multiplexing = self.settings['pyborg']['multiplex']
+        if self.multiplexing:
+            self.multi_server = self.settings['pyborg']['multiplex_server']
+
         self.hate_filter_off = self.settings['reddit']['hate_filter_disable']
 
         # script setup, ideal because no oauth browser rigamarole
@@ -48,7 +52,7 @@ class PyborgReddit(object):
         self.auth_script_secret = self.settings['reddit']['script_secret']
 
         self.reddit = praw.Reddit(client_id=self.auth_app_id, 
-                                  client_secret=self.client_secret,
+                                  client_secret=self.auth_script_secret,
                                   user_agent='pyborg for reddit/0.0.3 pyborg/1.3.0')
 
         if not self.multiplexing:
@@ -58,6 +62,7 @@ class PyborgReddit(object):
 
     def load_praw_comments(self):
         "Pulls comment objects from reddit using our praw instance"
+        # logger.debug("entering load_praw_comments")
         listing = self.reddit.get("/comments.json", params={"limit": self.CHUNKING})
         new_posts = filter(lambda x: arrow.get(x.created_utc) > self.last_look, listing)
         self.last_look = arrow.utcnow()
@@ -65,20 +70,25 @@ class PyborgReddit(object):
         return new_posts
 
     def handle_post(self, post):
-        logger.debug("entering handle_post")
+        # logger.debug("entering handle_post")
+        post_extract = post.body.encode('utf8')
         if self.settings['reddit']['learning']:
             if not self.multiplexing:
-                post_extract = post.body.encode('utf8') # do we still need this with praw?
-                post_clean = pyborg.filter_message(post_extract, self.pyborg) # this expects a clean ascii string?
-                self.pyborg.learn(post_clean)
+                # print(post_extract)
+                # post_clean = pyborg.filter_message(post.body, self.pyborg) # this expects a clean ascii string?
+                logger.debug(post_extract)
+                self.pyborg.learn(post_extract)
             else:
-                raise NotImplementedError
-
+                ret = requests.post("http://{}:2001/learn".format(self.multi_server), data={"body": post_extract})
+                if ret.status_code > 499:
+                    logger.error("Internal Server Error in pyborg_http. see logs.")
+                else:
+                    ret.raise_for_status()
         # replies not supported yet!
 
     def post_is_clean(self, post):
-        logger.debug("entered post_is_clean")
-        if post['data']['subreddit'] in SUBREDDIT_HATE_LIST:
+        # logger.debug("entered post_is_clean")
+        if post.subreddit.display_name in SUBREDDIT_HATE_LIST:
             return False
         return True
 
