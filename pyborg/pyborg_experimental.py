@@ -1,21 +1,23 @@
+import datetime
 import json
 import logging
 import os
+import pickle
 import shutil
 import sys
-import datetime
-import pickle
 import zipfile
 
 import click
+import humanize
 import pyborg
 import pyborg.pyborg
 import requests
-import humanize
 import toml
+from mastodon import Mastodon
 from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_linein import ModLineIn
 from pyborg.mod.mod_reddit import PyborgReddit
+from pyborg.mod.mod_mastodon import PyborgMastodon
 
 if sys.version_info <= (3,):
     from pyborg.mod.mod_tumblr import PyborgTumblr
@@ -137,6 +139,55 @@ def upgrade_to_pickle(target_brain):
 def check_server(server):
     response = requests.get("http://{}:2001/".format(server))
     response.raise_for_status()
+
+def run_mastodon(conf_file):
+    bot = PyborgMastodon(conf_file)
+    try:
+        bot.start()
+    except KeyboardInterrupt:
+        bot.teardown()
+        sys.exit()
+    except Exception:
+        bot.teardown()
+        raise
+
+
+@cli_base.group(invoke_without_command=True)
+@click.pass_context
+@click.option("--base-url", default='https://mastodon.social')
+@click.option("--conf-file", default="pyborg.mastodon.toml")
+def mastodon(ctx, base_url, conf_file):
+    ctx.obj = dict()
+    ctx.obj['base_url'] = base_url
+    if ctx.invoked_subcommand is None:
+        run_mastodon(conf_file)
+
+
+@mastodon.command(name="register")
+@click.argument("bot_name")
+@click.pass_context
+@click.option("--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path())
+def mastodon_register(ctx, cred_file, bot_name):
+    Mastodon.create_app(bot_name,
+                        api_base_url = ctx.obj['base_url'],
+                        to_file = cred_file)
+
+@mastodon.command("login")
+@click.argument("username")
+@click.password_option()
+@click.pass_context
+@click.option("--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path(exists=True))
+def mastodon_login(ctx, cred_file, username, password):
+    mastodon = Mastodon(
+    client_id = cred_file,
+    api_base_url = ctx.obj['base_url']
+    )
+    mastodon.log_in(
+        username,
+        password,
+        to_file = 'pyborg_mastodon_usercred.secret'
+    )
+
 
 @cli_base.command()
 @click.option("--conf-file", default="example.irc.toml")
