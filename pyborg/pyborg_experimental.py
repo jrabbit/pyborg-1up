@@ -101,50 +101,11 @@ def convert(target_brain, tag):
     shutil.copy2(target_brain, output)
     print("Imported your archive.zip as {}".format(output))
 
+
 @brain.command("upgrade")
 @click.argument('target_brain', default="current")
-def upgrade_to_pickle(target_brain):
-    "Upgrade from a version 1.2 pyborg brain to 1.3"
-    try:
-        os.makedirs(os.path.join(folder, "tmp"))
-    except OSError:
-        # Do nothing.
-        pass
-    if target_brain == "current":
-        brain_path = "archive.zip"
-    else:
-        brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
-    words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
-    version = pyborg.pyborg.pyborg.saves_version
-    # version = ???
-    with open(os.path.join(folder, "tmp", "words.pkl"), 'wb') as w:
-        pickle.dump(words, w)
-    with open(os.path.join(folder, "tmp", "lines.pkl"), 'wb') as l:
-        pickle.dump(lines, l)
-    with open(os.path.join(folder, "tmp", "version.pkl"), 'wb') as v:
-        pickle.dump(version, v)
-
-    with zipfile.ZipFile("current.pybrain.zip", "w") as f:
-        f.write(os.path.join(folder, "tmp",'words.pkl'), 'words.pkl')
-        f.write(os.path.join(folder, "tmp",'lines.pkl'), 'lines.pkl')
-        f.write(os.path.join(folder, "tmp",'version.pkl'), 'version.pkl')
-    try:
-        os.remove(os.path.join(folder, "tmp", 'words.pkl'))
-        os.remove(os.path.join(folder, "tmp", 'lines.pkl'))
-        os.remove(os.path.join(folder, "tmp", 'version.pkl'))
-    except (OSError, IOError):
-        logger.error("could not remove the files")
-
-
-@brain.command("upgrade_json")
-@click.argument('target_brain', default="current")
 def upgrade_to_json(target_brain):
-    "Upgrade from a version 1.2 pyborg brain to 1.3"
-    try:
-        os.makedirs(os.path.join(folder, "tmp"))
-    except OSError:
-        # Do nothing.
-        pass
+    "Upgrade from a version 1.2 pyborg brain to 1.3 mono-json format"
     if target_brain == "current":
         brain_path = "archive.zip"
     else:
