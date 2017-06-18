@@ -15,7 +15,7 @@ setup(name="pyborg",
       license="GPL v2 or later",
       install_requires=["irc==15.1.1", "toml", "baker==1.3",
                         "arrow==0.10.0", "PyTumblr==0.0.6", "requests", "bottle",
-                        "venusian", "click", "humanize", "praw"],
+                        "venusian", "click", "humanize", "praw", "Mastodon.py", "lxml"],
       entry_points='''
           [console_scripts]
           pyborg=pyborg_experimental:cli_base

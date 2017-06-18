@@ -151,12 +151,12 @@ def run_mastodon(conf_file):
         bot.teardown()
         raise
 
-
 @cli_base.group(invoke_without_command=True)
 @click.pass_context
 @click.option("--base-url", default='https://mastodon.social')
 @click.option("--conf-file", default="pyborg.mastodon.toml")
 def mastodon(ctx, base_url, conf_file):
+    "Run the mastodon mod; run register and login first"
     ctx.obj = dict()
     ctx.obj['base_url'] = base_url
     if ctx.invoked_subcommand is None:
@@ -178,15 +178,11 @@ def mastodon_register(ctx, cred_file, bot_name):
 @click.pass_context
 @click.option("--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path(exists=True))
 def mastodon_login(ctx, cred_file, username, password):
-    mastodon = Mastodon(
-    client_id = cred_file,
-    api_base_url = ctx.obj['base_url']
-    )
-    mastodon.log_in(
-        username,
-        password,
-        to_file = 'pyborg_mastodon_usercred.secret'
-    )
+    mastodon = Mastodon(client_id = cred_file,
+                        api_base_url = ctx.obj['base_url'])
+    mastodon.log_in(username,
+                    password,
+                    to_file = 'pyborg_mastodon_usercred.secret')
 
 
 @cli_base.command()
