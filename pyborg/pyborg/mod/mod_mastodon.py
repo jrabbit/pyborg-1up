@@ -1,10 +1,10 @@
-import time
 import logging
+import time
 
 import arrow
-import toml
-import requests
 import lxml.html
+import requests
+import toml
 from mastodon import Mastodon
 
 logger = logging.getLogger(__name__)

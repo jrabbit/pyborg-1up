@@ -78,7 +78,7 @@ def filter_message(message, bot):
             # And remove the (
             message = message[0:index]+message[index+1:]
     except ValueError as e:
-        logger.debug(e)
+        logger.debug("filter_message error: %s", e)
 
     message = message.replace(";", ",")
     message = message.replace("?", " ? ")
@@ -189,34 +189,18 @@ class pyborg(object):
         return words, lines
 
     @staticmethod
-    def load_brain_3(brain_path):
-        """1.3.0 pickle.zip loader
-        returns tuple(words, lines)"""
+    def load_brain_json(brain_path):
         saves_version = "1.3.0"
         folder = click.get_app_dir("Pyborg")
-        try:
-            zfile = zipfile.ZipFile(brain_path,'r')
-            for filename in zfile.namelist():
-                data = zfile.read(filename)
-                f = open(os.path.join(folder, "tmp", filename), 'w+b')
-                f.write(data)
-                f.close()
-        except (EOFError, IOError) as e:
-            logger.debug(e)
-            print("no zip found")
-            logger.info("No archive.zip (pyborg brain) found.")
-        
-        with open(os.path.join(folder, "tmp","version.pkl"), "rb") as vers, open(os.path.join(folder, "tmp","words.pkl"), "rb") as words, open(os.path.join(folder, "tmp","lines.pkl"), "rb") as lines:
-            x = vers.read()
-            logger.debug("Saves Version: %s", x)
-            if x != saves_version:
-                print("Error loading dictionary\nPlease convert it before launching pyborg")
-                logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
-                logger.debug("Pyborg version: %s", saves_version)
-                sys.exit(1)
-            words = pickle.loads(words.read())
-            lines = pickle.loads(lines.read())
-        return words, lines
+        brain = json.load(brain_path)
+        if brain['version'] is saves_version:
+            return brain['words'], brain['lines']
+        else:
+            print("Error loading dictionary\nPlease convert it before launching pyborg")
+            logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
+            logger.debug("Pyborg version: %s", saves_version)
+            sys.exit(1)
+
 
     def __init__(self, brain=None):
         """

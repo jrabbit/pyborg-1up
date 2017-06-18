@@ -136,6 +136,28 @@ def upgrade_to_pickle(target_brain):
         logger.error("could not remove the files")
 
 
+@brain.command("upgrade_json")
+@click.argument('target_brain', default="current")
+def upgrade_to_json(target_brain):
+    "Upgrade from a version 1.2 pyborg brain to 1.3"
+    try:
+        os.makedirs(os.path.join(folder, "tmp"))
+    except OSError:
+        # Do nothing.
+        pass
+    if target_brain == "current":
+        brain_path = "archive.zip"
+    else:
+        brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
+    words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
+    version = pyborg.pyborg.pyborg.saves_version
+
+    with open(os.path.join(folder, "brains", "current.pyborg.json"), 'wb') as brain_file:
+        out = {"words": words,
+               "lines": lines,
+               "version": version}
+        json.dump(out, brain_file, ensure_ascii=False)
+
 def check_server(server):
     response = requests.get("http://{}:2001/".format(server))
     response.raise_for_status()
