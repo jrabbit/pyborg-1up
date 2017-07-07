@@ -1,11 +1,12 @@
+#!/usr/bin/env python
+
 import datetime
 import json
 import logging
 import os
-import pickle
 import shutil
 import sys
-import zipfile
+import platform
 
 import click
 import humanize
@@ -111,7 +112,7 @@ def upgrade_to_json(target_brain):
     else:
         brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
     words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
-    version = pyborg.pyborg.pyborg.saves_version
+    version = "1.3.0"
 
     with open(os.path.join(folder, "brains", "current.pyborg.json"), 'wb') as brain_file:
         out = {"words": words,
@@ -266,6 +267,10 @@ def linein(multiplex):
         mod.save()
 
 
+@cli_base.command()
+def version():
+    print("I am a version {} pyborg!".format(pyborg.__version__))
+    print("I'm running on {} {}/{}".format(platform.python_implementation(), platform.python_version(), platform.platform()))
 
 
 if __name__ == '__main__':

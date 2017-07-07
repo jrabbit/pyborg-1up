@@ -4,7 +4,7 @@ import requests
 
 from .util.irc import command
 
-from pyborg import pyborg
+import pyborg
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 @command()
 def info():
     """Returns version number and source code link"""
-    return "{}. My source can be found at https://github.com/jrabbit/pyborg-1up".format(pyborg.ver_string)
+    return "I am a version {} Pyborg. My source can be found at https://github.com/jrabbit/pyborg-1up".format(pyborg.__version__)
 
 @command(internals=True)
 def words(multiplex, multi_server):

@@ -1,8 +1,11 @@
 #! /usr/bin/env python
 
 from setuptools import setup
+
+from pyborg import __version__
+
 setup(name="pyborg",
-      version="1.3.0b2",
+      version=__version__,
       packages=["pyborg", "pyborg.util", "pyborg.mod"],
       scripts=['pyborg-filein.py',
                'pyborg-telnet.py',

@@ -1,3 +1,4 @@
+
 import asyncio
 import logging
 import sys
@@ -67,9 +68,9 @@ class PyborgDiscord(discord.Client):
         if message.content[0] == "!":
             command_name = message.content[1:]
             if command_name in  ["list", "help"]:
-                help_text = "I have a bunch of commands: "
+                help_text = "I have a bunch of commands:"
                 for k, v in self.registry.registered.items():
-                    help_text += "!{}".format(k)
+                    help_text += " !{}".format(k)
                 await self.send_message(message.channel, help_text)
             else:
                 if command_name in self.registry.registered:
@@ -80,6 +81,7 @@ class PyborgDiscord(discord.Client):
         if self.settings['discord']['learning']:
             self.learn(message.content)
         if message.content.startswith("<@{}>".format(self.user.id)):
+            await self.send_typing(message.channel)
             clean = self.clean_msg(message)
             msg = self.reply(clean)
             logger.debug("on message: %s" % msg)
