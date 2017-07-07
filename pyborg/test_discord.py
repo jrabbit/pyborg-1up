@@ -8,6 +8,7 @@ except ImportError:
     import mock
 
 if sys.version_info >= (3,):
+    from functools import partial
     import asyncio
 
     import pyborg
@@ -49,6 +50,7 @@ if sys.version_info >= (3,):
 
             our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
             our_pybd.send_message = do_nothing
+            our_pybd.send_typing = partial(do_nothing, "bogus_arg")
             
             self.loop.run_until_complete(our_pybd.on_message(msg))
             # print(our_pybd.user.id)
@@ -75,6 +77,8 @@ if sys.version_info >= (3,):
 
             our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
             our_pybd.send_message = do_nothing
+            our_pybd.send_typing = partial(do_nothing, "bogus_arg")
+
             
             self.loop.run_until_complete(our_pybd.on_message(msg))
             patched_learn.assert_called_once_with(msg.content)
