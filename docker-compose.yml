@@ -24,6 +24,7 @@ services:
     image: "jrabbit/pyborg:3"
     environment:
       - PYBORG_HOST=pyborgd
+    # env_file: .env
     volumes:
       - ./pyborg/example.discord.toml:/etc/pyborg/discord.toml
     #   - .:/usr/src/pyborg
