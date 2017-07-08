@@ -25,6 +25,7 @@
 # Seb Dailly <seb.dailly@gmail.com>
 #
 
+import json
 import logging
 import os
 import pickle
@@ -37,9 +38,9 @@ import zipfile
 from random import randint
 from zlib import crc32
 
-import marshal
-import click
 import attr
+import click
+import marshal
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +142,7 @@ class pyborg(object):
     from . import cfgfile
 
     ver_string = "I am a version 1.3.0 PyBorg"
-    saves_version = "1.2.0"
+    saves_version = "1.3.0"
 
     # Main command list
     commandlist = "Pyborg commands:\n!checkdict, !contexts, !help, !known, !learning, !rebuilddict, \
@@ -202,7 +203,7 @@ class pyborg(object):
         with open(brain_path) as f:
             raw_json = f.read().decode('utf-8', 'replace')
         brain = json.loads(raw_json)
-        if brain['version'] is saves_version:
+        if brain['version'] == saves_version:
             return brain['words'], brain['lines']
         else:
             print("Error loading dictionary\nPlease convert it before launching pyborg")
@@ -211,15 +212,16 @@ class pyborg(object):
             sys.exit(1)
 
 
-    def save_brain(self, brain_path):
+    def save_brain(self):
         """
         Save brain as 1.3.0 JSON format
         """
         saves_version = "1.3.0"
         folder = click.get_app_dir("Pyborg")
+        logger.info("Saving pyborg brain to %s", self.brain_path)
         brain = {'version': saves_version, 'words': self.words, 'lines':self.lines}
-        with open(brain_path) as f:
-            json.dump(f, brain)
+        with open(self.brain_path, 'w') as f:
+            json.dump(brain, f)
 
 
     def __init__(self, brain=None):
@@ -255,11 +257,12 @@ class pyborg(object):
         else:
             self.brain_path = brain
         try:
-            self.words, self.lines = self.load_brain_2(self.brain_path)
+            self.words, self.lines = self.load_brain_json(self.brain_path)
         except (EOFError, IOError) as e:
             # Create mew database
             self.words = {}
             self.lines = {}
+            logger.error(e)
             print("Error reading saves. New database created.")
 
         # Is a resizing required?

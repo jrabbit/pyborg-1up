@@ -4,9 +4,9 @@ import datetime
 import json
 import logging
 import os
+import platform
 import shutil
 import sys
-import platform
 
 import click
 import humanize
@@ -15,10 +15,12 @@ import pyborg.pyborg
 import requests
 import toml
 from mastodon import Mastodon
+from pyborg.mod.mod_http import bottle
 from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_linein import ModLineIn
-from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.mod.mod_mastodon import PyborgMastodon
+from pyborg.mod.mod_reddit import PyborgReddit
+from pyborg.util.bottle_plugin import BottledPyborg
 
 if sys.version_info <= (3,):
     from pyborg.mod.mod_tumblr import PyborgTumblr
@@ -216,17 +218,16 @@ def tumblr(conf_file):
         raise
 
 @cli_base.command()
-@click.option("--brain", default="current")
+@click.option("--brain", default="current.pyborg.brain.zip")
 @click.option("--host", default="localhost")
 @click.option("--port", default=2001)
 @click.option("--reloader", default=False)
 def http(reloader, port, host, brain):
     "Run a server for mutliheaded (multiplex) pyborg"
-    from pyborg.mod.mod_http import bottle
-    from pyborg.util.bottle_plugin import BottledPyborg
 
     bottle.install(BottledPyborg(brain_path=brain))
     bottle.run(host=host, port=port, reloader=reloader)
+    bottle.default_app().close()
 
 @cli_base.command()
 @click.option("--conf-file", default="example.discord.toml")

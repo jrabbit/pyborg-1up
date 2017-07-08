@@ -11,7 +11,7 @@ class BottledPyborg(object):
         self.pyb = pyborg(self.brain_path)
 
     def close(self):
-        self.pyb.save_all()
+        self.pyb.save_brain()
         
     def apply(self, callback, route):
         keyword = "pyborg"

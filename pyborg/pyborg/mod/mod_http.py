@@ -28,6 +28,12 @@ def reply(pyborg):
     return pyborg.reply(body)
 
 
+
+# @bottle.route("/save", method="POST")
+# def reply(pyborg):
+#     pyborg.save_brain()
+#     return "OK"
+
 # Advanced API
 
 class DumbyIOMod(object):
