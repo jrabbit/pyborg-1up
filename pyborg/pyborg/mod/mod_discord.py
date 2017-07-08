@@ -1,11 +1,8 @@
 
 import asyncio
 import logging
-import sys
 from functools import partial
 
-import arrow
-import baker
 import discord
 import requests
 import toml
@@ -80,7 +77,7 @@ class PyborgDiscord(discord.Client):
         
         if self.settings['discord']['learning']:
             self.learn(message.content)
-        if message.content.startswith("<@{}>".format(self.user.id)):
+        if "<@{}>".format(self.user.id) in message.content:
             await self.send_typing(message.channel)
             clean = self.clean_msg(message)
             msg = self.reply(clean)
