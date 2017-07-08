@@ -10,12 +10,17 @@ class BottledPyborg(object):
     def setup(self, app):
         self.pyb = pyborg(self.brain_path)
 
+    def close(self):
+        self.pyb.save_all()
+        
     def apply(self, callback, route):
         keyword = "pyborg"
         args = inspect.getargspec(route.callback)[0]
         if keyword not in args:
             return callback
-        def wrapper(*arg, **kwargs):
+
+        def wrapper(*args, **kwargs):
             kwargs[keyword] = self.pyb
             return callback(*args, **kwargs)
+
         return wrapper
