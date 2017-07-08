@@ -3,30 +3,29 @@ import logging
 import bottle
 from bottle import request
 
-from pyborg.pyborg import pyborg
+from pyborg.util.bottle_plugin import BottledPyborg
 
 logger = logging.getLogger(__name__)
 
-our_pyborg = pyborg()
 
 @bottle.route("/")
-def index():
+def index(pyborg):
     return """<h1>Welcome to Pyborg/http</h1>
-    <h2>{}</h2>""".format(our_pyborg.ver_string)
+    <h2>{}</h2>""".format(pyborg.ver_string)
 
 # Basic API
 
 @bottle.route("/learn", method="POST")
-def learn():
+def learn(pyborg):
     body = request.POST.get("body")
-    our_pyborg.learn(body)
+    pyborg.learn(body)
     return "OK"
 
 
 @bottle.route("/reply", method="POST")
-def reply():
+def reply(pyborg):
     body = request.POST.get("body")
-    return our_pyborg.reply(body)
+    return pyborg.reply(body)
 
 
 # Advanced API
@@ -39,27 +38,25 @@ class DumbyIOMod(object):
         self.args = args
 
 @bottle.route("/process", method="POST")
-def process():
+def process(pyborg):
     body = request.POST.get("body")
     reply_rate = request.POST.get("reply_rate")
     learning = request.POST.get("learning")
     owner = request.POST.get("owner")
     io = DumbyIOMod()
-    our_pyborg.process_msg(io, body, reply_rate, learning, None, owner)
+    pyborg.process_msg(io, body, reply_rate, learning, None, owner)
     if io.message:
         return io.message
     return ""
 
 @bottle.route("/words.json")
-def words_json():
-    return {"words": our_pyborg.settings.num_words,
-            "contexts": our_pyborg.settings.num_contexts,
-            "lines": len(our_pyborg.lines)}
+def words_json(pyborg):
+    return {"words": pyborg.settings.num_words,
+            "contexts": pyborg.settings.num_contexts,
+            "lines": len(pyborg.lines)}
 
-def save():
-    our_pyborg.save_all()
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
+    bottle.install(BottledPyborg())
     bottle.run(host="localhost", port=2001, reloader=True)
-    save()

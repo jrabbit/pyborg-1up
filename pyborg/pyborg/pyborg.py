@@ -39,6 +39,7 @@ from zlib import crc32
 
 import marshal
 import click
+import attr
 
 logger = logging.getLogger(__name__)
 
@@ -108,7 +109,6 @@ def filter_message(message, bot):
     message = " ".join(words)
     return message
 
-
 class FakeCfg(object):
     """fake it until you make it"""
     def __init__(self):
@@ -118,12 +118,19 @@ class FakeCfg(object):
         self.censored = []
         self.no_save = False
         self.num_contexts = 26505
-        self.max_words = 6000
         self.ignore_list = []
         self.learning = True
 
     def save(self, *args):
         pass
+
+@attr.s
+class FakeCfg2(object):
+    max_words = attr.ib()
+    num_contexts = attr.ib()
+    no_save = attr.ib(default=False)
+    learning = attr.ib(default=True)
+
 
 class FakeAns(object):
     """this is a cool thing"""
@@ -192,7 +199,9 @@ class pyborg(object):
     def load_brain_json(brain_path):
         saves_version = "1.3.0"
         folder = click.get_app_dir("Pyborg")
-        brain = json.load(brain_path)
+        with open(brain_path) as f:
+            raw_json = f.read().decode('utf-8', 'replace')
+        brain = json.loads(raw_json)
         if brain['version'] is saves_version:
             return brain['words'], brain['lines']
         else:
@@ -200,6 +209,17 @@ class pyborg(object):
             logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
             logger.debug("Pyborg version: %s", saves_version)
             sys.exit(1)
+
+
+    def save_brain(self, brain_path):
+        """
+        Save brain as 1.3.0 JSON format
+        """
+        saves_version = "1.3.0"
+        folder = click.get_app_dir("Pyborg")
+        brain = {'version': saves_version, 'words': self.words, 'lines':self.lines}
+        with open(brain_path) as f:
+            json.dump(f, brain)
 
 
     def __init__(self, brain=None):

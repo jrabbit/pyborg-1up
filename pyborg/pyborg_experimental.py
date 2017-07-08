@@ -216,14 +216,17 @@ def tumblr(conf_file):
         raise
 
 @cli_base.command()
+@click.option("--brain", default="current")
 @click.option("--host", default="localhost")
 @click.option("--port", default=2001)
 @click.option("--reloader", default=False)
-def http(reloader, port, host):
+def http(reloader, port, host, brain):
     "Run a server for mutliheaded (multiplex) pyborg"
-    from pyborg.mod.mod_http import bottle, save
+    from pyborg.mod.mod_http import bottle
+    from pyborg.util.bottle_plugin import BottledPyborg
+
+    bottle.install(BottledPyborg(brain_path=brain))
     bottle.run(host=host, port=port, reloader=reloader)
-    save()
 
 @cli_base.command()
 @click.option("--conf-file", default="example.discord.toml")
