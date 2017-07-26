@@ -1,5 +1,4 @@
 
-import asyncio
 import logging
 from functools import partial
 
@@ -77,8 +76,9 @@ class PyborgDiscord(discord.Client):
         
         if self.settings['discord']['learning']:
             self.learn(message.content)
-        if "<@{}>".format(self.user.id) in message.content:
+        if self.user.mentioned_in(message):
             await self.send_typing(message.channel)
+            # print("Is this ever run in tests?")
             clean = self.clean_msg(message)
             msg = self.reply(clean)
             logger.debug("on message: %s" % msg)
