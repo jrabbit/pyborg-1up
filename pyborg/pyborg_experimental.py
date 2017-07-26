@@ -111,16 +111,20 @@ def upgrade_to_json(target_brain):
     "Upgrade from a version 1.2 pyborg brain to 1.3 mono-json format"
     if target_brain == "current":
         brain_path = "archive.zip"
+    elif os.path.exists(target_brain):
+        brain_path = target_brain
     else:
         brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
     words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
-    version = "1.3.0"
-
-    with open(os.path.join(folder, "brains", "current.pyborg.json"), 'wb') as brain_file:
+    version = u"1.3.0"
+    save_path = os.path.join(folder, "brains", "current.pyborg.json")
+    with open(save_path, 'wb') as brain_file:
         out = {"words": words,
                "lines": lines,
                "version": version}
         json.dump(out, brain_file, ensure_ascii=False)
+    print("Wrote out pyborg brain into {}".format(save_path))
+
 
 def check_server(server):
     response = requests.get("http://{}:2001/".format(server))
@@ -218,14 +222,14 @@ def tumblr(conf_file):
         raise
 
 @cli_base.command()
-@click.option("--brain", default="current.pyborg.brain.zip")
+@click.option("--brain", default="current.pyborg.json")
 @click.option("--host", default="localhost")
 @click.option("--port", default=2001)
 @click.option("--reloader", default=False)
 def http(reloader, port, host, brain):
     "Run a server for mutliheaded (multiplex) pyborg"
-
-    bottle.install(BottledPyborg(brain_path=brain))
+    brain_path = os.path.join(folder, "brains", "current.pyborg.json")
+    bottle.install(BottledPyborg(brain_path=brain_path))
     bottle.run(host=host, port=port, reloader=reloader)
     bottle.default_app().close()
 

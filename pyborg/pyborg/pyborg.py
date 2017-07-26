@@ -170,7 +170,7 @@ class pyborg(object):
     def load_brain_2(brain_path):
         """1.2.0 marshal.zip loader 
         Returns tuple (words, lines)"""
-        saves_version = "1.2.0"
+        saves_version = b"1.2.0"
         folder = click.get_app_dir("Pyborg")
         try:
             zfile = zipfile.ZipFile(brain_path,'r')
@@ -198,10 +198,10 @@ class pyborg(object):
 
     @staticmethod
     def load_brain_json(brain_path):
-        saves_version = "1.3.0"
+        saves_version = u"1.3.0"
         folder = click.get_app_dir("Pyborg")
         with open(brain_path) as f:
-            raw_json = f.read().decode('utf-8', 'replace')
+            raw_json = f.read().decode('utf-8', 'ignore')
         brain = json.loads(raw_json)
         if brain['version'] == saves_version:
             return brain['words'], brain['lines']
@@ -216,12 +216,12 @@ class pyborg(object):
         """
         Save brain as 1.3.0 JSON format
         """
-        saves_version = "1.3.0"
+        saves_version = u"1.3.0"
         folder = click.get_app_dir("Pyborg")
         logger.info("Saving pyborg brain to %s", self.brain_path)
         brain = {'version': saves_version, 'words': self.words, 'lines':self.lines}
-        with open(self.brain_path, 'w') as f:
-            json.dump(brain, f)
+        with open(self.brain_path, 'wb') as f:
+            json.dump(brain, f, ensure_ascii=False)
 
 
     def __init__(self, brain=None):
@@ -941,6 +941,8 @@ class pyborg(object):
             #this is for prevent the case when we have an ignore_listed word
             word = str(sentence[0].split(" ")[0])
             for x in xrange(0, len(self.words[word]) -1 ):
+                logger.debug(locals())
+                logger.debug('trying to unpack: %s', self.words[word][x])
                 l, w = struct.unpack("iH", self.words[word][x])
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
