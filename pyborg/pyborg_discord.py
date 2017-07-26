@@ -75,7 +75,7 @@ class PyborgDiscord(discord.Client):
         
         if self.settings['discord']['learning']:
             self.learn(message.content)
-        if message.content.startswith("<@{}>".format(self.user.id)):
+        if self.user.mentioned_in(message):
             clean = self.clean_msg(message)
             msg = self.reply(clean)
             logger.debug("on message: %s" % msg)
