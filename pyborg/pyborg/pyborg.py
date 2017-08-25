@@ -25,6 +25,7 @@
 # Seb Dailly <seb.dailly@gmail.com>
 #
 
+import collections
 import json
 import logging
 import os
@@ -40,6 +41,8 @@ from zlib import crc32
 
 import attr
 import click
+import six
+
 import marshal
 
 logger = logging.getLogger(__name__)
@@ -49,7 +52,7 @@ try:
     logger.debug("Got nltk!")
 except ImportError:
     nltk = None
-    logger.debug("No nltk, won't be useing advanced part of speech tagging.")
+    logger.debug("No nltk, won't be using advanced part of speech tagging.")
 
 def filter_message(message, bot):
     """
@@ -119,6 +122,7 @@ class FakeCfg(object):
         self.censored = []
         self.no_save = False
         self.num_contexts = 26505
+        self.max_words = 6000
         self.ignore_list = []
         self.learning = True
 
@@ -199,9 +203,14 @@ class pyborg(object):
     @staticmethod
     def load_brain_json(brain_path):
         saves_version = u"1.3.0"
-        folder = click.get_app_dir("Pyborg")
+        # folder = click.get_app_dir("Pyborg")
+        logger.debug("Trying to open brain %s", brain_path)
         with open(brain_path) as f:
-            raw_json = f.read().decode('utf-8', 'ignore')
+            if six.PY2:
+                raw_json = f.read().decode('utf-8', 'replace')
+            elif six.PY3:
+                raw_json = f.read()
+        logger.debug(raw_json)
         brain = json.loads(raw_json)
         if brain['version'] == saves_version:
             return brain['words'], brain['lines']
@@ -216,13 +225,25 @@ class pyborg(object):
         """
         Save brain as 1.3.0 JSON format
         """
+        logger.info("Writing dictionary...")
+
         saves_version = u"1.3.0"
         folder = click.get_app_dir("Pyborg")
         logger.info("Saving pyborg brain to %s", self.brain_path)
+        cnt = collections.Counter()
+        for key, value in self.words.items():
+            cnt[type(key)] += 1
+            # cnt[type(value)] += 1
+            for i in value:
+                 cnt[type(i)] += 1
+        logger.debug("Types: %s", cnt)
         brain = {'version': saves_version, 'words': self.words, 'lines':self.lines}
         with open(self.brain_path, 'wb') as f:
+            # this can fail half way...
             json.dump(brain, f, ensure_ascii=False)
 
+    def save_all(self):
+        self.save_brain()
 
     def __init__(self, brain=None):
         """
@@ -321,7 +342,7 @@ class pyborg(object):
 
 
 
-    def save_all(self):
+    def save_all_2(self):
         if self.settings.no_save != "True":
             print("Writing dictionary...")
 
