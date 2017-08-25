@@ -23,6 +23,7 @@ import string
 import sys
 
 import requests
+import six
 
 from pyborg import pyborg
 
@@ -48,10 +49,16 @@ class ModLineIn(object):
         print("PyBorg offline chat!\n")
         print("Type !quit to leave")
         print("What is your name")
-        self.name = raw_input("? ")
+        if six.PY2:
+            self.name = raw_input("? ")
+        else:
+            self.name = input("? ")
         while 1:
             try:
-                body = raw_input("> ")
+                if six.PY2:
+                    body = raw_input("> ")
+                else:
+                    body = input("> ")
             except (KeyboardInterrupt, EOFError) as e:
                 print()
                 return
@@ -70,8 +77,8 @@ class ModLineIn(object):
                 self.pyborg.process_msg(self, body, 100, 1, (self.name), owner=1)
 
     def linein_commands(self, body):
-        command_list = string.split(body)
-        command_list[0] = string.lower(command_list[0])
+        command_list = body.split()
+        command_list[0] = command_list[0].lower()
 
         if command_list[0] == "!quit":
             sys.exit(0)
