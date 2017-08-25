@@ -54,6 +54,9 @@ except ImportError:
     nltk = None
     logger.debug("No nltk, won't be using advanced part of speech tagging.")
 
+if six.PY3:
+    xrange = range
+
 def filter_message(message, bot):
     """
     Filter a message body so it is suitable for learning from and
