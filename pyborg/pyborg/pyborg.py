@@ -1004,7 +1004,7 @@ class pyborg(object):
             # Sort the words
             liste = list(pre_words.items()) # this is a view in py3
 
-            liste.sort(lambda x,y: cmp(y[1],x[1]))
+            liste.sort(key=lambda x: x[1])
             
             numbers = [liste[0][1]]
             for x in xrange(1, len(liste) ):
@@ -1072,9 +1072,9 @@ class pyborg(object):
                         post_words[look_for] += num_context
                 else:
                     post_words[""] += num_context
-            #Sort the words
-            liste = post_words.items()
-            liste.sort(lambda x,y: cmp(y[1],x[1]))
+            # Sort the words
+            liste = list(post_words.items())
+            liste.sort(key=lambda x: x[1])
             numbers = [liste[0][1]]
             
             for x in xrange(1, len(liste) ):
