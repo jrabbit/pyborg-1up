@@ -173,6 +173,8 @@ class pyborg(object):
         "owner": "Usage : !owner password\nAdd the user in the owner list"
     }
 
+    STRUCT_FMT = "IH"
+
     @staticmethod
     def load_brain_2(brain_path):
         """1.2.0 marshal.zip loader 
@@ -886,7 +888,7 @@ class pyborg(object):
             # Check all the word's links (backwards so we can delete)
             for y in xrange(len(word_contexts)-1, -1, -1):
                 # Check for any of the deleted contexts
-                if unpack("iH", word_contexts[y])[0] in dellist:
+                if unpack(self.STRUCT_FMT, word_contexts[y])[0] in dellist:
                     del word_contexts[y]
                     self.settings.num_contexts = self.settings.num_contexts - 1
             if len(words[x]) == 0:
@@ -971,7 +973,7 @@ class pyborg(object):
             for x in xrange(0, len(self.words[word]) -1 ):
                 logger.debug(locals())
                 logger.debug('trying to unpack: %s', self.words[word][x])
-                l, w = struct.unpack("iH", self.words[word][x])
+                l, w = struct.unpack(self.STRUCT_FMT, self.words[word][x])
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
                 cwords = context.split()
@@ -1048,7 +1050,7 @@ class pyborg(object):
             post_words = {"" : 0}
             word = str(sentence[-1].split(" ")[-1])
             for x in xrange(0, len(self.words[word]) ):
-                l, w = struct.unpack("iH", self.words[word][x])
+                l, w = struct.unpack(self.STRUCT_FMT, self.words[word][x])
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
                 cwords = context.split()
@@ -1182,20 +1184,25 @@ class pyborg(object):
             cleanbody = " ".join(words)
 
             # Hash collisions we don't care about. 2^32 is big :-)
-            hashval = crc32(cleanbody)
+            # Ok so this takes a bytes object... in python3 thats a pain
+            if six.PY3:
+                cleanbody = bytes(cleanbody, "utf-8")
+            # ok so crc32 got changed in 3...
+            hashval = crc32(cleanbody) & 0xffffffff
 
+            logger.debug(hashval)
             # Check context isn't already known
             if  hashval not in self.lines:
                 if not(num_cpw > 100 and self.settings.learning == 0):
                     
                     self.lines[hashval] = [cleanbody, num_context]
                     # Add link for each word
-                    for x in xrange(0, len(words)):
+                    for x in range(0, len(words)):
                         if words[x] in self.words:
                             # Add entry. (line number, word number)
-                            self.words[words[x]].append(struct.pack("iH", hashval, x))
+                            self.words[words[x]].append(struct.pack(self.STRUCT_FMT, hashval, x))
                         else:
-                            self.words[words[x]] = [ struct.pack("iH", hashval, x) ]
+                            self.words[words[x]] = [ struct.pack(self.STRUCT_FMT, hashval, x) ]
                             self.settings.num_words += 1
                         self.settings.num_contexts += 1
             else :
