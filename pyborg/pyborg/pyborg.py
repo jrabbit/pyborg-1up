@@ -102,7 +102,7 @@ def filter_message(message, bot):
     #   message = message.replace("..  ..  .. ", ".... ")
 
     words = message.split()
-    for x in xrange(0, len(words)):
+    for x in range(0, len(words)):
         #is there aliases ?
         for z in bot.settings.aliases.keys():
             for alias in bot.settings.aliases[z]:
@@ -1132,7 +1132,7 @@ class pyborg(object):
 
             # voyelles = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
             voyelles = "aeiouy"
-            for x in xrange(0, len(words)):
+            for x in range(0, len(words)):
 
                 nb_voy = 0
                 digit = 0
