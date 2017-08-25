@@ -118,12 +118,47 @@ def upgrade_to_json(target_brain):
     words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
     version = u"1.3.0"
     save_path = os.path.join(folder, "brains", "current.pyborg.json")
+    for key, value in words.items():
+        if isinstance(key, unicode):
+            logger.info("Repairing bad unicode type in dictionary...")
+            del words[key]
+            safe_key = key.encode('utf-8')
+            logger.info("New type: %s", type(safe_key))
+            logger.info("new key: %s", safe_key)
+            words[safe_key] = value
     with open(save_path, 'wb') as brain_file:
         out = {"words": words,
                "lines": lines,
                "version": version}
         json.dump(out, brain_file, ensure_ascii=False)
     print("Wrote out pyborg brain into {}".format(save_path))
+
+@brain.command()
+@click.argument('target_brain', default="current")
+def doctor(target_brain):
+    import collections
+    cnt = collections.Counter()
+    if target_brain == "current":
+        brain_path = os.path.join(folder, "brains", "current.pyborg.json")
+    else:
+        brain_path = os.path.join(folder, "brains", target_brain)
+
+    # words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
+    words, lines = pyborg.pyborg.pyborg.load_brain_json(brain_path)
+
+    # Type check the brain
+    assert isinstance(words, dict)
+    assert isinstance(lines, dict)
+    for key, value in words.items():
+        cnt[type(key)] += 1
+        # cnt[type(value)] += 1
+        for i in value:
+             cnt[type(i)] += 1
+        # print(type(key))
+    # for item in lines:
+    #     cnt[type(item)] += 1
+    print(cnt)
+
 
 
 def check_server(server):
