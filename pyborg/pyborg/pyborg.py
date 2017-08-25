@@ -1095,8 +1095,8 @@ class pyborg(object):
                     break
                 mot = liste[x][0]
 
-
-            mot = mot.split(" ")
+            # logger.debug("type of mot: %s", type(mot))
+            mot = mot.split()
             if mot == ['']:
                 done = 1
             else:
