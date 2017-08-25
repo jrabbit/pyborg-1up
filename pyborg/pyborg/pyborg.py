@@ -238,9 +238,13 @@ class pyborg(object):
                  cnt[type(i)] += 1
         logger.debug("Types: %s", cnt)
         brain = {'version': saves_version, 'words': self.words, 'lines':self.lines}
-        with open(self.brain_path, 'wb') as f:
+        tmp_file = os.path.join(folder, "tmp", "current.pyborg.json")
+        with open(tmp_file, 'wb') as f:
             # this can fail half way...
             json.dump(brain, f, ensure_ascii=False)
+        # if we didn't crash
+        os.rename(tmp_file, self.brain_path)
+        logger.debug("Successful writing of brain & renaming. Quitting.")
 
     def save_all(self):
         self.save_brain()
