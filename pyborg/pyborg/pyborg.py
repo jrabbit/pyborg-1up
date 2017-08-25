@@ -986,12 +986,12 @@ class pyborg(object):
                         if sentence[1] != cwords[w+1]:
                             continue
 
-                    #if the word is in ignore_list, look the previous word
+                    # if the word is in ignore_list, look the previous word
                     look_for = cwords[w-1]
                     if look_for in self.settings.ignore_list and w > 1:
                         look_for = cwords[w-2]+" "+look_for
 
-                    #saves how many times we can found each word
+                    # saves how many times we can found each word
                     if look_for not in pre_words:
                         pre_words[look_for] = num_context
                     else :
@@ -1001,22 +1001,23 @@ class pyborg(object):
                 else:
                     pre_words[""] += num_context
 
-            #Sort the words
-            liste = pre_words.items()
+            # Sort the words
+            liste = list(pre_words.items()) # this is a view in py3
+
             liste.sort(lambda x,y: cmp(y[1],x[1]))
             
             numbers = [liste[0][1]]
             for x in xrange(1, len(liste) ):
                 numbers.append(liste[x][1] + numbers[x-1])
 
-            #take one them from the list ( randomly )
+            # take one them from the list ( randomly )
             mot = randint(0, numbers[len(numbers) -1])
             for x in xrange(0, len(numbers)):
                 if mot <= numbers[x]:
                     mot = liste[x][0]
                     break
 
-            #if the word is already choosen, pick the next one
+            # if the word is already choosen, pick the next one
             while mot in sentence:
                 x += 1
                 if x >= len(liste) -1:
