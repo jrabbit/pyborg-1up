@@ -149,7 +149,7 @@ class pyborg(object):
     from . import cfgfile
 
     ver_string = "I am a version 1.3.0 PyBorg"
-    saves_version = "1.3.0"
+    saves_version = "1.4.0"
 
     # Main command list
     commandlist = "Pyborg commands:\n!checkdict, !contexts, !help, !known, !learning, !rebuilddict, \
@@ -207,7 +207,7 @@ class pyborg(object):
 
     @staticmethod
     def load_brain_json(brain_path):
-        saves_version = u"1.3.0"
+        saves_version = u"1.4.0"
         # folder = click.get_app_dir("Pyborg")
         logger.debug("Trying to open brain %s", brain_path)
         with open(brain_path) as f:
@@ -232,7 +232,7 @@ class pyborg(object):
         """
         logger.info("Writing dictionary...")
 
-        saves_version = u"1.3.0"
+        saves_version = u"1.4.0"
         folder = click.get_app_dir("Pyborg")
         logger.info("Saving pyborg brain to %s", self.brain_path)
         cnt = collections.Counter()
