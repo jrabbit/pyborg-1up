@@ -14,12 +14,13 @@ if sys.version_info >= (3,):
     import pyborg
     from pyborg.util.utils_testing import do_nothing
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
 
     class TestOnMessage(unittest.TestCase):
         def setUp(self):
            self.loop = asyncio.new_event_loop()
            asyncio.set_event_loop(self.loop)
+           self.loop.set_debug(True)
         
         def tearDown(self):
             self.loop.close()
@@ -56,7 +57,7 @@ if sys.version_info >= (3,):
             # print(our_pybd.user.id)
             # patched_user.id.assert_called_once_with()
             # print(patched_reply.mock_calls, patched_learn.mock_calls)
-            # print(patched_send.mock_calls)
+            #print(patched_send.mock_calls)
             patched_learn.assert_called_once_with(msg.content)
             patched_reply.assert_called_once_with(patched_clean.return_value)
 
@@ -76,10 +77,10 @@ if sys.version_info >= (3,):
             patched_reply.replace.return_value = "I should play dota! <@42303631157544375>" 
 
             our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
-            our_pybd.send_message = do_nothing
-            our_pybd.send_typing = partial(do_nothing, "bogus_arg")
+            our_pybd.send_message = partial(do_nothing, self.loop)
+            our_pybd.send_typing = partial(do_nothing, "bogus_arg", self.loop)
 
-            
             self.loop.run_until_complete(our_pybd.on_message(msg))
+            # print(asyncio.Task.all_tasks())
             patched_learn.assert_called_once_with(msg.content)
             patched_reply.assert_called_once_with(patched_clean.return_value)
