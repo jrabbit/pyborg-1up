@@ -1025,9 +1025,10 @@ class pyborg(object):
                 logging.info("the choosening: %s", liste[x])
                 mot = liste[x][0]
 
-            mot = mot.split(" ")
+            logger.debug("mot1: %s", len(mot))
+            mot = mot.split()
             mot.reverse()
-            if mot == ['']:
+            if mot == []:
                 done = 1
             else:
                 map( (lambda x: sentence.insert(0, x) ), mot )
@@ -1095,9 +1096,9 @@ class pyborg(object):
                     break
                 mot = liste[x][0]
 
-            # logger.debug("type of mot: %s", type(mot))
+            logger.debug("mot2: %s", len(mot))
             mot = mot.split()
-            if mot == ['']:
+            if mot == []:
                 done = 1
             else:
                 map( (lambda x: sentence.append(x) ), mot )
@@ -1121,9 +1122,12 @@ class pyborg(object):
                 sentence[x-1] = ""
 
         # yolo
-        l = [x.decode('utf-8') for x in sentence]
-        # return as string..
-        return u"".join(l)
+        if six.PY2:
+            l = [x.decode('utf-8') for x in sentence]
+            # return as string..
+            return u"".join(l)
+        else:
+            return "".join(sentence)
 
     def learn(self, body, num_context=1):
         """
