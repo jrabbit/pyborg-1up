@@ -565,7 +565,7 @@ class pyborg(object):
                     wlist = self.words[w]
 
                     for i in xrange(len(wlist)-1, -1, -1):
-                        line_idx = wlist[i]['hash']
+                        line_idx = wlist[i]['hashval']
                         word_num = wlist[i]['index']
                         # Nasty critical error we should fix
                         if line_idx not in self.lines:
@@ -833,7 +833,7 @@ class pyborg(object):
 
         for x in pointers:
             # pointers consist of (line, word) to self.lines
-            l = self.words[x['hash']]
+            l = self.words[x['hashval']]
             w = self.words[x['index']]
             line = self.lines[l][0].split()
             number = self.lines[l][1]
@@ -974,7 +974,7 @@ class pyborg(object):
             for x in xrange(0, len(self.words[word]) -1 ):
                 logger.debug(locals())
                 logger.debug('trying to unpack: %s', self.words[word][x])
-                l = self.words[word][x]['hash']
+                l = self.words[word][x]['hashval']
                 w = self.words[word][x]['index']
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
@@ -1054,7 +1054,7 @@ class pyborg(object):
             post_words = {"" : 0}
             word = str(sentence[-1].split(" ")[-1])
             for x in xrange(0, len(self.words[word]) ):
-                l = self.words[word][x]['hash']
+                l = self.words[word][x]['hashval']
                 w = self.words[word][x]['index']
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
@@ -1195,8 +1195,11 @@ class pyborg(object):
             # Ok so this takes a bytes object... in python3 thats a pain
             if six.PY3:
                 cleanbody_b = bytes(cleanbody, "utf-8")
-            # ok so crc32 got changed in 3...
-            hashval = crc32(cleanbody_b) & 0xffffffff
+                # ok so crc32 got changed in 3...
+                hashval = crc32(cleanbody_b) & 0xffffffff
+            else:
+                hashval = crc32(cleanbody) & 0xffffffff
+
 
             logger.debug(hashval)
             # Check context isn't already known
