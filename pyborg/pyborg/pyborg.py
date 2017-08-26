@@ -215,7 +215,9 @@ class pyborg(object):
         logger.debug(raw_json)
         brain = json.loads(raw_json)
         if brain['version'] == saves_version:
-            return brain['words'], brain['lines']
+            logger.debug(brain['lines'])
+            lines = {int(x):y for x,y in brain['lines'].items()}
+            return brain['words'], lines
         else:
             print("Error loading dictionary\nPlease convert it before launching pyborg")
             logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
