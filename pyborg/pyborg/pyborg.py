@@ -32,7 +32,6 @@ import os
 import pickle
 import random
 import re
-import struct
 import sys
 import time
 import zipfile
@@ -173,8 +172,6 @@ class pyborg(object):
         "owner": "Usage : !owner password\nAdd the user in the owner list"
     }
 
-    STRUCT_FMT = "IH"
-
     @staticmethod
     def load_brain_2(brain_path):
         """1.2.0 marshal.zip loader 
@@ -228,7 +225,7 @@ class pyborg(object):
 
     def save_brain(self):
         """
-        Save brain as 1.3.0 JSON format
+        Save brain as 1.4.0 JSON-Unsigned format
         """
         logger.info("Writing dictionary...")
 
@@ -242,11 +239,14 @@ class pyborg(object):
             for i in value:
                  cnt[type(i)] += 1
         logger.debug("Types: %s", cnt)
+        logger.debug("Words: %s", self.words)
+        logger.debug("Lines: %s", self.lines)
+
         brain = {'version': saves_version, 'words': self.words, 'lines':self.lines}
         tmp_file = os.path.join(folder, "tmp", "current.pyborg.json")
-        with open(tmp_file, 'wb') as f:
+        with open(tmp_file, 'w') as f:
             # this can fail half way...
-            json.dump(brain, f, ensure_ascii=False)
+            json.dump(brain, f)
         # if we didn't crash
         os.rename(tmp_file, self.brain_path)
         logger.debug("Successful writing of brain & renaming. Quitting.")
@@ -565,8 +565,8 @@ class pyborg(object):
                     wlist = self.words[w]
 
                     for i in xrange(len(wlist)-1, -1, -1):
-                        line_idx, word_num = struct.unpack("iH", wlist[i])
-
+                        line_idx = wlist[i]['hash']
+                        word_num = wlist[i]['index']
                         # Nasty critical error we should fix
                         if line_idx not in self.lines:
                             print("Removing broken link '%s' -> %d" % (w, line_idx))
@@ -833,7 +833,8 @@ class pyborg(object):
 
         for x in pointers:
             # pointers consist of (line, word) to self.lines
-            l, w = struct.unpack("iH", x)
+            l = self.words[x['hash']]
+            w = self.words[x['index']]
             line = self.lines[l][0].split()
             number = self.lines[l][1]
             if line[w] != old:
@@ -881,14 +882,14 @@ class pyborg(object):
                 dellist.append(x)
                 del self.lines[x]
         words = self.words
-        unpack = struct.unpack
         # update links
         for x in wordlist:
             word_contexts = words[x]
             # Check all the word's links (backwards so we can delete)
             for y in xrange(len(word_contexts)-1, -1, -1):
                 # Check for any of the deleted contexts
-                if unpack(self.STRUCT_FMT, word_contexts[y])[0] in dellist:
+                hashval = word_contexts[y]['hash']
+                if hashval in dellist:
                     del word_contexts[y]
                     self.settings.num_contexts = self.settings.num_contexts - 1
             if len(words[x]) == 0:
@@ -973,7 +974,8 @@ class pyborg(object):
             for x in xrange(0, len(self.words[word]) -1 ):
                 logger.debug(locals())
                 logger.debug('trying to unpack: %s', self.words[word][x])
-                l, w = struct.unpack(self.STRUCT_FMT, self.words[word][x])
+                l = self.words[word][x]['hash']
+                w = self.words[word][x]['index']
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
                 cwords = context.split()
@@ -1025,7 +1027,7 @@ class pyborg(object):
                 logging.info("the choosening: %s", liste[x])
                 mot = liste[x][0]
 
-            logger.debug("mot1: %s", len(mot))
+            # logger.debug("mot1: %s", len(mot))
             mot = mot.split()
             mot.reverse()
             if mot == []:
@@ -1052,7 +1054,8 @@ class pyborg(object):
             post_words = {"" : 0}
             word = str(sentence[-1].split(" ")[-1])
             for x in xrange(0, len(self.words[word]) ):
-                l, w = struct.unpack(self.STRUCT_FMT, self.words[word][x])
+                l = self.words[word][x]['hash']
+                w = self.words[word][x]['index']
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
                 cwords = context.split()
@@ -1096,7 +1099,7 @@ class pyborg(object):
                     break
                 mot = liste[x][0]
 
-            logger.debug("mot2: %s", len(mot))
+            # logger.debug("mot2: %s", len(mot))
             mot = mot.split()
             if mot == []:
                 done = 1
@@ -1191,9 +1194,9 @@ class pyborg(object):
             # Hash collisions we don't care about. 2^32 is big :-)
             # Ok so this takes a bytes object... in python3 thats a pain
             if six.PY3:
-                cleanbody = bytes(cleanbody, "utf-8")
+                cleanbody_b = bytes(cleanbody, "utf-8")
             # ok so crc32 got changed in 3...
-            hashval = crc32(cleanbody) & 0xffffffff
+            hashval = crc32(cleanbody_b) & 0xffffffff
 
             logger.debug(hashval)
             # Check context isn't already known
@@ -1205,9 +1208,9 @@ class pyborg(object):
                     for x in range(0, len(words)):
                         if words[x] in self.words:
                             # Add entry. (line number, word number)
-                            self.words[words[x]].append(struct.pack(self.STRUCT_FMT, hashval, x))
+                            self.words[words[x]].append({"hashval": hashval, "index": x})
                         else:
-                            self.words[words[x]] = [ struct.pack(self.STRUCT_FMT, hashval, x) ]
+                            self.words[words[x]] = [{"hashval": hashval, "index": x}]
                             self.settings.num_words += 1
                         self.settings.num_contexts += 1
             else :
