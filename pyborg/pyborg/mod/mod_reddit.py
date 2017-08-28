@@ -24,6 +24,7 @@ import time
 import arrow
 import praw
 import requests
+import six
 import toml
 
 from pyborg import pyborg
@@ -64,14 +65,17 @@ class PyborgReddit(object):
         "Pulls comment objects from reddit using our praw instance"
         # logger.debug("entering load_praw_comments")
         listing = self.reddit.get("/comments.json", params={"limit": self.CHUNKING})
-        new_posts = filter(lambda x: arrow.get(x.created_utc) > self.last_look, listing)
+        new_posts = [item for item in listing if arrow.get(item.created_utc) > self.last_look]
         self.last_look = arrow.utcnow()
         logger.debug("loaded %s new comments", len(new_posts))
         return new_posts
 
     def handle_post(self, post):
         # logger.debug("entering handle_post")
-        post_extract = post.body.encode('utf8')
+        if six.PY2:
+            post_extract = post.body.encode('utf8')
+        else:
+            post_extract = post.body
         if self.settings['reddit']['learning']:
             if not self.multiplexing:
                 # print(post_extract)
