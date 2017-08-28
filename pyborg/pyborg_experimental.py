@@ -32,12 +32,14 @@ logger = logging.getLogger(__name__)
 
 folder = click.get_app_dir("Pyborg")
 
+
 def mk_folder():
     try:
         os.makedirs(os.path.join(folder, "brains"))
         logger.info("pyborg folder created.")
     except OSError:
         logger.info("pyborg folder already exists.")
+
 
 @click.group()
 @click.option('--debug', default=False, is_flag=True)
@@ -49,18 +51,21 @@ def cli_base(verbose, debug):
     if verbose:
         logging.basicConfig(level=logging.INFO)
 
+
 @cli_base.group()
 def brain():
-    "Pyborg brain (archive.zip) utils"
+    "Pyborg brain (pybrain.json) utils"
     pass
+
 
 @brain.command("list")
 def list_brains():
-    "print out the pyborg brains (archive.zip)s info"
-    print(os.path.join(folder,"brains") + ":")
+    "print out the pyborg brains (pybrain.json)s info"
+    print(os.path.join(folder, "brains") + ":")
     for x in os.listdir(os.path.join(folder, "brains")):
         brain_size = os.path.getsize(os.path.join(folder, "brains", x))
         print("\t {0} {1}".format(x, humanize.naturalsize(brain_size)))
+
 
 @brain.command()
 @click.option('--output', type=click.Path())
@@ -71,8 +76,9 @@ def backup(target_brain, output):
         target = os.path.join(folder, "brains", "archive.zip")
     backup_name = datetime.datetime.now().strftime("pyborg-%m-%d-%y-archive")
     if output is None:
-        output  = os.path.join(folder, "brains", "{}.zip".format(backup_name))
+        output = os.path.join(folder, "brains", "{}.zip".format(backup_name))
     shutil.copy2(target, output)
+
 
 @brain.command()
 @click.argument('target_brain', default="current")
@@ -81,14 +87,15 @@ def stats(target_brain):
     if target_brain == "current":
         pyb = pyborg.pyborg.pyborg()
         print(json.dumps({"words": pyb.settings.num_words,
-                "contexts": pyb.settings.num_contexts,
-                "lines": len(pyb.lines)}))
+                          "contexts": pyb.settings.num_contexts,
+                          "lines": len(pyb.lines)}))
     else:
         brain_path = os.path.join(folder, "brains", target_brain)
         pyb = pyborg.pyborg.pyborg(brain=brain_path)
         print(json.dumps({"words": pyb.settings.num_words,
-                "contexts": pyb.settings.num_contexts,
-                "lines": len(pyb.lines)}))
+                          "contexts": pyb.settings.num_contexts,
+                          "lines": len(pyb.lines)}))
+
 
 @brain.command("import")
 @click.argument('target_brain', type=click.Path(exists=True), default="archive.zip")
@@ -100,7 +107,7 @@ def convert(target_brain, tag):
         tag_name = datetime.datetime.now().strftime("pyborg-%m-%d-%y-import-archive")
     else:
         tag_name = tag
-    output  = os.path.join(folder, "brains", "{}.zip".format(tag_name))
+    output = os.path.join(folder, "brains", "{}.zip".format(tag_name))
     shutil.copy2(target_brain, output)
     print("Imported your archive.zip as {}".format(output))
 
@@ -114,7 +121,8 @@ def upgrade_to_json(target_brain):
     elif os.path.exists(target_brain):
         brain_path = target_brain
     else:
-        brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
+        brain_path = os.path.join(
+            folder, "brains", "{}.zip".format(target_brain))
     words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
     version = u"1.3.0"
     save_path = os.path.join(folder, "brains", "current.pyborg.json")
@@ -132,6 +140,7 @@ def upgrade_to_json(target_brain):
                "version": version}
         json.dump(out, brain_file, ensure_ascii=False)
     print("Wrote out pyborg brain into {}".format(save_path))
+
 
 @brain.command()
 @click.argument('target_brain', default="current")
@@ -153,17 +162,17 @@ def doctor(target_brain):
         cnt[type(key)] += 1
         # cnt[type(value)] += 1
         for i in value:
-             cnt[type(i)] += 1
+            cnt[type(i)] += 1
         # print(type(key))
     # for item in lines:
     #     cnt[type(item)] += 1
     print(cnt)
 
 
-
 def check_server(server):
     response = requests.get("http://{}:2001/".format(server))
     response.raise_for_status()
+
 
 def run_mastodon(conf_file):
     bot = PyborgMastodon(conf_file)
@@ -175,6 +184,7 @@ def run_mastodon(conf_file):
     except Exception:
         bot.teardown()
         raise
+
 
 @cli_base.group(invoke_without_command=True)
 @click.pass_context
@@ -194,8 +204,9 @@ def mastodon(ctx, base_url, conf_file):
 @click.option("--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path())
 def mastodon_register(ctx, cred_file, bot_name):
     Mastodon.create_app(bot_name,
-                        api_base_url = ctx.obj['base_url'],
-                        to_file = cred_file)
+                        api_base_url=ctx.obj['base_url'],
+                        to_file=cred_file)
+
 
 @mastodon.command("login")
 @click.argument("username")
@@ -203,11 +214,11 @@ def mastodon_register(ctx, cred_file, bot_name):
 @click.pass_context
 @click.option("--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path(exists=True))
 def mastodon_login(ctx, cred_file, username, password):
-    mastodon = Mastodon(client_id = cred_file,
-                        api_base_url = ctx.obj['base_url'])
+    mastodon = Mastodon(client_id=cred_file,
+                        api_base_url=ctx.obj['base_url'])
     mastodon.log_in(username,
                     password,
-                    to_file = 'pyborg_mastodon_usercred.secret')
+                    to_file='pyborg_mastodon_usercred.secret')
 
 
 @cli_base.command()
@@ -243,6 +254,7 @@ def irc(conf_file):
         bot.disconnect("Caught exception")
         raise e
 
+
 @cli_base.command()
 @click.option("--conf-file", default="example.tumblr.toml")
 def tumblr(conf_file):
@@ -256,6 +268,7 @@ def tumblr(conf_file):
         bot.teardown()
         raise
 
+
 @cli_base.command()
 @click.option("--brain", default="current.pyborg.json")
 @click.option("--host", default="localhost")
@@ -267,6 +280,7 @@ def http(reloader, port, host, brain):
     bottle.install(BottledPyborg(brain_path=brain_path))
     bottle.run(host=host, port=port, reloader=reloader)
     bottle.default_app().close()
+
 
 @cli_base.command()
 @click.option("--conf-file", default="example.discord.toml")
@@ -285,6 +299,7 @@ def discord(conf_file):
         bot.teardown()
         raise
 
+
 @cli_base.command()
 @click.option("--conf-file", default="pyborg.reddit.toml")
 def reddit(conf_file):
@@ -297,6 +312,7 @@ def reddit(conf_file):
     except Exception:
         bot.teardown()
         raise
+
 
 @cli_base.command()
 @click.option("--multiplex", default=True, type=click.BOOL)
@@ -313,10 +329,11 @@ def linein(multiplex):
 @cli_base.command()
 def version():
     print("I am a version {} pyborg!".format(pyborg.__version__))
-    print("I'm running on {} {}/{}".format(platform.python_implementation(), platform.python_version(), platform.platform()))
+    print("I'm running on {} {}/{}".format(platform.python_implementation(),
+                                           platform.python_version(), platform.platform()))
 
 
 if __name__ == '__main__':
     # use this if we want to import third party commands or something
     # cli = click.CommandCollection(sources=[cli_base, brain])
-    cli_base() # noqa
+    cli_base()  # noqa
