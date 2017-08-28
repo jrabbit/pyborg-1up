@@ -397,7 +397,7 @@ class pyborg(object):
             for key in self.words.keys():
                 wordlist.append([key, len(self.words[key])])
             wordlist.sort(key=lambda x: x[1])
-            map((lambda x: f.write(str(x[0])+"\n\r")), wordlist)
+            list(map((lambda x: f.write(str(x[0])+"\n\r")), wordlist))
             f.close()
 
             f = open("sentences.txt", "w")
@@ -408,7 +408,7 @@ class pyborg(object):
                 wordlist.append([key, self.unfilterd[key]])
             # wordlist.sort(lambda x, y: cmp(y[1], x[1]))
             wordlist.sort(key=lambda x: x[1])
-            map((lambda x: f.write(str(x[0])+"\n")), wordlist)
+            list(map((lambda x: f.write(str(x[0])+"\n")), wordlist))
             f.close()
 
             # Save settings
@@ -974,8 +974,8 @@ class pyborg(object):
             #this is for prevent the case when we have an ignore_listed word
             word = str(sentence[0].split(" ")[0])
             for x in xrange(0, len(self.words[word]) -1 ):
-                logger.debug(locals())
-                logger.debug('trying to unpack: %s', self.words[word][x])
+                # logger.debug(locals())
+                # logger.debug('trying to unpack: %s', self.words[word][x])
                 l = self.words[word][x]['hashval']
                 w = self.words[word][x]['index']
                 context = self.lines[l][0]
@@ -1035,7 +1035,7 @@ class pyborg(object):
             if mot == []:
                 done = 1
             else:
-                map( (lambda x: sentence.insert(0, x) ), mot )
+                list(map( (lambda x: sentence.insert(0, x) ), mot ))
 
         pre_words = sentence
         sentence = sentence[-2:]
@@ -1106,8 +1106,7 @@ class pyborg(object):
             if mot == []:
                 done = 1
             else:
-                map( (lambda x: sentence.append(x) ), mot )
-
+                list(map(lambda x: sentence.append(x), mot))
         sentence = pre_words[:-2] + sentence
 
         #Replace aliases
@@ -1115,7 +1114,7 @@ class pyborg(object):
             if sentence[x][0] == "~": sentence[x] = sentence[x][1:]
 
         #Insert space between each words
-        map( (lambda x: sentence.insert(1+x*2, " ") ), xrange(0, len(sentence)-1) ) 
+        list(map( (lambda x: sentence.insert(1+x*2, " ") ), xrange(0, len(sentence)-1) ))
 
         #correct the ' & , spaces problem
         #code is not very good and can be improve but does his job...
@@ -1125,7 +1124,7 @@ class pyborg(object):
                 sentence[x+1] = ""
             if sentence[x] == ",":
                 sentence[x-1] = ""
-
+        # logger.debug("final locals: %s", locals())
         # yolo
         if six.PY2:
             l = [x.decode('utf-8') for x in sentence]
