@@ -31,6 +31,8 @@ if sys.version_info >= (3,):
         def test_no_reply(self, patched_reply, patched_learn, patched_user):
             msg = mock.Mock()
             msg.content = "Yolo!"
+            patched_reply.return_value = ""
+            patched_user.mentioned_in.return_value = False
             our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
             our_pybd.send_typing = partial(do_nothing, "bogus_arg")
 

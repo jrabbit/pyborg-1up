@@ -80,6 +80,7 @@ class PyborgDiscord(discord.Client):
             await self.send_typing(message.channel)
             # print("Is this ever run in tests?")
             clean = self.clean_msg(message)
+            logger.debug(clean)
             msg = self.reply(clean)
             logger.debug("on message: %s" % msg)
             if msg:
