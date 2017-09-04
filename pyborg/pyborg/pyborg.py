@@ -116,24 +116,10 @@ def filter_message(message, bot):
     message = " ".join(words)
     return message
 
-class FakeCfg(object):
-    """fake it until you make it"""
-    def __init__(self):
-        self.num_words = 6003
-        self.aliases = {}
-        self.num_aliases = 0
-        self.censored = []
-        self.no_save = False
-        self.num_contexts = 26505
-        self.max_words = 6000
-        self.ignore_list = []
-        self.learning = True
-
-    def save(self, *args):
-        pass
-
 @attr.s
 class FakeCfg2(object):
+    """fake it until you make it"""
+
     aliases = attr.ib(default={})
     num_aliases = attr.ib(default=0)
     censored = attr.ib(default=[])
@@ -291,11 +277,7 @@ class pyborg(object):
         #       "no_save" :("If True, Pyborg don't saves the dictionary and configuration on disk", "False")
         #     } )
         self.settings = self.load_settings()
-        # self.settings = FakeCfg()
-        # self.answers = self.cfgfile.cfgset()
-        # self.answers.load("answers.txt",
-        #     { "sentences":  ("A list of prepared answers", {})
-        #     } )
+
         self.answers =  FakeAns()
         self.unfilterd = {}
 
