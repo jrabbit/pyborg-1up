@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)
 
 @bottle.route("/")
 def index(pyborg):
-    return """<h1>Welcome to Pyborg/http</h1>
-    <h2>{}</h2>""".format(pyborg.ver_string)
+    return """<h1>Welcome to PyBorg/http</h1>
+    <h2>{}</h2>
+    <a href="/words.json">Words info (json)</a>""".format(pyborg.ver_string)
 
 # Basic API
 

@@ -40,6 +40,7 @@ from zlib import crc32
 
 import attr
 import click
+import toml
 import six
 
 import marshal
@@ -133,11 +134,18 @@ class FakeCfg(object):
 
 @attr.s
 class FakeCfg2(object):
-    max_words = attr.ib()
-    num_contexts = attr.ib()
+    aliases = attr.ib(default={})
+    num_aliases = attr.ib(default=0)
+    censored = attr.ib(default=[])
+    ignore_list = attr.ib(default=[])
+    max_words = attr.ib(default=6000)
+    num_words = attr.ib(default=0)
+    num_contexts = attr.ib(default=0)
     no_save = attr.ib(default=False)
     learning = attr.ib(default=True)
 
+    def save(self, *args):
+        pass
 
 class FakeAns(object):
     """this is a cool thing"""
@@ -145,9 +153,8 @@ class FakeAns(object):
         self.sentences = {}
 
 class pyborg(object):
-    from . import cfgfile
-
-    ver_string = "I am a version 1.3.0 PyBorg"
+    
+    ver_string = "I am a version 1.4.0 PyBorg"
     saves_version = "1.4.0"
 
     # Main command list
@@ -256,6 +263,15 @@ class pyborg(object):
     def save_all(self):
         self.save_brain()
 
+    def load_settings(self):
+        toml_path = os.path.join(click.get_app_dir("Pyborg"), "pyborg.toml")
+        d = toml.load(toml_path)['pyborg-core']
+        if not d['max_words']:
+            cfg = FakeCfg2(max_words=d['max_words'])
+        else:
+            cfg = FakeCfg2(max_words=50000)
+        return cfg
+
     def __init__(self, brain=None):
         """
         Open the dictionary. Resize as required.
@@ -274,7 +290,8 @@ class pyborg(object):
         #       "aliases":    ("A list of similars words", {}),
         #       "no_save" :("If True, Pyborg don't saves the dictionary and configuration on disk", "False")
         #     } )
-        self.settings = FakeCfg()
+        self.settings = self.load_settings()
+        # self.settings = FakeCfg()
         # self.answers = self.cfgfile.cfgset()
         # self.answers.load("answers.txt",
         #     { "sentences":  ("A list of prepared answers", {})

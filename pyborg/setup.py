@@ -16,7 +16,7 @@ setup(name="pyborg",
       author_email="jackjrabbit@gmail.com",
       description="Markov chain bot for irc which generates replies to messages",
       license="GPL v2 or later",
-      install_requires=["irc==15.1.1", "toml", "baker==1.3",
+      install_requires=["irc>=15.1.1", "toml",
                         "arrow==0.10.0", "PyTumblr==0.0.6", "requests", "bottle",
                         "venusian", "click", "humanize", "praw", "Mastodon.py", "lxml", "attrs"],
       entry_points='''
@@ -26,4 +26,6 @@ setup(name="pyborg",
       url="https://github.com/jrabbit/pyborg-1up/",
       classifiers=["License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
                    "Topic :: Communications :: Chat :: Internet Relay Chat",
-                   "Topic :: Games/Entertainment"])
+                   "Topic :: Games/Entertainment",
+                   "Programming Language :: Python :: 2.7",
+                   "Programming Language :: Python :: 3",])
