@@ -29,7 +29,6 @@ import collections
 import json
 import logging
 import os
-import pickle
 import random
 import re
 import sys
