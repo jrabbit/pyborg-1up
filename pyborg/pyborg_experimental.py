@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import collections
 import datetime
 import json
 import logging
@@ -13,6 +14,7 @@ import humanize
 import pyborg
 import pyborg.pyborg
 import requests
+import six
 import toml
 from mastodon import Mastodon
 from pyborg.mod.mod_http import bottle
@@ -85,16 +87,13 @@ def backup(target_brain, output):
 def stats(target_brain):
     "Get stats about a brain"
     if target_brain == "current":
-        pyb = pyborg.pyborg.pyborg()
-        print(json.dumps({"words": pyb.settings.num_words,
-                          "contexts": pyb.settings.num_contexts,
-                          "lines": len(pyb.lines)}))
+        brain_path = os.path.join(folder, "brains", "current.pyborg.json")
     else:
         brain_path = os.path.join(folder, "brains", target_brain)
-        pyb = pyborg.pyborg.pyborg(brain=brain_path)
-        print(json.dumps({"words": pyb.settings.num_words,
-                          "contexts": pyb.settings.num_contexts,
-                          "lines": len(pyb.lines)}))
+    pyb = pyborg.pyborg.pyborg(brain=brain_path)
+    print(json.dumps({"words": pyb.settings.num_words,
+                      "contexts": pyb.settings.num_contexts,
+                      "lines": len(pyb.lines)}))
 
 
 @brain.command("import")
@@ -127,7 +126,7 @@ def upgrade_to_json(target_brain):
     version = u"1.3.0"
     save_path = os.path.join(folder, "brains", "current.pyborg.json")
     for key, value in words.items():
-        if isinstance(key, unicode):
+        if isinstance(key, six.text_type):
             logger.info("Repairing bad unicode type in dictionary...")
             del words[key]
             safe_key = key.encode('utf-8')
@@ -138,22 +137,31 @@ def upgrade_to_json(target_brain):
         out = {"words": words,
                "lines": lines,
                "version": version}
-        json.dump(out, brain_file, ensure_ascii=False)
+        json.dump(out, brain_file)
     print("Wrote out pyborg brain into {}".format(save_path))
 
 
 @brain.command()
+@click.option('--one-two', is_flag=True)
 @click.argument('target_brain', default="current")
-def doctor(target_brain):
-    import collections
+def doctor(target_brain, one_two):
     cnt = collections.Counter()
+    
     if target_brain == "current":
         brain_path = os.path.join(folder, "brains", "current.pyborg.json")
+
+    elif os.path.exists(target_brain):
+        brain_path = target_brain
+    
     else:
         brain_path = os.path.join(folder, "brains", target_brain)
 
-    # words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
-    words, lines = pyborg.pyborg.pyborg.load_brain_json(brain_path)
+    logger.debug(brain_path)
+
+    if one_two:
+        words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
+    else:
+        words, lines = pyborg.pyborg.pyborg.load_brain_json(brain_path)
 
     # Type check the brain
     assert isinstance(words, dict)
