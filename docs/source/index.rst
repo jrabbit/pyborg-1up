@@ -15,6 +15,14 @@ Contents:
 Pyborg is a `markov chain <https://en.wikipedia.org/wiki/Markov_chain>`_ bot for `IRC <https://en.wikipedia.org/wiki/Internet_Relay_Chat>`_ (and other services) that generates replies based on messages and it's database.
 Pyborg exists as a range of scripts, libraries and servers. 
 
+
+
+.. click:: pyborg_experimental:cli_base
+   :prog: pyborg
+   :show-nested:
+
+
+
 Scripts
 =======
 
