@@ -7,6 +7,7 @@ import logging
 import os
 import platform
 import shutil
+import struct
 import sys
 
 import click
@@ -133,6 +134,15 @@ def upgrade_to_json(target_brain):
             logger.info("New type: %s", type(safe_key))
             logger.info("new key: %s", safe_key)
             words[safe_key] = value
+
+    # Convert the structpacking to dicts
+
+    for key,value in words.items():
+        new_packed = []
+        for packed in value:
+            hashval, idx = struct.unpack("iH", packed)
+        new_packed.append({"hash": hashval, "index": idx})
+
     with open(save_path, 'wb') as brain_file:
         out = {"words": words,
                "lines": lines,

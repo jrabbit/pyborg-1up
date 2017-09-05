@@ -197,6 +197,7 @@ class pyborg(object):
 
     @staticmethod
     def load_brain_json(brain_path):
+        """Load the new format"""
         saves_version = u"1.4.0"
         # folder = click.get_app_dir("Pyborg")
         logger.debug("Trying to open brain %s", brain_path)
