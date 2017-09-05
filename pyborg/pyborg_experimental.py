@@ -44,6 +44,18 @@ def mk_folder():
         logger.info("pyborg folder already exists.")
 
 
+def resolve_brain(target_brain):
+    if target_brain == "current":
+        brain_path = os.path.join(folder, "brains", "current.pyborg.json")
+
+    elif os.path.exists(target_brain):
+        brain_path = target_brain
+
+    else:
+        brain_path = os.path.join(folder, "brains", target_brain)
+    logger.debug("Resolved brain: %s", brain_path)
+    return brain_path
+
 @click.group()
 @click.option('--debug', default=False, is_flag=True)
 @click.option('--verbose/--silent', default=True)
@@ -87,10 +99,7 @@ def backup(target_brain, output):
 @click.argument('target_brain', default="current")
 def stats(target_brain):
     "Get stats about a brain"
-    if target_brain == "current":
-        brain_path = os.path.join(folder, "brains", "current.pyborg.json")
-    else:
-        brain_path = os.path.join(folder, "brains", target_brain)
+    brain_path = resolve_brain(target_brain)
     pyb = pyborg.pyborg.pyborg(brain=brain_path)
     print(json.dumps({"words": pyb.settings.num_words,
                       "contexts": pyb.settings.num_contexts,
@@ -159,16 +168,7 @@ def upgrade_to_json(target_brain):
 def doctor(target_brain, one_two):
     cnt = collections.Counter()
 
-    if target_brain == "current":
-        brain_path = os.path.join(folder, "brains", "current.pyborg.json")
-
-    elif os.path.exists(target_brain):
-        brain_path = target_brain
-
-    else:
-        brain_path = os.path.join(folder, "brains", target_brain)
-
-    logger.debug(brain_path)
+    brain_path = resolve_brain(target_brain)
 
     if one_two:
         words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
@@ -296,17 +296,7 @@ def tumblr(conf_file):
 @click.option("--reloader", default=False)
 def http(reloader, port, host, brain):
     "Run a server for mutliheaded (multiplex) pyborg"
-    target_brain = brain
-    
-    if target_brain == "current":
-        brain_path = os.path.join(folder, "brains", "current.pyborg.json")
-
-    elif os.path.exists(target_brain):
-        brain_path = target_brain
-
-    else:
-        brain_path = os.path.join(folder, "brains", target_brain)
-
+    brain_path = resolve_brain(brain)
     bottle.install(BottledPyborg(brain_path=brain_path))
     bottle.run(host=host, port=port, reloader=reloader)
     bottle.default_app().close()
