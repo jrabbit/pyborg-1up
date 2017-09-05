@@ -115,7 +115,7 @@ def convert(target_brain, tag):
 @brain.command("upgrade")
 @click.argument('target_brain', default="current")
 def upgrade_to_json(target_brain):
-    "Upgrade from a version 1.2 pyborg brain to 1.3 mono-json format"
+    "Upgrade from a version 1.2 pyborg brain to 1.4 mono-json dict format"
     if target_brain == "current":
         brain_path = "archive.zip"
     elif os.path.exists(target_brain):
@@ -124,8 +124,9 @@ def upgrade_to_json(target_brain):
         brain_path = os.path.join(
             folder, "brains", "{}.zip".format(target_brain))
     words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
-    version = u"1.3.0"
-    save_path = os.path.join(folder, "brains", "current.pyborg.json")
+    version = u"1.4.0"
+    tag_name = datetime.datetime.now().strftime("%m-%d-%y-import-archive")
+    save_path = os.path.join(folder, "brains", "{}.pyborg.json".format(tag_name))
     for key, value in words.items():
         if isinstance(key, six.text_type):
             logger.info("Repairing bad unicode type in dictionary...")
@@ -137,11 +138,12 @@ def upgrade_to_json(target_brain):
 
     # Convert the structpacking to dicts
 
-    for key,value in words.items():
+    for key, value in words.items():
         new_packed = []
         for packed in value:
             hashval, idx = struct.unpack("iH", packed)
         new_packed.append({"hash": hashval, "index": idx})
+        words[key] = new_packed
 
     with open(save_path, 'wb') as brain_file:
         out = {"words": words,
@@ -156,13 +158,13 @@ def upgrade_to_json(target_brain):
 @click.argument('target_brain', default="current")
 def doctor(target_brain, one_two):
     cnt = collections.Counter()
-    
+
     if target_brain == "current":
         brain_path = os.path.join(folder, "brains", "current.pyborg.json")
 
     elif os.path.exists(target_brain):
         brain_path = target_brain
-    
+
     else:
         brain_path = os.path.join(folder, "brains", target_brain)
 
@@ -288,13 +290,23 @@ def tumblr(conf_file):
 
 
 @cli_base.command()
-@click.option("--brain", default="current.pyborg.json")
+@click.option("--brain", default="current")
 @click.option("--host", default="localhost")
 @click.option("--port", default=2001)
 @click.option("--reloader", default=False)
 def http(reloader, port, host, brain):
     "Run a server for mutliheaded (multiplex) pyborg"
-    brain_path = os.path.join(folder, "brains", "current.pyborg.json")
+    target_brain = brain
+    
+    if target_brain == "current":
+        brain_path = os.path.join(folder, "brains", "current.pyborg.json")
+
+    elif os.path.exists(target_brain):
+        brain_path = target_brain
+
+    else:
+        brain_path = os.path.join(folder, "brains", target_brain)
+
     bottle.install(BottledPyborg(brain_path=brain_path))
     bottle.run(host=host, port=port, reloader=reloader)
     bottle.default_app().close()
