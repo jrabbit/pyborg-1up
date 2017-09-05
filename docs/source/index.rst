@@ -23,55 +23,8 @@ Pyborg exists as a range of scripts, libraries and servers.
 
 
 
-Scripts
-=======
-
-pyborg_irc2.py
---------------
-.. attention::
-   ``pyborg_irc2.py`` requires a configure file, default name: ``example.irc.toml``
-The rewritten irc module for pyborg. 
-Usage: pyborg_irc2.py <start_irc_bot> [<verbose>] [<debug>] [<conffile>]
-
-
-Command line options:
-
- *  :option:`-v` :option:`--verbose` -- set logging level to INFO
- *  :option:`-d` :option:`--debug`  -- set logging level to DEBUG
- *  :option:`-f` :option:`--conffile` specify a different conf file (default: ``example.irc.toml``)
-
-pyborg_tumblr.py
-----------------
-.. attention::
-   ``pyborg_tumblr.py`` requires a configure file default name: ``example.tumblr.toml``
-
-Usage: pyborg_tumblr.py <start_tumblr_bot> [<verbose>] [<toml_conf>]
-
-
-Command line options:
-
- *  :option:`--verbose` -- set logging level to INFO (default)
- *  :option:`-f` :option:`--toml_conf` -- 
-
-pyborg-linein.py
-----------------
-PyBorg offline line input module.
-
-Usage: pyborg-linein.py <start> [<multiplex>]
-
-
-Options:
-
- *  :option:`-m` :option:`--multiplex` -- turns on multiplexing.
-
-
-pyborg_http.py
---------------
-The http server that allows "multiplexing", letting different pyborg clients share one database. This is a small server configured just for a few clients.
-
-pyborg_http.py has no options currently.
-
-
+API
+===
 
 The core of pyborg is contained in the :py:mod:`pyborg.pyborg` module.
 
