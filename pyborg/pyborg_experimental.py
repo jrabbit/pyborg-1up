@@ -29,6 +29,7 @@ if sys.version_info <= (3,):
     from pyborg.mod.mod_tumblr import PyborgTumblr
 
 if sys.version_info >= (3,):
+    from pyborg.mod.mod_subtitle import PyborgSubtitles
     from pyborg.mod.mod_discord import PyborgDiscord
 
 logger = logging.getLogger(__name__)
@@ -300,6 +301,16 @@ def http(reloader, port, host, brain):
     bottle.install(BottledPyborg(brain_path=brain_path))
     bottle.run(host=host, port=port, reloader=reloader)
     bottle.default_app().close()
+
+
+@cli_base.command()
+@click.argument("subtitle-file")
+@click.option("--conf-file", default=os.path.join(folder, "subtitle.toml"))
+def subtitles(conf_file, subtitle_file):
+    subs = PyborgSubtitles(conf_file=conf_file, subs_file=subtitle_file)
+    subs.start()
+
+
 
 
 @cli_base.command()
