@@ -47,22 +47,36 @@ class TestPyborgInit(unittest.TestCase):
         expected_lines = {713833202: ['destroy edgar', 1],
                           1071494628: ['murder edgar', 1],
                           2622503271: ['kill edgar', 2],
-                          3710277035: ['are you a murderer', 1]}
+                          3025701897: ['fuck the moon', 1],
+                          3127776909: ['fuck space', 1],
+                          3710277035: ['are you a murderer', 1],
+                          3953240527: ['fuck reddit', 1],
+                          4186136012: ['fuck', 1]}
+
         expected_words = {'a': [{'hashval': 3710277035, 'index': 2}],
                           'are': [{'hashval': 3710277035, 'index': 0}],
                           'destroy': [{'hashval': 713833202, 'index': 0}],
                           'edgar': [{'hashval': 2622503271, 'index': 1},
                                     {'hashval': 713833202, 'index': 1},
                                     {'hashval': 1071494628, 'index': 1}],
+                          'fuck': [{'hashval': 4186136012, 'index': 0},
+                                   {'hashval': 3025701897, 'index': 0},
+                                   {'hashval': 3127776909, 'index': 0},
+                                   {'hashval': 3953240527, 'index': 0}],
                           'kill': [{'hashval': 2622503271, 'index': 0}],
+                          'moon': [{'hashval': 3025701897, 'index': 2}],
                           'murder': [{'hashval': 1071494628, 'index': 0}],
                           'murderer': [{'hashval': 3710277035, 'index': 3}],
+                          'reddit': [{'hashval': 3953240527, 'index': 1}],
+                          'space': [{'hashval': 3127776909, 'index': 1}],
+                          'the': [{'hashval': 3025701897, 'index': 1}],
                           'you': [{'hashval': 3710277035, 'index': 1}]}
+
         words, lines = pyborg.pyborg.pyborg.load_brain_json(self.small_brain)
         self.assertIsInstance(words, dict)
         self.assertIsInstance(lines, dict)
-        self.assertEqual(len(words), 8)
-        self.assertEqual(len(lines), 4)
+        self.assertEqual(len(words), 13)
+        self.assertEqual(len(lines), 8)
         self.assertEqual(words, expected_words)
         self.assertEqual(lines, expected_lines)
 
@@ -95,5 +109,5 @@ class TestPyborgReply(unittest.TestCase):
     def test_bs_reply(self, patched_toml):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
         our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
-        ret = our_pyb.reply("kill edgar")
+        ret = our_pyb.reply("fuck")
         self.assertNotEqual(ret, "")

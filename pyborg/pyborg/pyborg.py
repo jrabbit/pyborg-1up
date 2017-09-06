@@ -892,7 +892,7 @@ class pyborg(object):
             # Check all the word's links (backwards so we can delete)
             for y in xrange(len(word_contexts)-1, -1, -1):
                 # Check for any of the deleted contexts
-                hashval = word_contexts[y]['hash']
+                hashval = word_contexts[y]['hashval']
                 if hashval in dellist:
                     del word_contexts[y]
                     self.settings.num_contexts = self.settings.num_contexts - 1
@@ -917,15 +917,17 @@ class pyborg(object):
         
         # remove words on the ignore list
         words = [x for x in words if x not in self.settings.ignore_list and not x.isdigit()]
-
+        logging.debug("reply: cleaned words: %s", words)
         # Find rarest word (excluding those unknown)
         index = []
         known = -1
         # The word has to have been seen in already 3 contexts differents for being choosen
         known_min = 3
         for w in words:
+            logger.debug("known_loop: locals: %s", locals())
             if w in self.words:
                 k = len(self.words[w])
+                logger.debug("known_loop: k?? %s", k)
             else:
                 continue
             if (known == -1 or k < known) and k > known_min:
@@ -1225,7 +1227,8 @@ class pyborg(object):
                 self.lines[hashval][1] += num_context
 
             # if max_words reached, don't learn more
-            if self.settings.num_words >= self.settings.max_words: self.settings.learning = 0
+            if self.settings.num_words >= self.settings.max_words: 
+                self.settings.learning = 0
 
         # Split body text into sentences and parse them
         # one by one.
