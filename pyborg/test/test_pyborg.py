@@ -47,9 +47,9 @@ class TestPyborgLearning(unittest.TestCase):
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
         our_pyb.learn("'Read a book, any book' - Trotskist Proverb")
         print("words:", our_pyb.words)
-        self.assertNotEqual(len(our_pyb.words), 0)
         print(our_pyb.settings.num_words)
         print(our_pyb)
+        self.assertNotEqual(len(our_pyb.words), 0)
 
 
 class TestPyborgReply(unittest.TestCase):

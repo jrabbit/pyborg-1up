@@ -259,7 +259,7 @@ class pyborg(object):
         return cfg
 
     def __repr__(self):
-        return "{} with {} words and {} lines".format(self.ver_string, len(self.words), len(self.lines))
+        return "{} with {} words and {} lines. With a settings of: \n {}".format(self.ver_string, len(self.words), len(self.lines), self.settings)
 
     def __init__(self, brain=None):
         """
@@ -1145,6 +1145,7 @@ class pyborg(object):
             """
             Learn from a sentence.
             """
+            logger.debug("entering learn_line")
             words = body.split()
             # Ignore sentences of < 1 words XXX was <3
             if len(words) < 1:
@@ -1170,7 +1171,7 @@ class pyborg(object):
                     if re.search(pattern, words[x]):
                         print("Censored word %s" %words[x])
                         return
-
+                logger.debug("reply:learn_line:words: %s", words)
                 if len(words[x]) > 13 \
                 or ( ((nb_voy*100) / len(words[x]) < 26) and len(words[x]) > 5 ) \
                 or ( char and digit ) \
@@ -1181,6 +1182,7 @@ class pyborg(object):
                     #don't learn the sentence if one word is censored
                     #don't learn too if there are digits and char in the word
                     #same if learning is off
+                    logger.debug("reply:learn_line: Bailing because reasons?")
                     return
                 elif ( "-" in words[x] or "_" in words[x] ) :
                     words[x]="#nick"
