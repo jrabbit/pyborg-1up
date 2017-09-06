@@ -14,13 +14,15 @@ logger = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 class TestPyborgInit(unittest.TestCase):
     "Test all the pyborg loaders"
 
     blank_brain_path = "pyborg/test/fixtures/blank.brain.pyborg.json"
     old_style_brain = "pyborg/test/fixtures/old.brain.pyborg.archive.zip"
+    small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
 
-    @mock.patch("pyborg.pyborg.pyborg.__init__") # skip loading brain
+    @mock.patch("pyborg.pyborg.pyborg.__init__")  # skip loading brain
     @mock.patch("toml.load")
     def test_load_settings(self, patched_toml, patched_init):
         patched_init.return_value = None
@@ -34,11 +36,35 @@ class TestPyborgInit(unittest.TestCase):
     #   words, lines = pyborg.pyborg.pyborg.load_brain_2(self.old_style_brain)
 
     def test_load_brain_json_retuns_dicts(self):
-        words, lines = pyborg.pyborg.pyborg.load_brain_json(self.blank_brain_path)
+        words, lines = pyborg.pyborg.pyborg.load_brain_json(
+            self.blank_brain_path)
         self.assertIsInstance(words, dict)
         self.assertIsInstance(lines, dict)
         self.assertEqual(len(words), 0)
         self.assertEqual(len(lines), 0)
+
+    def test_load_brain_json_loads_small(self):
+        expected_lines = {713833202: ['destroy edgar', 1],
+                          1071494628: ['murder edgar', 1],
+                          2622503271: ['kill edgar', 2],
+                          3710277035: ['are you a murderer', 1]}
+        expected_words = {'a': [{'hashval': 3710277035, 'index': 2}],
+                          'are': [{'hashval': 3710277035, 'index': 0}],
+                          'destroy': [{'hashval': 713833202, 'index': 0}],
+                          'edgar': [{'hashval': 2622503271, 'index': 1},
+                                    {'hashval': 713833202, 'index': 1},
+                                    {'hashval': 1071494628, 'index': 1}],
+                          'kill': [{'hashval': 2622503271, 'index': 0}],
+                          'murder': [{'hashval': 1071494628, 'index': 0}],
+                          'murderer': [{'hashval': 3710277035, 'index': 3}],
+                          'you': [{'hashval': 3710277035, 'index': 1}]}
+        words, lines = pyborg.pyborg.pyborg.load_brain_json(self.small_brain)
+        self.assertIsInstance(words, dict)
+        self.assertIsInstance(lines, dict)
+        self.assertEqual(len(words), 8)
+        self.assertEqual(len(lines), 4)
+        self.assertEqual(words, expected_words)
+        self.assertEqual(lines, expected_lines)
 
 
 class TestPyborgLearning(unittest.TestCase):
@@ -64,3 +90,10 @@ class TestPyborgReply(unittest.TestCase):
         our_pyb = pyborg.pyborg.pyborg(brain=self.blank_brain_path)
         ret = our_pyb.reply("'Read a book, any book' - Trotskist Proverb")
         self.assertEqual(ret, "")
+
+    @mock.patch("toml.load")
+    def test_bs_reply(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
+        ret = our_pyb.reply("kill edgar")
+        self.assertNotEqual(ret, "")

@@ -1,4 +1,1 @@
-{"version": "1.4.0", 
-	"lines": {}, 
-	"words": {}
-}
+{"version": "1.4.0", "lines": {"713833202": ["destroy edgar", 1], "3710277035": ["are you a murderer", 1], "1071494628": ["murder edgar", 1], "2622503271": ["kill edgar", 2]}, "words": {"a": [{"index": 2, "hashval": 3710277035}], "murder": [{"index": 0, "hashval": 1071494628}], "murderer": [{"index": 3, "hashval": 3710277035}], "edgar": [{"index": 1, "hashval": 2622503271}, {"index": 1, "hashval": 713833202}, {"index": 1, "hashval": 1071494628}], "kill": [{"index": 0, "hashval": 2622503271}], "are": [{"index": 0, "hashval": 3710277035}], "destroy": [{"index": 0, "hashval": 713833202}], "you": [{"index": 1, "hashval": 3710277035}]}}
