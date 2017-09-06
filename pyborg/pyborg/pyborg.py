@@ -252,7 +252,7 @@ class pyborg(object):
     def load_settings(self):
         toml_path = os.path.join(click.get_app_dir("Pyborg"), "pyborg.toml")
         d = toml.load(toml_path)['pyborg-core']
-        if not d['max_words']:
+        if d['max_words']:
             cfg = FakeCfg2(max_words=d['max_words'])
         else:
             cfg = FakeCfg2(max_words=50000)

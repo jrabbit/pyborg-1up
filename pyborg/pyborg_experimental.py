@@ -24,6 +24,7 @@ from pyborg.mod.mod_linein import ModLineIn
 from pyborg.mod.mod_mastodon import PyborgMastodon
 from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.util.bottle_plugin import BottledPyborg
+from pyborg.util.util_cli import mk_folder
 
 if sys.version_info <= (3,):
     from pyborg.mod.mod_tumblr import PyborgTumblr
@@ -37,12 +38,6 @@ logger = logging.getLogger(__name__)
 folder = click.get_app_dir("Pyborg")
 
 
-def mk_folder():
-    try:
-        os.makedirs(os.path.join(folder, "brains"))
-        logger.info("pyborg folder created.")
-    except OSError:
-        logger.info("pyborg folder already exists.")
 
 
 def resolve_brain(target_brain):
@@ -61,6 +56,7 @@ def resolve_brain(target_brain):
 @click.option('--debug', default=False, is_flag=True)
 @click.option('--verbose/--silent', default=True)
 def cli_base(verbose, debug):
+    mk_folder()
     # only the first basicConfig() is respected.
     if debug:
         logging.basicConfig(level=logging.DEBUG)
