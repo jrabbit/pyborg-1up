@@ -43,9 +43,11 @@ class TestPyborgInit(unittest.TestCase):
 
 class TestPyborgLearning(unittest.TestCase):
     "Test learning"
-    def test_functional_learn(self):
+    @mock.patch("toml.load")
+    def test_functional_learn(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
-        our_pyb.learn("'Read a book, any book' - Trotskist Proverb")
+        our_pyb.learn("Read a book, any book - Trotskist Proverb")
         print("words:", our_pyb.words)
         print(our_pyb.settings.num_words)
         print(our_pyb)
@@ -56,7 +58,9 @@ class TestPyborgReply(unittest.TestCase):
     blank_brain_path = "pyborg/test/fixtures/blank.brain.pyborg.json"
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
 
-    def test_no_reply(self):
+    @mock.patch("toml.load")
+    def test_no_reply(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
         our_pyb = pyborg.pyborg.pyborg(brain=self.blank_brain_path)
         ret = our_pyb.reply("'Read a book, any book' - Trotskist Proverb")
         self.assertEqual(ret, "")
