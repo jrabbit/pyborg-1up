@@ -258,6 +258,9 @@ class pyborg(object):
             cfg = FakeCfg2(max_words=50000)
         return cfg
 
+    def __repr__(self):
+        return "{} with {} words and {} lines".format(self.ver_string, len(self.words), len(self.lines))
+
     def __init__(self, brain=None):
         """
         Open the dictionary. Resize as required.
@@ -1138,7 +1141,7 @@ class pyborg(object):
         to this.
         """
 
-        def learn_line(self, body, num_context):
+        def learn_line(body, num_context):
             """
             Learn from a sentence.
             """
@@ -1225,6 +1228,7 @@ class pyborg(object):
         # Split body text into sentences and parse them
         # one by one.
         body += " "
+        logger.debug("reply:replying to %s", body)
         # map ( (lambda x : learn_line(self, x, num_context)), body.split(". "))
         for part in body.split('. '):
-            learn_line(self, part, num_context)
+            learn_line(part, num_context)
