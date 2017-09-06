@@ -88,6 +88,9 @@ class TestPyborgLearning(unittest.TestCase):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
         our_pyb.learn("Read a book, any book - Trotskist Proverb")
+        our_pyb.learn("You should play dota 2 it's fun")
+        our_pyb.learn("dota 2 is a free game")
+
         print("words:", our_pyb.words)
         print(our_pyb.settings.num_words)
         print(our_pyb)
