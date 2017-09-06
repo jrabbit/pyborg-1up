@@ -148,7 +148,7 @@ def upgrade_to_json(target_brain):
         new_packed = []
         for packed in value:
             hashval, idx = struct.unpack("iH", packed)
-        new_packed.append({"hash": hashval, "index": idx})
+        new_packed.append({"hashval": hashval, "index": idx})
         words[key] = new_packed
 
     with open(save_path, 'wb') as brain_file:
