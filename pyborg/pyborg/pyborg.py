@@ -130,7 +130,24 @@ class FakeCfg2(object):
     learning = attr.ib(default=True)
 
     def save(self, *args):
+        logger.debug("Settings save called. Current state: %s", self)
+
+class FakeCfg(object):
+    """fake it until you make it"""
+    def __init__(self):
+        self.num_words = 6003
+        self.aliases = {}
+        self.num_aliases = 0
+        self.censored = []
+        self.no_save = False
+        self.num_contexts = 26505
+        self.max_words = 6000
+        self.ignore_list = []
+        self.learning = True
+
+    def save(self, *args):
         pass
+
 
 class FakeAns(object):
     """this is a cool thing"""
@@ -259,7 +276,7 @@ class pyborg(object):
         return cfg
 
     def __repr__(self):
-        return "{} with {} words and {} lines. With a settings of: \n {}".format(self.ver_string, len(self.words), len(self.lines), self.settings)
+        return "{} with {} words and {} lines. With a settings of: {}".format(self.ver_string, len(self.words), len(self.lines), self.settings)
 
     def __init__(self, brain=None):
         """
@@ -439,7 +456,7 @@ class pyborg(object):
             self.learn(body)
 
         # Make a reply if desired
-        if randint(0, 99) < replyrate:
+        if randint(0, 99) < int(replyrate):
 
             message = ""
 
@@ -938,8 +955,28 @@ class pyborg(object):
                 index.append(w)
                 continue
         # Index now contains list of rarest known words in sentence
+
+
+        # index = words
+
+        # def find_known_words(words):
+        #     d = dict()
+        #     for w in words:
+        #         if w in self.words:
+        #             logger.debug(self.words[w])
+        #             k = len(self.words[w])
+                    
+        #             d[w] = k
+        #     logger.debug("find_known_words: %s", d)
+        #     idx = [x for x,y  in d.items() if y > 3]
+        #     logger.debug("find_known_words: %s", idx)
+        #     return idx
+
+        # index = find_known_words(words)
+
         if len(index)==0:
             logging.debug("No words with atleast 3 contexts were found.")
+            logging.debug("reply:index: %s", index)
             return ""
 
         # Begin experimental NLP code
@@ -962,7 +999,7 @@ class pyborg(object):
             word = random.choice(population)
             # make sure the word is known
             counter = 0
-            while word not in index and counter < 200:
+            while word not in self.words and counter < 200:
                 word = random.choice(population)
                 counter += 1
             logging.debug("Ran choice %d times", counter)
@@ -978,8 +1015,8 @@ class pyborg(object):
             #this is for prevent the case when we have an ignore_listed word
             word = str(sentence[0].split(" ")[0])
             for x in xrange(0, len(self.words[word]) -1 ):
-                # logger.debug(locals())
-                # logger.debug('trying to unpack: %s', self.words[word][x])
+                logger.debug(locals())
+                logger.debug('trying to unpack: %s', self.words[word][x])
                 l = self.words[word][x]['hashval']
                 w = self.words[word][x]['index']
                 context = self.lines[l][0]
