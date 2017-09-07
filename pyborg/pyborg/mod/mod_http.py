@@ -1,4 +1,5 @@
 import logging
+import six
 
 import bottle
 from bottle import request
@@ -26,6 +27,9 @@ def learn(pyborg):
 @bottle.route("/reply", method="POST")
 def reply(pyborg):
     body = request.POST.get("body")
+    if six.PY2:
+        body = body.decode("utf-8")
+    logger.debug(type(body))
     return pyborg.reply(body)
 
 
@@ -47,7 +51,9 @@ class DumbyIOMod(object):
 @bottle.route("/process", method="POST")
 def process(pyborg):
     body = request.POST.get("body")
-    reply_rate = int(request.POST.get("reply_rate"))
+    if six.PY3:
+        reply_rate = int(request.POST.get("reply_rate"))
+    reply_rate = request.POST.get("reply_rate")
     learning = request.POST.get("learning")
     owner = request.POST.get("owner")
     io = DumbyIOMod()
