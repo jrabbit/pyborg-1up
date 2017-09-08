@@ -12,6 +12,7 @@ Contents:
    command
    api
    deploy
+   enduser
 
 
 
