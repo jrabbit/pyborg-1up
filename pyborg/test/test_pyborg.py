@@ -89,23 +89,63 @@ class TestPyborgClobbersave(unittest.TestCase):
             # touch the cat; do it stat!
             archive.write("")
 
-    # @mock.patch('__main__.open', mock.mock_open()) 
-    # this doesnt work????
     @mock.patch("toml.load")
     @mock.patch("pyborg.pyborg.pyborg.load_brain_json")
-    def test_no_clobber(self, patched_load_brain, patched_toml):
+    def test_no_clobber(self, patched_load_brain, patched_toml, ):
         "sometimes 1.4 will nuke archive.zip"
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
         patched_load_brain.side_effect = IOError
         our_pyb = pyborg.pyborg.pyborg()
-        our_pyb.save_brain()
 
         with open("archive.zip") as archive:
             self.assertEqual(archive.read(), "")
-        # patched_open.assert_called_once_with('foo', 'w')
+        self.assertNotEqual(our_pyb.brain_path, "archive.zip")
+
 
 class TestPyborgSave(unittest.TestCase):
-    pass
+    blank_brain_path = "pyborg/test/fixtures/blank.brain.pyborg.json"
+
+    lines = {713833202: ['destroy edgar', 1],
+                      1071494628: ['murder edgar', 1],
+                      2622503271: ['kill edgar', 2],
+                      3025701897: ['fuck the moon', 1],
+                      3127776909: ['fuck space', 1],
+                      3710277035: ['are you a murderer', 1],
+                      3953240527: ['fuck reddit', 1],
+                      4186136012: ['fuck', 1]}
+
+    words = {'a': [{'hashval': 3710277035, 'index': 2}],
+                      'are': [{'hashval': 3710277035, 'index': 0}],
+                      'destroy': [{'hashval': 713833202, 'index': 0}],
+                      'edgar': [{'hashval': 2622503271, 'index': 1},
+                                {'hashval': 713833202, 'index': 1},
+                                {'hashval': 1071494628, 'index': 1}],
+                      'fuck': [{'hashval': 4186136012, 'index': 0},
+                               {'hashval': 3025701897, 'index': 0},
+                               {'hashval': 3127776909, 'index': 0},
+                               {'hashval': 3953240527, 'index': 0}],
+                      'kill': [{'hashval': 2622503271, 'index': 0}],
+                      'moon': [{'hashval': 3025701897, 'index': 2}],
+                      'murder': [{'hashval': 1071494628, 'index': 0}],
+                      'murderer': [{'hashval': 3710277035, 'index': 3}],
+                      'reddit': [{'hashval': 3953240527, 'index': 1}],
+                      'space': [{'hashval': 3127776909, 'index': 1}],
+                      'the': [{'hashval': 3025701897, 'index': 1}],
+                      'you': [{'hashval': 3710277035, 'index': 1}]}
+
+    @mock.patch("json.loads")
+    @mock.patch("toml.load")
+    def test_save_db(self, patched_toml, patched_json):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        patched_json.return_value = {'version': u"1.4.0", 'words': self.words, 'lines':self.lines}
+        # m = mock.mock_open()
+        # with mock.patch('pyborg.pyborg.open', m):
+        our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
+        # our_pyb.brain_path = ""
+        our_pyb.save_brain()
+
+        # print(m.mock_calls)
+
 
 
 class TestPyborgLearning(unittest.TestCase):
