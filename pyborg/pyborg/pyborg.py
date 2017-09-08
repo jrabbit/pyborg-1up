@@ -45,6 +45,9 @@ import marshal
 import six
 import toml
 
+from pyborg.util.util_cli import mk_folder
+
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -301,7 +304,7 @@ class pyborg(object):
 
         self.answers =  FakeAns()
         self.unfilterd = {}
-
+        mk_folder()
         # Read the dictionary
         print("Reading dictionary...")
         if brain is None:
