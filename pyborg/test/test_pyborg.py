@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 import tempfile
 import unittest
@@ -79,6 +80,29 @@ class TestPyborgInit(unittest.TestCase):
         self.assertEqual(len(lines), 8)
         self.assertEqual(words, expected_words)
         self.assertEqual(lines, expected_lines)
+
+
+class TestPyborgClobbersave(unittest.TestCase):
+
+    def setUp(self):
+        with open("archive.zip", "w") as archive:
+            # touch the cat; do it stat!
+            archive.write("")
+
+    @mock.patch('__main__.open', mock.mock_open())
+    @mock.patch("pyborg.pyborg.pyborg.load_brain_json")
+    def test_no_clobber(self, patched_load_brain, patched_open):
+        "sometimes 1.4 will nuke archive.zip"
+        patched_load_brain.side_effect = IOError
+        our_pyb = pyborg.pyborg.pyborg()
+        our_pyb.save_brain()
+
+        with open("archive.zip") as archive:
+            self.assertEqual(archive.read(), "")
+        patched_open.assert_called_once_with('foo', 'w')
+
+class TestPyborgSave(unittest.TestCase):
+    pass
 
 
 class TestPyborgLearning(unittest.TestCase):

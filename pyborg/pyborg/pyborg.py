@@ -26,6 +26,7 @@
 #
 
 import collections
+import datetime
 import json
 import logging
 import os
@@ -33,16 +34,16 @@ import random
 import re
 import sys
 import time
+import uuid
 import zipfile
 from random import randint
 from zlib import crc32
 
 import attr
 import click
-import toml
-import six
-
 import marshal
+import six
+import toml
 
 logger = logging.getLogger(__name__)
 
@@ -260,6 +261,7 @@ class pyborg(object):
             # this can fail half way...
             json.dump(brain, f)
         # if we didn't crash
+        # if os.path.exists()
         os.rename(tmp_file, self.brain_path)
         logger.debug("Successful writing of brain & renaming. Quitting.")
 
@@ -314,6 +316,9 @@ class pyborg(object):
             self.words = {}
             self.lines = {}
             logger.error(e)
+            folder = click.get_app_dir("Pyborg")
+            name = datetime.datetime.now().strftime("%m-%d-%y-auto-{}.pyborg.json").format(str(uuid.uuid4())[:4])
+            self.brain_path = os.path.join(folder, "brains", name)
             print("Error reading saves. New database created.")
 
         # Is a resizing required?
