@@ -25,6 +25,9 @@
 # Seb Dailly <seb.dailly@gmail.com>
 #
 
+from __future__ import absolute_import
+
+
 import collections
 import datetime
 import json
@@ -45,7 +48,7 @@ import marshal
 import six
 import toml
 
-from util.util_cli import mk_folder
+from pyborg.util.util_cli import mk_folder
 
 
 logger = logging.getLogger(__name__)
