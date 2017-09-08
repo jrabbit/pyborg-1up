@@ -91,9 +91,11 @@ class TestPyborgClobbersave(unittest.TestCase):
 
     # @mock.patch('__main__.open', mock.mock_open()) 
     # this doesnt work????
+    @mock.patch("toml.load")
     @mock.patch("pyborg.pyborg.pyborg.load_brain_json")
-    def test_no_clobber(self, patched_load_brain):
+    def test_no_clobber(self, patched_load_brain, patched_toml):
         "sometimes 1.4 will nuke archive.zip"
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
         patched_load_brain.side_effect = IOError
         our_pyb = pyborg.pyborg.pyborg()
         our_pyb.save_brain()
