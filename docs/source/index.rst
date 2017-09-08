@@ -9,7 +9,10 @@ Welcome to pyborg-1up's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   command
+   api
+   deploy
+
 
 
 Pyborg is a `markov chain <https://en.wikipedia.org/wiki/Markov_chain>`_ bot for `IRC <https://en.wikipedia.org/wiki/Internet_Relay_Chat>`_ (and other services) that generates replies based on messages and it's database.
@@ -17,21 +20,14 @@ Pyborg exists as a range of scripts, libraries and servers.
 
 
 
-.. click:: pyborg_experimental:cli_base
-   :prog: pyborg
-   :show-nested:
 
+Installing
+==========
 
+We're on the cheeseshop.
 
-API
-===
+	pip install pyborg
 
-The core of pyborg is contained in the :py:mod:`pyborg.pyborg` module.
-
-
-.. autoclass:: pyborg.pyborg.pyborg
-    :members: learn, unlearn, reply, replace
-    :undoc-members:
 
 
 
