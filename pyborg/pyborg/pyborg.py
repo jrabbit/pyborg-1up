@@ -261,7 +261,6 @@ class pyborg(object):
             # this can fail half way...
             json.dump(brain, f)
         # if we didn't crash
-        # if os.path.exists()
         os.rename(tmp_file, self.brain_path)
         logger.debug("Successful writing of brain & renaming. Quitting.")
 
