@@ -30,6 +30,16 @@ We're on the cheeseshop.
 
 
 
+Advanced NLTK integration
+-------------------------
+
+ * install the nltk package
+ * run `their downloader <http://www.nltk.org/data.html>`_ and select the the following packages:
+
+ 	* averaged_perceptron_tagger
+	* punkt
+
+
 
 
 Indices and tables
