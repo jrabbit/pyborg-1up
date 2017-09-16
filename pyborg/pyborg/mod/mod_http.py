@@ -34,10 +34,15 @@ def reply(pyborg):
 
 
 
-# @bottle.route("/save", method="POST")
-# def reply(pyborg):
-#     pyborg.save_brain()
-#     return "OK"
+@bottle.route("/save", method="POST")
+def save(pyborg):
+    pyborg.save_brain()
+    return "Saved to {}".format(pyborg.brain_path)
+
+@bottle.route("/info")
+def info(pyborg):
+    return pyborg.ver_string, pyborg.brain_path
+
 
 # Advanced API
 
