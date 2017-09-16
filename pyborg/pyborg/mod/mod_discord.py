@@ -78,9 +78,10 @@ class PyborgDiscord(discord.Client):
         if self.settings['discord']['learning']:
             l = list()
             for x in message.content.split() 
-                if x.startswith("<@"):
+                if x.startswith("<@!"):
                     x = "#nick"
                 l.append(x)
+            logger.info(l)
             line = " ".join(l)
             self.learn(line)
         if self.user.mentioned_in(message):
