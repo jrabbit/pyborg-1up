@@ -72,9 +72,17 @@ class PyborgDiscord(discord.Client):
                     command = self.registry.registered[command_name]
                     logger.info("Running command %s", command)
                     await self.send_message(message.channel, command())
-        
+        if message.author == self.user:
+            logger.info("Not learning/responding to self")
+            return
         if self.settings['discord']['learning']:
-            self.learn(message.content)
+            l = list()
+            for x in message.content.split() 
+                if x.startswith("<@"):
+                    x = "#nick"
+                l.append(x)
+            line = " ".join(l)
+            self.learn(line)
         if self.user.mentioned_in(message):
             await self.send_typing(message.channel)
             # print("Is this ever run in tests?")
