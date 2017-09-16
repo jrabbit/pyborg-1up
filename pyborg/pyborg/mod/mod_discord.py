@@ -77,7 +77,7 @@ class PyborgDiscord(discord.Client):
             return
         if self.settings['discord']['learning']:
             l = list()
-            for x in message.content.split() 
+            for x in message.content.split(): 
                 if x.startswith("<@!"):
                     x = "#nick"
                 l.append(x)
