@@ -46,6 +46,7 @@ if sys.version_info >= (3,):
         def test_reply(self, patched_reply, patched_learn, patched_user, patched_clean):
             msg = mock.MagicMock()
             msg.content.return_value = "<@221134985560588289> you should play dota!"
+            msg.content.split.return_value = ["<@!221134985560588289>", "you", "should", "play", "dota!"]
             msg.channel.return_value = "maketotaldestroy"
             msg.author.mention.return_value = "<@42303631157544375>"
 
@@ -62,7 +63,7 @@ if sys.version_info >= (3,):
             # patched_user.id.assert_called_once_with()
             # print(patched_reply.mock_calls, patched_learn.mock_calls)
             #print(patched_send.mock_calls)
-            patched_learn.assert_called_once_with(msg.content)
+            patched_learn.assert_called_once_with("#nick you should play dota!")
             patched_reply.assert_called_once_with(patched_clean.return_value)
 
 
@@ -73,6 +74,7 @@ if sys.version_info >= (3,):
         def test_nick_replace(self, patched_reply, patched_learn, patched_user, patched_clean):
             msg = mock.MagicMock()
             msg.content.return_value = "<@221134985560588289> you should play dota!"
+            msg.content.split.return_value = ["<@!221134985560588289>", "you", "should", "play", "dota!"]
             msg.channel.return_value = "maketotaldestroy"
             msg.author.mention.return_value = "<@42303631157544375>"
 
@@ -86,5 +88,5 @@ if sys.version_info >= (3,):
 
             self.loop.run_until_complete(our_pybd.on_message(msg))
             # print(asyncio.Task.all_tasks())
-            patched_learn.assert_called_once_with(msg.content)
+            patched_learn.assert_called_once_with('#nick you should play dota!')
             patched_reply.assert_called_once_with(patched_clean.return_value)
