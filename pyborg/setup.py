@@ -18,7 +18,7 @@ setup(name="pyborg",
       license="GPL v2 or later",
       install_requires=["irc>=15.1.1", "toml",
                         "arrow==0.10.0", "PyTumblr==0.0.6", "requests", "bottle",
-                        "venusian", "click", "humanize", "praw", "Mastodon.py", "lxml", "attrs", "statsd"],
+                        "venusian", "click", "humanize", "praw", "Mastodon.py", "lxml", "attrs", "statsd", "aeidon"],
       entry_points='''
           [console_scripts]
           pyborg=pyborg_experimental:cli_base
@@ -28,4 +28,4 @@ setup(name="pyborg",
                    "Topic :: Communications :: Chat :: Internet Relay Chat",
                    "Topic :: Games/Entertainment",
                    "Programming Language :: Python :: 2.7",
-                   "Programming Language :: Python :: 3",])
+                   "Programming Language :: Python :: 3", ])
