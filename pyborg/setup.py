@@ -4,6 +4,13 @@ from setuptools import setup
 
 from pyborg import __version__
 
+
+requires = ["irc>=15.1.1", "toml",
+            "arrow==0.10.0", "PyTumblr==0.0.6", "requests", "bottle",
+            "venusian", "click", "humanize", "praw", "Mastodon.py",
+            "lxml", "attrs", "statsd"]
+if sys.version_info >= (3,):
+    requires.extend(["discord.py", "aeidon"])
 setup(name="pyborg",
       version=__version__,
       packages=["pyborg", "pyborg.util", "pyborg.mod"],
@@ -16,9 +23,7 @@ setup(name="pyborg",
       author_email="jackjrabbit@gmail.com",
       description="Markov chain bot for irc which generates replies to messages",
       license="GPL v2 or later",
-      install_requires=["irc>=15.1.1", "toml",
-                        "arrow==0.10.0", "PyTumblr==0.0.6", "requests", "bottle",
-                        "venusian", "click", "humanize", "praw", "Mastodon.py", "lxml", "attrs", "statsd"],
+      install_requires=requires,
       entry_points='''
           [console_scripts]
           pyborg=pyborg_experimental:cli_base
