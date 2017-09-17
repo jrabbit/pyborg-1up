@@ -5,6 +5,7 @@ import bottle
 from bottle import request
 
 from pyborg.util.bottle_plugin import BottledPyborg
+from pyborg.util.stats import send_stats
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,12 @@ def save(pyborg):
 def info(pyborg):
     return pyborg.ver_string, pyborg.brain_path
 
+
+@bottle.route("/stats", method="POST")
+def stats(pyborg):
+    "record stats to statsd"
+    send_stats(pyborg)
+    return "OK"
 
 # Advanced API
 

@@ -97,7 +97,8 @@ class PyborgReddit(object):
         return True
 
     def start(self):
-        print("I knew {} words ({} lines) before reading Reddit.com".format(self.pyborg.settings.num_words, len(self.pyborg.lines)))
+        # print("I knew {} words ({} lines) before reading Reddit.com".format(self.pyborg.settings.num_words, len(self.pyborg.lines)))
+        # this doesn't work on multiplexing
         while True:
             new_posts = self.load_praw_comments()
             for post in new_posts:

@@ -74,7 +74,7 @@ pyborg_http_saver.service ::
 	[Service]
 	WorkingDirectory=/home/jack/src/pyborg-1up/pyborg
 	# this uses httpie
-	ExecStart=http post :2001/save
+	ExecStart=/usr/bin/http post :2001/save
 	User=pyborg
 ..
 
@@ -101,7 +101,7 @@ pyborg_http_stats.service ::
 
 	[Service]
 	WorkingDirectory=/home/jack/src/pyborg-1up/pyborg
-	ExecStart=/home/jack/.virtualenvs/pyborg3/bin/pyborg brain stats --json
+	ExecStart=/usr/bin/http post :2001/stats
 	User=pyborg
 	
 ..
