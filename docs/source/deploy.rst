@@ -63,3 +63,58 @@ pyborg_discord.service ::
 	WantedBy=multi-user.target
 
 ..
+
+pyborg_http_saver.service ::
+
+	[Unit]
+	Description=Pyborg HTTP Saver
+	After=network.target
+	#Requires=pyborg_http.service
+
+	[Service]
+	WorkingDirectory=/home/jack/src/pyborg-1up/pyborg
+	# this uses httpie
+	ExecStart=http post :2001/save
+	User=pyborg
+..
+
+pyborg_http_saver.timer ::
+	
+	[Unit]
+	Description=Save and backup pyborg brain
+
+	[Timer]
+	OnBootSec=15min
+	OnUnitActiveSec=30min 
+
+	[Install]
+	WantedBy=timers.target
+
+..
+
+pyborg_http_stats.service ::
+
+	[Unit]
+	Description=Pyborg Stats Saver
+	After=network.target
+	#Requires=pyborg_http.service
+
+	[Service]
+	WorkingDirectory=/home/jack/src/pyborg-1up/pyborg
+	ExecStart=/home/jack/.virtualenvs/pyborg3/bin/pyborg brain stats --json
+	User=pyborg
+	
+..
+
+pyborg_http_stats.timer ::
+	
+	[Unit]
+	Description=Save stats snapshot of pyborg
+
+	[Timer]
+	OnUnitActiveSec=30min
+
+	[Install]
+	WantedBy=timers.target
+
+..
