@@ -275,7 +275,8 @@ class pyborg(object):
 
     def load_settings(self):
         toml_path = os.path.join(click.get_app_dir("Pyborg"), "pyborg.toml")
-        if not os.path.exists(toml_path):
+
+        if os.path.exists(click.get_app_dir("Pyborg")) and not os.path.exists(toml_path):
             settings = {'pyborg-core': {"max_words": False}}
             toml.dump(settings, open(toml_path, "w"))
 
