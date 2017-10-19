@@ -31,7 +31,6 @@ oauth2==1.9.0.post1
 pkg-resources==0.0.0
 praw==5.1.0
 prawcore==0.12.0
--e git+https://github.com/jrabbit/pyborg-1up.git@9424b7d4d60eb465caaf4c43a83a0e5e5361de1f#egg=pyborg&subdirectory=pyborg
 python-dateutil==2.6.0
 PyTumblr==0.0.6
 pytz==2017.2
