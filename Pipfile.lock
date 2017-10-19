@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "317a37e48ab950f2230304855087dbbd6ab2c687b93496c95bb7ca06e3d1ad45"
+            "sha256": "86fc3407436861e7a97aeed740f400eb2e4d73c9767afa3ecd8903c5eb58089f"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -34,6 +34,7 @@
                 "sha256:b12559b85926548607ac5d54133f8c2574cb13c581e5781f01c4dc07c7056d19",
                 "sha256:9e1f192f8f9d36acdcbf0e7354d95e2d997addebeb7be4be1b0fc1f686f54b6d"
             ],
+            "markers": "python_version >= '3.0'",
             "version": "==1.2"
         },
         "aiohttp": {
@@ -48,6 +49,7 @@
                 "sha256:3bfcb76553d7f6296d1a598162d5fb890198f98c021540cbbb85bb604ff198db",
                 "sha256:c3e1897726f97d40e067e8b658b2dbdfe216f32b801c5c589212e1b1f9aa8388"
             ],
+            "markers": "python_version >= '3.0'",
             "version": "==1.0.5"
         },
         "argparse": {
@@ -122,6 +124,7 @@
             "hashes": [
                 "sha256:d775b701383e3a5762accf3816b819f357f299476701615ac30c7715a5ea79aa"
             ],
+            "markers": "python_version >= '3.0'",
             "version": "==0.16.8"
         },
         "httplib2": {
@@ -253,6 +256,7 @@
                 "sha256:7328bc54a2c793c48c70f2c5c627b65227ae610383b8fdfd8908f24e806dbdd3",
                 "sha256:e76909da2fad6966281d4e0e4ccfd3c3025699ebcc30806afa09fa1384c3532b"
             ],
+            "markers": "python_version >= '3.0'",
             "version": "==3.3.0"
         },
         "oauth2": {
@@ -381,6 +385,7 @@
                 "sha256:09dfec40e9b73e8808c39ecdbc1733e33915a2b26b90c54566afc0af546a9ec3",
                 "sha256:43e5b9f51dd0000a4c6f646e2ade0c886bd14a784ffac08b9e079bd17a63bcc5"
             ],
+            "markers": "python_version >= '3.0'",
             "version": "==3.4"
         }
     },

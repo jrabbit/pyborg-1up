@@ -12,7 +12,11 @@ mock = "*"
 
 [packages]
 
-aeidon = "==1.2"
+aeidon = {version = "==1.2", markers = "python_version >= '3.0'"}
+multidict = {version = "==3.3.0", markers = "python_version >= '3.0'"}
+websockets = {version = "==3.4", markers = "python_version >= '3.0'"}
+aiohttp = {version = "==1.0.5", markers = "python_version >= '3.0'"}
+
 arrow = "==0.10.0"
 attrs = "*"
 bottle = "==0.12.13"
@@ -20,7 +24,7 @@ certifi = "*"
 chardet = "==3.0.4"
 click = ">=6.7"
 dateutils = "==0.6.6"
-"discord.py" = "==0.16.8"
+"discord.py" = {version = "==0.16.8", markers = "python_version >= '3.0'"}
 "httplib2" = "==0.10.3"
 httpretty = "==0.8.14"
 humanize = "==0.5.1"
