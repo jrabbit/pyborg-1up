@@ -1,13 +1,15 @@
-FROM python:2-alpine
+FROM python:2-slim
 
 LABEL maintainer "jackjrabbit@gmail.com"
 
 RUN mkdir -p /usr/src/pyborg
 
+COPY Pipfile Pipfile.lock /usr/src/
+
 COPY pyborg /usr/src/pyborg
 
-RUN pip --no-cache-dir install -e /usr/src/pyborg
+WORKDIR /usr/src/
 
-WORKDIR /usr/src/pyborg
+RUN pip install pipenv && pipenv install
 
-CMD ["pyborg", "linein"]
+CMD ["pipenv", "run", "pyborg", "linein"]
