@@ -1,13 +1,13 @@
 import logging
-import six
 
 import bottle
+import six
 from bottle import request
-
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.stats import send_stats
 
 logger = logging.getLogger(__name__)
+
 
 
 @bottle.route("/")
