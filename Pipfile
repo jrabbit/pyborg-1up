@@ -8,6 +8,9 @@ name = "pypi"
 green = "*"
 coverage = "*"
 mock = "*"
+"sphinx-click" = "*"
+click = "*"
+"sphinx-autobuild" = "*"
 
 
 [packages]
@@ -24,7 +27,7 @@ certifi = "*"
 chardet = "==3.0.4"
 click = ">=6.7"
 dateutils = "==0.6.6"
-"discord.py" = {version = "==0.16.8", markers = "python_version >= '3.0'"}
+"discord.py" = {version = "*", markers = "python_version >= '3.0'"}
 "httplib2" = "==0.10.3"
 httpretty = "==0.8.14"
 humanize = "==0.5.1"
@@ -46,7 +49,7 @@ pytumblr = "==0.0.6"
 pytz = "*"
 requests = ">=2.18"
 statsd = "*"
-toml = "==0.9.2"
+toml = "*"
 "update-checker" = "==0.16"
 venusian = "==1.1.0"
 lxml = "*"
