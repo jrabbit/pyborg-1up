@@ -81,7 +81,7 @@ class ModLineIn(object):
         command_list[0] = command_list[0].lower()
 
         if command_list[0] == "!quit":
-            sys.exit(0)
+            return
 
     def save(self):
         self.pyborg.save_all()
