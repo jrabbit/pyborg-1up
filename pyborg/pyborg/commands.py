@@ -33,3 +33,8 @@ def words(multiplex, multi_server):
 
     else:
         raise NotImplementedError
+
+
+@command()
+def blap():
+    return "https://mutualism.net/blap/its_good_to_be_sad.gif"
