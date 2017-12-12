@@ -3,7 +3,7 @@ services:
   pyborgd:
     build: .
     image: "jrabbit/pyborg"
-    command: pyborg http --host 0.0.0.0
+    command: pipenv run pyborg http --host 0.0.0.0
     volumes:
       # - .:/usr/src/pyborg
       - ./pyborg/archive.zip:/usr/src/pyborg/archive.zip
@@ -14,7 +14,7 @@ services:
   irc:
     build: .
     image: "jrabbit/pyborg"
-    command: pyborg irc
+    command: pipenv run pyborg irc
     depends_on:
       - pyborgd
   discord:
@@ -28,4 +28,4 @@ services:
     volumes:
       - ./pyborg/example.discord.toml:/etc/pyborg/discord.toml
     #   - .:/usr/src/pyborg
-    command: pyborg discord --conf-file /etc/pyborg/discord.toml
+    command: pipenv run pyborg discord --conf-file /etc/pyborg/discord.toml
