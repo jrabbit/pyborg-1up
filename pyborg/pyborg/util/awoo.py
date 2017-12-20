@@ -9,6 +9,7 @@ def normalize_awoos(inp):
     def repl(m):
         m.group()
         return "awoo"
-    pattern = r"awo+" 
-    out = re.sub(pattern, repl, inp)
+    pattern = re.compile(r"(?i)awo+")
+    # out = re.sub(pattern, repl, inp)
+    out = pattern.sub(repl, inp)
     return out
