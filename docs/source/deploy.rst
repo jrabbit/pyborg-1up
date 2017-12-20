@@ -15,6 +15,8 @@ Systemd Unit files
 
   * Install pyborg either from source or pip into the virtualenv
 
+  * Edit the unit files to match your system. (you probably aren't named Jack.)
+
   * install these unit files into your systemd path. (try :kbd:`/usr/lib/systemd/system`)
 
   * reload your systemd (:kbd:`systemctl daemon-reload`)
