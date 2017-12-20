@@ -7,6 +7,8 @@ import toml
 import venusian
 
 import pyborg.commands
+from pyborg.util.awoo import normalize_awoos
+
 
 #https://github.com/Rapptz/discord.py/blob/master/discord/ext/commands/bot.py#L146
 
@@ -55,12 +57,12 @@ class PyborgDiscord(discord.Client):
         print('------')
 
     def clean_msg(self, message):
-        return ' '.join(message.content.split()[1:])
+        return ' '.join(message.content.split())
 
     async def on_message(self, message):
         """message.content  ~= <@221134985560588289> you should play dota"""
         logger.debug(message.content)
-        if message.content[0] == "!":
+        if message.content and message.content[0] == "!":
             command_name = message.content[1:]
             if command_name in  ["list", "help"]:
                 help_text = "I have a bunch of commands:"
@@ -81,14 +83,17 @@ class PyborgDiscord(discord.Client):
                 if x.startswith("<@!"):
                     x = "#nick"
                 l.append(x)
-            logger.info(l)
+            logger.debug(l)
             line = " ".join(l)
+            line = normalize_awoos(line)
             self.learn(line)
         if self.user.mentioned_in(message):
             await self.send_typing(message.channel)
             # print("Is this ever run in tests?")
-            clean = self.clean_msg(message)
-            logger.debug(clean)
+            # clean = self.clean_msg(message)
+            # logger.debug(clean)
+            clean = normalize_awoos(message.content)
+            logger.debug("normalized: %s", clean)
             msg = self.reply(clean)
             logger.debug("on message: %s" % msg)
             if msg:
