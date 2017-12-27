@@ -99,6 +99,7 @@ class PyborgDiscord(discord.Client):
             if msg:
                 logger.debug("Sending message...")
                 msg = msg.replace("#nick", str(message.author.mention))
+                msg = msg.replace("@everyone", "")
                 await self.send_message(message.channel, msg)
 
     def learn(self, body):
