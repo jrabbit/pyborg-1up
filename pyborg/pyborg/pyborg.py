@@ -908,7 +908,7 @@ class pyborg(object):
         dellist = []
         # words that will have broken context due to this
         wordlist = []
-        for x in self.lines.keys():
+        for x in self.lines.copy().keys():
             # get context. pad
             c = " "+self.lines[x][0]+" "
             if c.find(context) != -1:
