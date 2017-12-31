@@ -454,12 +454,13 @@ class pyborg(object):
         Process message 'body' and pass back to IO module with args.
         If owner==1 allow owner commands.
         """
-
+        logger.debug("process_msg: %s", locals())
         # add trailing space so sentences are broken up correctly
         body = body + " "
 
         # Parse commands
         if body[0] == "!":
+            logger.debug("sending do_commands...")
             self.do_commands(io_module, body, args, owner)
             return
 
@@ -511,6 +512,7 @@ class pyborg(object):
         msg = ""
 
         command_list = body.split()
+        logger.debug("do_commands.command_list: %s", command_list)
         command_list[0] = command_list[0].lower()
 
         # Guest commands.

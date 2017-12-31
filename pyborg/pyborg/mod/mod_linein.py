@@ -66,9 +66,8 @@ class ModLineIn(object):
                 return
             if body == "":
                 continue
-            if body[0] == "!":
-                if self.linein_commands(body):
-                    continue
+            if body == "!quit":
+                return
             # Pass message to borg
             if self.multiplexed:
                 d = {"body": body, "reply_rate": 100, "learning": 1, "owner": 1}
@@ -80,13 +79,6 @@ class ModLineIn(object):
                     logger.error(resp)
             else:
                 self.pyborg.process_msg(self, body, 100, 1, (self.name), owner=1)
-
-    def linein_commands(self, body):
-        command_list = body.split()
-        command_list[0] = command_list[0].lower()
-
-        if command_list[0] == "!quit":
-            return
 
     def save(self):
         self.pyborg.save_all()

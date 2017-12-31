@@ -55,6 +55,7 @@ def stats(pyborg):
 
 class DumbyIOMod(object):
     """fake IO mod for pyborg interop"""
+    commandlist = ""
     message = None
     def output(self, message, args):
         self.message = message
@@ -65,9 +66,10 @@ def process(pyborg):
     body = request.POST.get("body")
     if six.PY3:
         reply_rate = int(request.POST.get("reply_rate"))
-    reply_rate = request.POST.get("reply_rate")
-    learning = request.POST.get("learning")
-    owner = request.POST.get("owner")
+    reply_rate = int(request.POST.get("reply_rate"))
+    learning = int(request.POST.get("learning"))
+    owner = int(request.POST.get("owner"))
+    # logger.debug("process: type: owner: %s", type(owner))
     io = DumbyIOMod()
     pyborg.process_msg(io, body, reply_rate, learning, None, owner)
     if io.message:
