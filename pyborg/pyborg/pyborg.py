@@ -49,6 +49,7 @@ import six
 import toml
 
 from pyborg.util.util_cli import mk_folder
+from pyborg.util.censored_defaults import CENSORED_REASONABLE_DEFAULTS
 
 
 logger = logging.getLogger(__name__)
@@ -128,7 +129,7 @@ class FakeCfg2(object):
 
     aliases = attr.ib(default={})
     num_aliases = attr.ib(default=0)
-    censored = attr.ib(default=[])
+    censored = attr.ib(default=CENSORED_REASONABLE_DEFAULTS)
     ignore_list = attr.ib(default=[])
     max_words = attr.ib(default=6000)
     num_words = attr.ib(default=0)
