@@ -129,7 +129,7 @@ class FakeCfg2(object):
 
     aliases = attr.ib(default={})
     num_aliases = attr.ib(default=0)
-    censored = attr.ib(default=CENSORED_REASONABLE_DEFAULTS)
+    censored = attr.ib(default=CENSORED_REASONABLE_DEFAULTS, repr=False)
     ignore_list = attr.ib(default=[])
     max_words = attr.ib(default=6000)
     num_words = attr.ib(default=0)
