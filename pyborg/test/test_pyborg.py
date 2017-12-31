@@ -164,6 +164,10 @@ class TestPyborgLearning(unittest.TestCase):
         self.assertNotEqual(len(our_pyb.words), 0)
 
 
+class TestPyborgFilterWord(unittest.TestCase):
+    pass
+
+
 class TestPyborgReply(unittest.TestCase):
     blank_brain_path = "pyborg/test/fixtures/blank.brain.pyborg.json"
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"

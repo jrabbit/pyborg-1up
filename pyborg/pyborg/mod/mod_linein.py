@@ -19,13 +19,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
+import logging
 import string
 import sys
 
 import requests
 import six
-
 from pyborg import pyborg
+
+logger = logging.getLogger(__name__)
 
 
 class ModLineIn(object):
@@ -46,7 +48,7 @@ class ModLineIn(object):
         self.start()
 
     def start(self):
-        print("PyBorg offline chat!\n")
+        print("PyBorg offline chat!")
         print("Type !quit to leave")
         print("What is your name")
         if six.PY2:
@@ -71,8 +73,11 @@ class ModLineIn(object):
             if self.multiplexed:
                 d = {"body": body, "reply_rate": 100, "learning": 1, "owner": 1}
                 resp = requests.post("http://localhost:2001/process", data=d)
-                resp.raise_for_status()
-                self.output(resp.text, None)
+                #resp.raise_for_status()
+                if resp.status_code == requests.codes.ok:
+                    self.output(resp.text, None)
+                else:
+                    logger.error(resp)
             else:
                 self.pyborg.process_msg(self, body, 100, 1, (self.name), owner=1)
 
