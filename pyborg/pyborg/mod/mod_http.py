@@ -82,6 +82,9 @@ def words_json(pyborg):
             "contexts": pyborg.settings.num_contexts,
             "lines": len(pyborg.lines)}
 
+@bottle.route("/commands.json")
+def commands_json(pyborg):
+    return pyborg.commanddict
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
