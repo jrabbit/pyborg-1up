@@ -6,7 +6,8 @@ services:
     command: pipenv run pyborg http --host 0.0.0.0
     volumes:
       # - .:/usr/src/pyborg
-      - ./pyborg/archive.zip:/usr/src/pyborg/archive.zip
+      # - ./pyborg/archive.zip:/usr/src/pyborg/archive.zip
+      - ./docker-brains:/root/.config/pyborg/brains/
     expose: 
       - "2001"
     ports:

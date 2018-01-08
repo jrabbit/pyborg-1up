@@ -11,9 +11,7 @@ Systemd Unit files
 
   * Create :program:`pyborg` user (:kbd:`adduser pyborg --no-create-home --shell /bin/false`)
 
-  * Create your desired python virtualenvs (Use :kbd:`virtualenv` or virtualenvwrapper's :kbd:`mkvirtualenv`)
-
-  * Install pyborg either from source or pip into the virtualenv
+  * Install pyborg into pipenv. Either from source (git) or pypi.
 
   * Edit the unit files to match your system. (you probably aren't named Jack.)
 
@@ -35,7 +33,7 @@ pyborg_http.service ::
 
 	[Service]
 	WorkingDirectory=/home/jack/src/pyborg-1up/pyborg
-	ExecStart=/home/jack/src/pyborg-1up/venv/bin/pyborg http
+	ExecStart=/usr/local/bin/pipenv run pyborg http
 	ExecReload=/bin/kill -HUP $MAINPID
 	KillMode=process
 	Restart=on-failure
@@ -56,7 +54,7 @@ pyborg_discord.service ::
 
 	[Service]
 	WorkingDirectory=/home/jack/src/pyborg-1up/pyborg
-	ExecStart=/home/jack/.virtualenvs/pyborg3/bin/pyborg discord
+	ExecStart=/usr/local/bin/pipenv run pyborg discord
 	ExecReload=/bin/kill -HUP $MAINPID
 	KillMode=process
 	Restart=on-failure
