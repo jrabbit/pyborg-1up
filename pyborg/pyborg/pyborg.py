@@ -1210,6 +1210,7 @@ class pyborg(object):
 
             # voyelles = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
             voyelles = "aeiouy"
+            logger.debug("reply:learn_line:words: %s", words)
             for x in range(0, len(words)):
 
                 nb_voy = 0
@@ -1228,7 +1229,6 @@ class pyborg(object):
                     if re.search(pattern, words[x]):
                         print("Censored word %s" %words[x])
                         return
-                logger.debug("reply:learn_line:words: %s", words)
                 if len(words[x]) > 13 \
                 or ( ((nb_voy*100) / len(words[x]) < 26) and len(words[x]) > 5 ) \
                 or ( char and digit ) \
