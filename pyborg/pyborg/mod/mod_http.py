@@ -63,13 +63,16 @@ class DumbyIOMod(object):
 
 @bottle.route("/process", method="POST")
 def process(pyborg):
-    body = request.POST.get("body")
+    body = request.POST.getunicode("body")
     if six.PY3:
         reply_rate = int(request.POST.get("reply_rate"))
     reply_rate = int(request.POST.get("reply_rate"))
     learning = int(request.POST.get("learning"))
     owner = int(request.POST.get("owner"))
     # logger.debug("process: type: owner: %s", type(owner))
+    # logger.debug("process:body type: %s", type(body))
+    # logger.debug("process:body: %s" ,body)
+
     io = DumbyIOMod()
     pyborg.process_msg(io, body, reply_rate, learning, None, owner)
     if io.message:
