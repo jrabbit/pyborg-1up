@@ -20,14 +20,14 @@ def index(pyborg):
 
 @bottle.route("/learn", method="POST")
 def learn(pyborg):
-    body = request.POST.get("body")
+    body = request.POST.getunicode("body")
     pyborg.learn(body)
     return "OK"
 
 
 @bottle.route("/reply", method="POST")
 def reply(pyborg):
-    body = request.POST.get("body")
+    body = request.POST.getunicode("body")
     if six.PY2:
         body = body.decode("utf-8")
     logger.debug(type(body))
