@@ -16,9 +16,12 @@ class ModFileIn(object):
             self.pyborg = pyborg.pyborg()
 
     def run(self, f_name):
-        ret = requests.get("http://{}:2001/words.json".format(self.multi_server))
-        ret.raise_for_status()
-        words = ret.json()
+        if self.multiplexing:
+            ret = requests.get("http://{}:2001/words.json".format(self.multi_server))
+            ret.raise_for_status()
+            words = ret.json()
+        else:
+            words = {"words": len(self.pyborg.words), "lines":len(self.pyborg.lines)}
         print("I knew {} words ({} lines) before reading {}".format(words['words'], words['lines'], f_name))
         counter = 0
         for line in fileinput.input(f_name):
@@ -33,11 +36,14 @@ class ModFileIn(object):
             if counter > 1000000:
                 self.save()
                 counter = 0
-        
-        ret2 = requests.get("http://{}:2001/words.json".format(self.multi_server))
-        ret2.raise_for_status()
-        words = ret2.json()
+        if self.multiplexing:
+            ret2 = requests.get("http://{}:2001/words.json".format(self.multi_server))
+            ret2.raise_for_status()
+            words = ret2.json()
+        else:
+            words = {"words": len(self.pyborg.words), "lines":len(self.pyborg.lines)}
         print("I know {} words ({} lines) now.".format(words['words'], words['lines']))
+
     def learn(self, msg):
         if not self.multiplexing:
             self.pyborg.learn(msg)

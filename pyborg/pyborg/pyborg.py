@@ -231,7 +231,13 @@ class pyborg(object):
             elif six.PY3:
                 raw_json = f.read()
         logger.debug(raw_json)
-        brain = json.loads(raw_json)
+        try:
+            brain = json.loads(raw_json)
+        except json.decoder.JSONDecodeError as e:
+            logger.exception(e)
+            logger.info("Tried to open brain %s", brain_path)
+            sys.exit(12)
+
         if brain['version'] == saves_version:
             logger.debug(brain['lines'])
             lines = {int(x):y for x,y in brain['lines'].items()}
