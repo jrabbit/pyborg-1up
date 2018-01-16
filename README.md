@@ -10,6 +10,10 @@ We're now on the cheeseshop! Yay!
 
 `pip install pyborg`
 
+If you want the latest git via pip you'll need some special sauce.
+
+`pip install -e git+https://github.com/jrabbit/pyborg-1up.git#egg=pyborg\&subdirectory=pyborg`
+
 
 Basic Usage
 -----------
