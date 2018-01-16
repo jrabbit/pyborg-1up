@@ -313,6 +313,13 @@ def subtitles(conf_file, subtitle_file):
     subs.start()
 
 
+@cli_base.command()
+@click.argument("input-file")
+@click.option("--multiplex", default=True, type=click.BOOL)
+def filein(multiplex, input_file):
+    from pyborg.mod.mod_filein import ModFileIn
+    mod = ModFileIn(multiplexing=multiplex)
+    mod.run(input_file)
 
 
 @cli_base.command()
