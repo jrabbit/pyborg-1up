@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 folder = click.get_app_dir("Pyborg")
 
-
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 def resolve_brain(target_brain):
@@ -52,7 +52,7 @@ def resolve_brain(target_brain):
     logger.debug("Resolved brain: %s", brain_path)
     return brain_path
 
-@click.group()
+@click.group(context_settings=CONTEXT_SETTINGS)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('--verbose/--silent', default=True)
 def cli_base(verbose, debug):
@@ -63,6 +63,12 @@ def cli_base(verbose, debug):
     if verbose:
         logging.basicConfig(level=logging.INFO)
 
+
+@cli_base.command()
+@click.pass_context
+def help(ctx):
+    """Show this message and exit."""
+    print(ctx.parent.get_help())
 
 @cli_base.group()
 def brain():
@@ -166,7 +172,7 @@ def doctor(target_brain, one_two):
     cnt = collections.Counter()
 
     brain_path = resolve_brain(target_brain)
-
+    # TODO: catch FileNotFoundError    
     if one_two:
         words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
     else:
