@@ -89,6 +89,15 @@ def words_json(pyborg):
 def commands_json(pyborg):
     return pyborg.commanddict
 
+@bottle.route("/logging-level", method="POST")
+def set_log_level():
+    # when we drop 2 support this can use strings instead of the enums
+    levels = {"DEBUG": logging.DEBUG, "INFO": logging.INFO,
+              "WARNING": logging.WARNING, "ERROR": logging.ERROR, "CRITICAL": logging.CRITICAL}
+    target = levels[request.POST.get("level").upper()]
+    logger.setLevel(target)
+
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     bottle.install(BottledPyborg())

@@ -305,6 +305,14 @@ def http(reloader, port, host, brain):
     bottle.default_app().close()
 
 
+@cli_base.command('set-log-level')
+@click.argument("log-level")
+def set_logging_level(log_level):
+    ret = requests.post("http://localhost:2001/logging-level", data={"level": log_level})
+    ret.raise_for_status()
+
+
+
 @cli_base.command()
 @click.argument("subtitle-file")
 @click.option("--conf-file", default=os.path.join(folder, "subtitle.toml"))
@@ -317,6 +325,7 @@ def subtitles(conf_file, subtitle_file):
 @click.argument("input-file")
 @click.option("--multiplex", default=True, type=click.BOOL)
 def filein(multiplex, input_file):
+    """ascii file input module"""
     from pyborg.mod.mod_filein import ModFileIn
     mod = ModFileIn(multiplexing=multiplex)
     mod.run(input_file)

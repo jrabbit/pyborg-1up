@@ -1,10 +1,12 @@
 import fileinput
 
 import attr
+import click
 import requests
 
 from pyborg import pyborg
 
+folder = click.get_app_dir("Pyborg")
 
 @attr.s
 class ModFileIn(object):
@@ -13,7 +15,8 @@ class ModFileIn(object):
 
     def __attrs_post_init__(self):
         if not self.multiplexing:
-            self.pyborg = pyborg.pyborg()
+            brain_path = os.path.join(folder, "brains", "current.pyborg.json")
+            self.pyborg = pyborg.pyborg(brain=brain_path)
 
     def run(self, f_name):
         if self.multiplexing:
@@ -63,4 +66,3 @@ class ModFileIn(object):
                 logger.error("Internal Server Error in pyborg_http. see logs.")
             else:
                 ret.raise_for_status()
-
