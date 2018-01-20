@@ -212,7 +212,7 @@ def run_mastodon(conf_file):
 @cli_base.group(invoke_without_command=True)
 @click.pass_context
 @click.option("--base-url", default='https://mastodon.social')
-@click.option("--conf-file", default="pyborg.mastodon.toml")
+@click.option("--conf-file", default=os.path.join(folder, "pyborg.mastodon.toml"))
 def mastodon(ctx, base_url, conf_file):
     "Run the mastodon mod; run register and login first"
     ctx.obj = dict()
