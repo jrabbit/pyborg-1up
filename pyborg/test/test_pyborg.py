@@ -185,3 +185,10 @@ class TestPyborgReply(unittest.TestCase):
         our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
         ret = our_pyb.reply("fuck")
         self.assertNotEqual(ret, "")
+
+    @mock.patch("toml.load")
+    def test_unicode_reply(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
+        ret = our_pyb.reply("fuck \U0001f52b")
+        print(ret)

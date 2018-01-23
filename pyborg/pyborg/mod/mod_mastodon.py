@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 class PyborgMastodon(object):
     """docstring for PyborgMastodon"""
     def __init__(self, conf_file):
-        super(PyborgMastodon, self).__init__()
         self.toml_file = conf_file
         self.settings = toml.load(conf_file)
         self.last_look = arrow.get(self.settings['mastodon']['last_look'])
@@ -57,6 +56,7 @@ class PyborgMastodon(object):
         return usern in should_reply
 
     def is_reply_to_me(self, item):
+        logger.debug(item)
         try:
             if item["in_reply_to_account_id"] == self.my_id:
                 return True
@@ -64,6 +64,24 @@ class PyborgMastodon(object):
                 return False
         except KeyError:
             return False
+
+    def handle_toots(self, toots):
+        for item in toots:
+            logger.debug(arrow.get(item["created_at"]) > self.last_look)
+            logger.debug(item['content'])
+            logger.debug(arrow.get(item["created_at"]) - self.last_look)
+            if arrow.get(item["created_at"]) > self.last_look and item["account"]["id"] is not self.my_id or True:
+                logger.debug("Got New Toot: {}".format(item))
+                fromacct = item['account']['acct'] # to check if we've banned them?
+                parsed_html = lxml.html.fromstring(item['content'])
+                body = parsed_html.text_content()
+                if self.settings['pyborg']['learning']:
+                    self.learn(body)
+                reply = self.reply(body)
+                if reply and (self.should_reply_direct(fromacct) or self.is_reply_to_me(item)):
+                    self.mastodon.status_post(reply, in_reply_to_id=item['id'])
+                else:
+                    logger.info("Couldn't toot.")
 
     def start(self):
         self.mastodon = Mastodon(
@@ -76,20 +94,11 @@ class PyborgMastodon(object):
         while True:
             tl = self.mastodon.timeline()
             toots = []
-            toots.extend(tl, mentions)
+            mentions = [notif['status'] for notif in self.mastodon.notifications() if notif['type'] == "mention"]
+            toots.extend(tl)
+            toots.extend(mentions)
+            self.handle_toots(toots)
             self.last_look = arrow.utcnow()
-            for item in tl:
-                if arrow.get(item["created_at"]) > self.last_look and item["acctount"]["id"] is not self.my_id:
-                    logger.debug("Got New Toot: {}".format(item))
-                    fromacct = item['account']['acct'] # to check if we've banned them?
-                    parsed_html = lxml.html.fromstring(item['content'])
-                    body = parsed_html.text_content()
-                    if self.settings['pyborg']['learning']:
-                        self.learn(body)
-                    reply = self.reply(body)
-                    if reply and (self.should_reply_direct(fromacct) or self.is_reply_to_me(item)):
-                        self.mastodon.status_post(reply, in_reply_to_id=item['id'])
-                    else:
-                        logger.info("Couldn't toot.")
+            logger.debug("Sleeping for {} seconds".format(self.settings['mastodon']['cooldown']))
             time.sleep(self.settings['mastodon']['cooldown'])
 
