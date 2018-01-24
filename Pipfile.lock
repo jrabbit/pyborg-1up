@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cc05578b3cd1082d0a6e91977a4cf968aa0347ae626303bc248e80020bf74dd6"
+            "sha256": "1abdff77a10842681284c10e127b6fcb895058746b2d37c6386337e0e7af5e15"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -302,6 +302,12 @@
             ],
             "version": "==1.9.0.post1"
         },
+        "oauthlib": {
+            "hashes": [
+                "sha256:ce57b501e906ff4f614e71c36a3ab9eacbb96d35c24d1970d2539bbc3ec70ce1"
+            ],
+            "version": "==2.0.6"
+        },
         "praw": {
             "hashes": [
                 "sha256:bdd892469fd53753923109e4c38b36ab26e9f918b0f41fc14386de7d6134ee33",
@@ -358,6 +364,13 @@
             ],
             "version": "==2.18.4"
         },
+        "requests-oauthlib": {
+            "hashes": [
+                "sha256:50a8ae2ce8273e384895972b56193c7409601a66d4975774c60c2aed869639ca",
+                "sha256:883ac416757eada6d3d07054ec7092ac21c7f35cb1d2cf82faf205637081f468"
+            ],
+            "version": "==0.8.0"
+        },
         "six": {
             "hashes": [
                 "sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb",
@@ -384,6 +397,13 @@
                 "sha256:8e86bd6ce8cc11b9620cb637466453d94f5d57ad86f17e98a98d1f73e3baab2d"
             ],
             "version": "==0.9.4"
+        },
+        "tweepy": {
+            "hashes": [
+                "sha256:12449b5ca16b0be6a3ea68fb41992627227b48bbad8cd7d5912039340d36badc",
+                "sha256:f00ccf5f48c30d559ce0b750dfe3b2df6668dc799d8ce276fd90bfaa68845a58"
+            ],
+            "version": "==3.5.0"
         },
         "update-checker": {
             "hashes": [

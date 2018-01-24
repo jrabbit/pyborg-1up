@@ -322,6 +322,20 @@ def subtitles(conf_file, subtitle_file):
 
 
 @cli_base.command()
+@click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
+def twitter(conf_file):
+    from pyborg.mod.mod_twitter import PyborgTwitter
+    mod = PyborgTwitter(conf_file)
+    try:
+        mod.start()
+    except KeyboardInterrupt:
+        mod.teardown()
+        sys.exit()
+    except Exception:
+        mod.teardown()
+        raise
+
+@cli_base.command()
 @click.argument("input-file")
 @click.option("--multiplex", default=True, type=click.BOOL)
 def filein(multiplex, input_file):

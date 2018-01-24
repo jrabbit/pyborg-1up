@@ -57,3 +57,4 @@ venusian = "==1.1.0"
 lxml = "*"
 "4392609" = {path = "pyborg", editable = true}
 prompt-toolkit = "*"
+tweepy = "*"
