@@ -10,6 +10,20 @@ import tweepy
 
 logger = logging.getLogger(__name__)
 
+class NoBlankLogFilter(logging.Filter):
+    def filter(self, record):
+        if isinstance(record.args, tuple):
+            # logger.info("args: %s", record.args)
+            if record.msg == "PARAMS: %r" and record.args[0] == {}:
+                logger.debug("ignoring %s", record)
+                return 0
+            else:
+                return True
+        else:
+            return True
+
+logging.getLogger("tweepy.binder").addFilter(NoBlankLogFilter())
+
 class PyborgTwitter(object):
     def __init__(self, conf_file):
         self.toml_file = conf_file
@@ -100,6 +114,7 @@ class PyborgTwitter(object):
         auth.set_access_token(self.settings['twitter']['auth']['access_token'], self.settings['twitter']['auth']['access_token_secret'])
 
         self.api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+        logger.info("Got API, starting twitter module...")
         while True:
             for t in self.get_tweets():
                 self.handle_tweet(t)
