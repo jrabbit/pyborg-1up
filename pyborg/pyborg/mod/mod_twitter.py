@@ -62,6 +62,10 @@ class PyborgTwitter(object):
             logger.info("Hit rate-limit.")
             return []
 
+    def is_reply_to_me(self, tweet):
+        """TODO: determine if we should reply"""
+        return False
+
     def handle_tweet(self, tweet):
         parsed_date = arrow.get(tweet.created_at)
         logger.debug(parsed_date)
@@ -70,11 +74,18 @@ class PyborgTwitter(object):
             if self.settings['pyborg']['learning']:
                 self.learn(tweet.text)
             reply = self.reply(tweet.text)
+            reply = reply.replace("#nick", "@"+tweet.user.screen_name)
             if reply:
-                if random.choice([True, True, False]):
-                    self.api.update_status(reply, in_reply_to_status_id=tweet.id)
-                else:
-                    self.api.update_status(reply)
+                try:
+                    if random.choice([True, True, False]) or self.is_reply_to_me(tweet):
+                        # auto_populate_reply_metadata 
+                        # https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update
+                        self.api.update_status(reply, in_reply_to_status_id=int(tweet.id), auto_populate_reply_metadata=True)
+                    else:
+                        self.api.update_status(reply)
+                except tweepy.error.TweepError as e:
+                    # trying to avoid tweepy.error.TweepError: [{'code': 187, 'message': 'Status is a duplicate.'}]
+                    logger.exception(e)
 
 
     def teardown(self):
