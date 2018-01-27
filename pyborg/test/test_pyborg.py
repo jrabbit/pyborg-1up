@@ -165,7 +165,23 @@ class TestPyborgLearning(unittest.TestCase):
 
 
 class TestPyborgFilterWord(unittest.TestCase):
-    pass
+    small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
+    
+    @mock.patch("toml.load")
+    def test_censored_reply(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
+        our_pyb.settings.censored = ["murder"]
+        ret = our_pyb.reply("murder")
+        self.assertEqual(ret, "")
+
+    @mock.patch("toml.load")
+    def test_censored_reply_regex(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
+        our_pyb.settings.censored = ["murder"]
+        ret = our_pyb.reply("murderer")
+        self.assertEqual(ret, "")
 
 
 class TestPyborgReply(unittest.TestCase):

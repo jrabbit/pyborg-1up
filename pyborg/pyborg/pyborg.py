@@ -1134,7 +1134,7 @@ class pyborg(object):
                 if w < len(cwords)-1:
                     #if the word is in ignore_list, look the next word
                     look_for = cwords[w+1]
-                    if look_for in self.settings.ignore_list and w < len(cwords) -2:
+                    if (look_for in self.settings.ignore_list or look_for in self.settings.censored) and w < len(cwords) -2:
                         look_for = look_for+" "+cwords[w+2]
 
                     if look_for not in post_words:

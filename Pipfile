@@ -13,6 +13,7 @@ mock = "*"
 sphinx-click = "*"
 click = "*"
 sphinx-autobuild = "*"
+mypy = "*"
 
 
 [packages]
