@@ -13,7 +13,7 @@ mock = "*"
 sphinx-click = "*"
 click = "*"
 sphinx-autobuild = "*"
-mypy = "*"
+mypy = {version = "*", markers = "python_version >= '3.0'"}
 
 
 [packages]
