@@ -1,5 +1,6 @@
 import logging
 from functools import partial
+from typing import Union, Dict
 
 import discord
 import requests
@@ -32,7 +33,7 @@ class PyborgDiscord(discord.Client):
     def __init__(self, toml_file):
         super(PyborgDiscord, self).__init__()
         self.toml_file = toml_file
-        self.settings = toml.load(self.toml_file)
+        self.settings: Dict = toml.load(self.toml_file)
         self.multiplexing = self.settings['pyborg']['multiplex']
         self.multi_server = self.settings['pyborg']['multiplex_server']
         self.registry = Registry(self)
@@ -43,23 +44,23 @@ class PyborgDiscord(discord.Client):
         else:
             self.pyborg = None
 
-    def our_start(self):
+    def our_start(self) -> None:
         self.scan()
         if 'token' in self.settings['discord']:
             self.run(self.settings['discord']['token'])
         else:
             logger.error("No Token. Set one in your conf file.")
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         print('Logged in as')
         print(self.user.name)
         print(self.user.id)
         print('------')
 
-    def clean_msg(self, message):
+    def clean_msg(self, message: discord.Message) -> str:
         return ' '.join(message.content.split())
 
-    async def on_message(self, message):
+    async def on_message(self, message) -> None:
         """message.content  ~= <@221134985560588289> you should play dota"""
         logger.debug(message.content)
         if message.content and message.content[0] == "!":
@@ -83,7 +84,7 @@ class PyborgDiscord(discord.Client):
                 if x.startswith("<@!"):
                     x = "#nick"
                 l.append(x)
-            logger.debug(l)
+            logger.debug(str(l))
             line = " ".join(l)
             line = normalize_awoos(line)
             self.learn(line)
@@ -103,7 +104,7 @@ class PyborgDiscord(discord.Client):
                 msg = msg.replace("@here", "`@here`")
                 await self.send_message(message.channel, msg)
 
-    def learn(self, body):
+    def learn(self, body: str) -> None:
         """thin wrapper for learn to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
             ret = requests.post("http://{}:2001/learn".format(self.multi_server), data={"body": body})
@@ -112,7 +113,7 @@ class PyborgDiscord(discord.Client):
             else:
                 ret.raise_for_status()
 
-    def reply(self, body):
+    def reply(self, body: str) -> Union[str, None]:
         """thin wrapper for reply to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
             ret = requests.post("http://{}:2001/reply".format(self.multi_server), data={"body": body})
@@ -121,14 +122,16 @@ class PyborgDiscord(discord.Client):
                 logger.debug("got reply: %s", reply)
             elif ret.status_code > 499:
                 logger.error("Internal Server Error in pyborg_http. see logs.")
-                return
+                return None
             else:
                 ret.raise_for_status()
             return reply
+        else:
+            raise NotImplementedError
 
-    def teardown(self):
+    def teardown(self) -> None:
         pass
 
-    def scan(self, module=pyborg.commands):
+    def scan(self, module=pyborg.commands) -> None:
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
