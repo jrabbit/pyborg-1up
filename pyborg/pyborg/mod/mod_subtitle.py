@@ -1,5 +1,7 @@
 import logging
 import time
+from typing import Union
+
 
 import aeidon  # https://github.com/otsaloma/gaupol/tree/master/aeidon
 import attr
@@ -19,7 +21,7 @@ class PyborgSubtitles(object):
     # def __attrs_post_init__(self):
     #    pass
 
-    def start(self):
+    def start(self) -> None:
         self.settings = toml.load(self.conf_file)
         self.multiplexing = True
         self.multi_server = self.settings['pyborg']['multi_server']
@@ -31,11 +33,11 @@ class PyborgSubtitles(object):
         self.subtitles = self.project.subtitles
         self.run()
 
-    def clean(self, subtitle):
+    def clean(self, subtitle: str) -> str:
         text = subtitle.replace("{\i1}", "").replace("{\i0}", "")
         return text
 
-    def run(self):
+    def run(self) -> None:
         """As time goes on print out our riffs"""
         for idx, subtitle in enumerate(self.subtitles):
             # remove italics markup
@@ -54,14 +56,14 @@ class PyborgSubtitles(object):
         
         self.teardown()
 
-    def pre_process(self):
+    def pre_process(self) -> None:
         for i, sub in enumerate(self.subtitles):
             reply = self.reply(self.clean(sub.main_text))
             if reply:
                 self.riffs[i] = reply
 
 
-    def reply(self, body):
+    def reply(self, body) -> Union[str, None]:
         """thin wrapper for reply to switch to multiplex mode"""
         if self.multiplexing:
             ret = requests.post("http://{}:2001/reply".format(self.multi_server), data={"body": body})
@@ -70,12 +72,14 @@ class PyborgSubtitles(object):
                 logger.debug("got reply: %s", reply)
             elif ret.status_code > 499:
                 logger.error("Error: Internal Server Error in pyborg_http. see logs.")
-                return
+                return None
             else:
                 ret.raise_for_status()
             return reply
+        else:
+            raise NotImplementedError
 
-    def teardown(self):
+    def teardown(self) -> None:
         pass
 
 
