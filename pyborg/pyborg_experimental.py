@@ -349,12 +349,12 @@ def follow_twitter_user(conf_file, target_user):
     api = get_api(conf_file)
     api.create_friendship(target_user)
 
-@cli_base.command()
-@click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
-def twitter_debug_shell(conf_file):
-    api = get_api(conf_file)
-    from IPython import embed
-    embed()
+# @cli_base.command()
+# @click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
+# def twitter_debug_shell(conf_file):
+#     api = get_api(conf_file)
+#     from IPython import embed
+#     embed()
 
 @cli_base.command()
 @click.argument("input-file")
