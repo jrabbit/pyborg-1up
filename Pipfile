@@ -14,6 +14,7 @@ sphinx-click = "*"
 click = "*"
 sphinx-autobuild = "*"
 mypy = {version = "*", markers = "python_version >= '3.0'"}
+ipython = "*"
 
 
 [packages]
@@ -22,7 +23,7 @@ aeidon = {version = "*", markers = "python_version >= '3.0'"}
 multidict = {version = "==3.3.0", markers = "python_version >= '3.0'"}
 websockets = {version = "==3.4", markers = "python_version >= '3.0'"}
 aiohttp = {version = "==1.0.5", markers = "python_version >= '3.0'"}
-async-timeout = {version = "*", markers = "python_version >= '3.0'"}
+async_timeout = {version = "*", markers = "python_version >= '3.0'"}
 arrow = "==0.10.0"
 attrs = "*"
 bottle = "==0.12.13"
@@ -43,19 +44,19 @@ irc = "==16.0"
 "jaraco.logging" = "==1.5"
 "jaraco.stream" = "==1.1.2"
 "jaraco.text" = "==1.9.2"
-"mastodon.py" = "==1.0.8"
+"Mastodon.py" = "==1.0.8"
 more-itertools = "==3.2.0"
 "oauth2" = "==1.9.0.post1"
 praw = "==5.1.0"
 prawcore = "==0.12.0"
-pytumblr = "==0.0.6"
+PyTumblr = "==0.0.6"
 pytz = "*"
 requests = ">=2.18"
 statsd = "*"
 toml = "*"
-update-checker = "==0.16"
+update_checker = "==0.16"
 venusian = "==1.1.0"
 lxml = "*"
 "4392609" = {path = "pyborg", editable = true}
-prompt-toolkit = "*"
+prompt_toolkit = "*"
 tweepy = "*"

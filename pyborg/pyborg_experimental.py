@@ -335,6 +335,27 @@ def twitter(conf_file):
         mod.teardown()
         raise
 
+def get_api(conf_file):
+    import tweepy
+    twsettings = toml.load(conf_file)
+    auth = tweepy.OAuthHandler(twsettings['twitter']['auth']['consumer_key'], twsettings['twitter']['auth']['consumer_secret'])
+    auth.set_access_token(twsettings['twitter']['auth']['access_token'], twsettings['twitter']['auth']['access_token_secret'])
+    api = tweepy.API(auth)
+
+@cli_base.command()
+@click.argument("target-user")
+@click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
+def follow_twitter_user(conf_file, target_user):
+    api = get_api(conf_file)
+    api.create_friendship(target_user)
+
+@cli_base.command()
+@click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
+def twitter_debug_shell(conf_file):
+    api = get_api(conf_file)
+    from IPython import embed
+    embed()
+
 @cli_base.command()
 @click.argument("input-file")
 @click.option("--multiplex", default=True, type=click.BOOL)

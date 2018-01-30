@@ -25,6 +25,9 @@ class NoBlankLogFilter(logging.Filter):
 
 logging.getLogger("tweepy.binder").addFilter(NoBlankLogFilter())
 
+# def follow_user_cli(api:tweepy.API, target_user: str) -> None:
+#     api.create_friendship(target_user)
+
 class PyborgTwitter(object):
     def __init__(self, conf_file):
         self.toml_file = conf_file
@@ -34,7 +37,7 @@ class PyborgTwitter(object):
         self.multi_server = self.settings['pyborg']['multi_server']
         self.pyborg = None
 
-    def learn(self, body) -> None:
+    def learn(self, body: str) -> None:
         if self.multiplexing:
             try:
                 ret = requests.post("http://{}:2001/learn".format(self.multi_server), data={"body": body})
@@ -82,21 +85,39 @@ class PyborgTwitter(object):
         return []
 
     def is_reply_to_me(self, tweet: tweepy.Status) -> bool:
-        """TODO: determine if we should reply"""
-        return False
+        me_at = self.me.screen_name
+        if me_at in [x["screen_name"] for x in tweet.entities["user_mentions"]] or tweet.in_reply_to_user_id == self.me.id:
+            logger.debug("I'm mentioned in: %s or am being replied to?", tweet.entities["user_mentions"])
+            return True
+        else:
+            return False
 
-    def handle_tweet(self, tweet: tweepy.Status):
+    def handle_tweet(self, tweet: tweepy.Status) -> None:
         parsed_date = arrow.get(tweet.created_at)
         logger.debug(parsed_date)
         if parsed_date > self.last_look:
             logger.info("Should respond to this tweet: %s from %s", tweet.text, tweet.user.screen_name)
+            # remove literal RTs here
+            if tweet.text.startswith("RT"):
+                text = tweet.text[3:]
+            else:
+                text = tweet.text
+            # if hasattr(tweet, "quote_tweet"):
+            # doesn't actually get the full quote tweet??? so fuck that
+            l = list()
+            for x in text.split(): 
+                if x.startswith("@"):
+                    x = "#nick"
+                l.append(x)
+            logger.debug(str(l))
+            line = " ".join(l)
             if self.settings['pyborg']['learning']:
-                self.learn(tweet.text)
-            reply = self.reply(tweet.text)
+                self.learn(line)
+            reply = self.reply(line)
             if reply:
                 reply = reply.replace("#nick", "@"+tweet.user.screen_name)
                 try:
-                    if random.choice([True, True, False]) or self.is_reply_to_me(tweet):
+                    if random.choice([True, False, False]) or self.is_reply_to_me(tweet):
                         # auto_populate_reply_metadata 
                         # https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update
                         self.api.update_status(reply, in_reply_to_status_id=int(tweet.id), auto_populate_reply_metadata=True)
@@ -119,6 +140,7 @@ class PyborgTwitter(object):
         auth.set_access_token(self.settings['twitter']['auth']['access_token'], self.settings['twitter']['auth']['access_token_secret'])
 
         self.api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+        self.me = self.api.me()
         logger.info("Got API, starting twitter module...")
         while True:
             for t in self.get_tweets():
