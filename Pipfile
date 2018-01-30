@@ -14,7 +14,6 @@ sphinx-click = "*"
 click = "*"
 sphinx-autobuild = "*"
 mypy = {version = "*", markers = "python_version >= '3.0'"}
-ipython = "*"
 
 
 [packages]
