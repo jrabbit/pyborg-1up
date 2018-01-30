@@ -221,7 +221,7 @@ class SingleServerIRCBot(SimpleIRCClient):
             self.connected = 0
             try:
                 self.connection.socket.close()
-            except socket.error, x:
+            except socket.error:
                 pass
             self.socket = None
         self.server_list.append(self.server_list.pop(0))
