@@ -341,6 +341,7 @@ def get_api(conf_file):
     auth = tweepy.OAuthHandler(twsettings['twitter']['auth']['consumer_key'], twsettings['twitter']['auth']['consumer_secret'])
     auth.set_access_token(twsettings['twitter']['auth']['access_token'], twsettings['twitter']['auth']['access_token_secret'])
     api = tweepy.API(auth)
+    return api
 
 @cli_base.command()
 @click.argument("target-user")
