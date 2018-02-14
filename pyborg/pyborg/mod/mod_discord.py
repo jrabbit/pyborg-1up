@@ -78,27 +78,44 @@ class PyborgDiscord(discord.Client):
         if message.author == self.user:
             logger.info("Not learning/responding to self")
             return
+
+        # Custom Emoji handling here
+        # DEBUG:pyborg.mod.mod_discord:<:weedminion:392111795642433556>
+        # e = message.server.emojis
+        # logger.info(str([x.name for x in e]))
+
+        #s[s.find("<:"):s.find(">")+1]
+
+        message.content[message.content.find("<:"):message.content.find(">")+1]
+
+
+        # Strip nicknames for pyborg
+        l = list()
+        for x in message.content.split(): 
+            if x.startswith("<@!"):
+                x = "#nick"
+            l.append(x)
+
+        logger.debug(str(l))
+        line = " ".join(l)
+        line = normalize_awoos(line)
+
         if self.settings['discord']['learning']:
-            l = list()
-            for x in message.content.split(): 
-                if x.startswith("<@!"):
-                    x = "#nick"
-                l.append(x)
-            logger.debug(str(l))
-            line = " ".join(l)
-            line = normalize_awoos(line)
             self.learn(line)
+
         if self.user.mentioned_in(message):
             await self.send_typing(message.channel)
-            # print("Is this ever run in tests?")
-            # clean = self.clean_msg(message)
-            # logger.debug(clean)
-            clean = normalize_awoos(message.content)
-            logger.debug("normalized: %s", clean)
-            msg = self.reply(clean)
+            msg = self.reply(line)
             logger.debug("on message: %s" % msg)
             if msg:
                 logger.debug("Sending message...")
+                # if custom emoji: replace to <:weedminion:392111795642433556>
+                # message.server map to full custom emoji
+                emoji_map = {x.name:x for x in message.server.emojis}
+                for word in msg.split():
+                    if word in emoji_map:
+                        e = emoji_map[word]
+                        msg = msg.replace(word, "<:{}:{}>".format(e.name, e.id))
                 msg = msg.replace("#nick", str(message.author.mention))
                 msg = msg.replace("@everyone", "`@everyone`")
                 msg = msg.replace("@here", "`@here`")
