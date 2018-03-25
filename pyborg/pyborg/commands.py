@@ -23,7 +23,7 @@ def words(multiplex, multi_server):
         ret.raise_for_status()
         words = ret.json()
         try:
-            contexts_per_word = float(words["words"]) / float(words["contexts"])
+            contexts_per_word = float(words["contexts"]) / float(words["words"]) 
 
         except ZeroDivisionError:
             contexts_per_word = 0
