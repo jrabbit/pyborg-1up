@@ -942,7 +942,7 @@ class pyborg(object):
                 self.settings.num_words = self.settings.num_words - 1
                 print("\"%s\" vaped totally" %x)
 
-    def _filter_censored(self, word):
+    def _is_censored(self, word):
         """DRY."""
         for censored in self.settings.censored:
             pattern = "^%s$" % censored
@@ -1040,7 +1040,7 @@ class pyborg(object):
             word = index[randint(0, len(index)-1)]
 
         # Build sentence backwards from "chosen" word
-        if _is_censored(word):
+        if self._is_censored(word):
             logger.debug("chosen word: %s***%s is censored. ignoring.", (word[0],word[-1]))
             return
         sentence = [word]
@@ -1204,7 +1204,7 @@ class pyborg(object):
         # logger.debug("final locals: %s", locals())
         # yolo
         for w in sentence:
-            if _is_censored(w):
+            if self._is_censored(w):
                 logger.debug("word in sentence: %s***%s is censored. escaping.", (w[0],w[-1]))
                 return None
         if six.PY2:
