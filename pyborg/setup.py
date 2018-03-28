@@ -15,8 +15,7 @@ if sys.version_info >= (3,):
 setup(name="pyborg",
       version=__version__,
       packages=["pyborg", "pyborg.util", "pyborg.mod"],
-      scripts=['pyborg-telnet.py',
-               'pyborg-irc.py',
+      scripts=['pyborg-irc.py',
                'pyborg_experimental.py'],
       author="Jack Laxson",
       author_email="jackjrabbit@gmail.com",
@@ -32,4 +31,5 @@ setup(name="pyborg",
                    "Topic :: Communications :: Chat :: Internet Relay Chat",
                    "Topic :: Games/Entertainment",
                    "Programming Language :: Python :: 2.7",
-                   "Programming Language :: Python :: 3", ])
+                   "Programming Language :: Python :: 3", 
+                   "Programming Language :: Python :: 3.6",])
