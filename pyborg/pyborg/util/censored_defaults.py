@@ -2,5 +2,8 @@
 CENSORED_REASONABLE_DEFAULTS = [
     "rape",
     "raping",
-    "rapist"
+    "rapist",
+    "retarded",
+    "retard",
+    "kike",
 ]

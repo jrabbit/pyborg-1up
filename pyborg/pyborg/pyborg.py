@@ -942,6 +942,15 @@ class pyborg(object):
                 self.settings.num_words = self.settings.num_words - 1
                 print("\"%s\" vaped totally" %x)
 
+    def _filter_censored(self, word):
+        """DRY."""
+        for censored in self.settings.censored:
+            pattern = "^%s$" % censored
+            if re.search(pattern, word):
+                print("Censored word %s" % word)
+                return False
+
+
     def reply(self, body):
         """
         Reply to a line of text.
@@ -1031,6 +1040,9 @@ class pyborg(object):
             word = index[randint(0, len(index)-1)]
 
         # Build sentence backwards from "chosen" word
+        if _is_censored(word):
+            logger.debug("chosen word: %s***%s is censored. ignoring.", (word[0],word[-1]))
+            return
         sentence = [word]
         done = 0
         while done == 0:
@@ -1191,12 +1203,17 @@ class pyborg(object):
                 sentence[x-1] = ""
         # logger.debug("final locals: %s", locals())
         # yolo
+        for w in sentence:
+            if _is_censored(w):
+                logger.debug("word in sentence: %s***%s is censored. escaping.", (w[0],w[-1]))
+                return None
         if six.PY2:
             l = [x.decode('utf-8') for x in sentence]
             # return as string..
-            return u"".join(l)
+            final = u"".join(l)
         else:
-            return "".join(sentence)
+            final = "".join(sentence)
+        return final
 
     def learn(self, body, num_context=1):
         """
