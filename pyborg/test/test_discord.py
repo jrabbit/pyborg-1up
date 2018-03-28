@@ -33,7 +33,7 @@ if sys.version_info >= (3,):
             msg.content = "Yolo!"
             patched_reply.return_value = ""
             patched_user.mentioned_in.return_value = False
-            our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
+            our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
             our_pybd.send_typing = partial(do_nothing, "bogus_arg")
 
             self.loop.run_until_complete(our_pybd.on_message(msg))
@@ -54,7 +54,7 @@ if sys.version_info >= (3,):
             patched_reply.return_value = "I should play dota!"
             patched_reply.replace.return_value = "I should play dota!" 
 
-            our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
+            our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
             our_pybd.send_message = do_nothing
             our_pybd.send_typing = partial(do_nothing, "bogus_arg")
             
@@ -82,7 +82,7 @@ if sys.version_info >= (3,):
             patched_reply.return_value = "I should play dota! #nick"
             patched_reply.replace.return_value = "I should play dota! <@42303631157544375>" 
 
-            our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/fixtures/discord.toml")
+            our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
             our_pybd.send_message = do_nothing
             our_pybd.send_typing = partial(do_nothing, "bogus_arg")
 

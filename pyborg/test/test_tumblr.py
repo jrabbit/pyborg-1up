@@ -21,7 +21,7 @@ if sys.version_info < (3,):
                                'last_look': datetime.datetime(2016, 8, 18, 7, 25, 30, 164769),
                                'learning': False,
                                'tags': ['hello bill']}}
-        with open("pyborg/fixtures/tumblr_posts.json") as fixture_f:
+        with open("pyborg/test/fixtures/tumblr_posts.json") as fixture_f:
             posts = json.load(fixture_f)
 
         @mock.patch('pyborg.pyborg.pyborg')
