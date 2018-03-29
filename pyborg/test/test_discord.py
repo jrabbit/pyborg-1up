@@ -1,6 +1,6 @@
+import logging
 import sys
 import unittest
-import logging
 
 try:
     from unittest import mock
@@ -90,3 +90,79 @@ if sys.version_info >= (3,):
             # print(asyncio.Task.all_tasks())
             patched_learn.assert_called_once_with(patched_normalize.return_value)
             patched_reply.assert_called_once_with(patched_normalize.return_value)
+
+    @unittest.skip
+    class TestCustomEmojis(unittest.TestCase):
+
+        def setUp(self):
+           self.loop = asyncio.new_event_loop()
+           asyncio.set_event_loop(self.loop)
+           # self.loop.set_debug(True)
+        
+        def tearDown(self):
+            self.loop.close()
+
+        @mock.patch('pyborg.mod.mod_discord.normalize_awoos')
+        @mock.patch('pyborg.mod.mod_discord.PyborgDiscord.user', create=True)
+        @mock.patch('pyborg.mod.mod_discord.PyborgDiscord.learn')
+        @mock.patch('pyborg.mod.mod_discord.PyborgDiscord.reply')
+        def test_learn_custom_emojis(self, patched_reply, patched_learn, patched_user, patched_normalize):
+            msg = mock.MagicMock()
+            original = 'attempt <:weedminion:392111795642433556> replacement'
+            content = mock.MagicMock()
+            content.return_value = original
+            msg.content =  content
+            msg.content.__contains__.return_value = True
+            msg.content.split.return_value = ['attempt', '<:weedminion:392111795642433556>', 'replacement']
+            msg.content.partition.return_value = ("attempt ", "<:weedminion:392111795642433556>", " replacement")
+            msg.channel.return_value = "maketotaldestroy"
+            # patched_normalize.return_value = 'attempt <:weedminion:392111795642433556> replacement'
+            expected = "attempt weedminion replacement"
+
+            our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
+            our_pybd.send_message = do_nothing
+            our_pybd.send_typing = partial(do_nothing, "bogus_arg")
+
+            self.loop.run_until_complete(our_pybd.on_message(msg))
+            patched_normalize.assert_called_once_with(expected)
+
+            patched_learn.assert_called_once_with(expected)
+            patched_reply.assert_called_once_with(original)
+        
+
+        @mock.patch('pyborg.mod.mod_discord.normalize_awoos')
+        @mock.patch('pyborg.mod.mod_discord.PyborgDiscord.user', create=True)
+        @mock.patch('pyborg.mod.mod_discord.PyborgDiscord.learn')
+        @mock.patch('pyborg.mod.mod_discord.PyborgDiscord.reply')
+        def test_learn_custom_emojis_simple(self, patched_reply, patched_learn, patched_user, patched_normalize):
+            msg = mock.MagicMock()
+            original = '<:weedminion:392111795642433556>'
+            content = mock.MagicMock()
+            content.return_value = original
+            msg.content =  content
+            msg.content.__contains__.return_value = True
+            msg.content.split.return_value = ['<:weedminion:392111795642433556>']
+            msg.content.partition.return_value = ("attempt ", "<:weedminion:392111795642433556>", " replacement")
+            msg.channel.return_value = "maketotaldestroy"
+            expected = "weedminion"
+
+            our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
+            our_pybd.send_message = do_nothing
+            our_pybd.send_typing = partial(do_nothing, "bogus_arg")
+
+            self.loop.run_until_complete(our_pybd.on_message(msg))
+            patched_normalize.assert_called_once_with(expected)
+            # patched_learn.assert_called_once_with(expected)
+            patched_reply.assert_called_once_with(original)
+
+        def test_extract_emoji(self):
+            from pyborg.mod.mod_discord import PyborgDiscord
+            msg = mock.MagicMock()
+            original = '<:weedminion:392111795642433556>'
+            content = mock.MagicMock()
+            content.return_value = original
+            msg.content.partition.return_value = ("", "<:weedminion:392111795642433556>", "")
+            msg.content =  content
+            our_pybd = PyborgDiscord("pyborg/test/fixtures/discord.toml")
+            extracted = our_pybd._extract_emoji(msg, ["weedminion"])
+            self.assertEqual(extracted, "weedminion")
