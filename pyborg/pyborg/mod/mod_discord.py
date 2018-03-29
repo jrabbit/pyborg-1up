@@ -1,15 +1,13 @@
 import logging
 from functools import partial
-from typing import Union, Dict
 
 import discord
+import pyborg.commands
 import requests
 import toml
 import venusian
-
-import pyborg.commands
 from pyborg.util.awoo import normalize_awoos
-
+from typing import Dict, Tuple, Union, List
 
 #https://github.com/Rapptz/discord.py/blob/master/discord/ext/commands/bot.py#L146
 
@@ -29,7 +27,8 @@ class Registry(object):
 
 
 class PyborgDiscord(discord.Client):
-    """docstring for PyborgDiscord"""
+    """This is the pyborg discord client module. 
+    It connects over http to a running pyborg/http service."""
     def __init__(self, toml_file):
         super(PyborgDiscord, self).__init__()
         self.toml_file = toml_file
@@ -60,7 +59,25 @@ class PyborgDiscord(discord.Client):
     def clean_msg(self, message: discord.Message) -> str:
         return ' '.join(message.content.split())
 
-    async def on_message(self, message) -> None:
+    def _extract_emoji(self, msg: str, server_emojis:List[str]) -> str:
+        """extract an emoji, returns a str ready to be munged"""
+        #s[s.find("<:"):s.find(">")+1] the general idea here
+        start = msg.find("<:")
+        attempted_emoji = msg[start+2:msg.find(":",start+2)]
+        logger.info("_extract_emoji:attempting to emoji: %s", attempted_emoji)
+        if attempted_emoji in server_emojis:
+            # now replace the range from start to end with the extracted emoji
+            end = msg.find(">", start)+1
+            before, _, after = msg.partition(msg[start:end])
+            logger.debug(_)
+            incoming_message = before + attempted_emoji + after
+            logger.info(incoming_message)
+            return incoming_message
+        else:
+            logger.info("someone did a fucky wucky")
+            return msg
+
+    async def on_message(self, message: discord.Message) -> None:
         """message.content  ~= <@221134985560588289> you should play dota"""
         logger.debug(message.content)
         if message.content and message.content[0] == "!":
@@ -81,22 +98,24 @@ class PyborgDiscord(discord.Client):
 
         # Custom Emoji handling here
         # DEBUG:pyborg.mod.mod_discord:<:weedminion:392111795642433556>
-        # e = message.server.emojis
-        # logger.info(str([x.name for x in e]))
+        # is this cached? is this fast? who the fuck knows
+        if "<:" in message.content:
+            e = message.server.emojis
+            server_emojis = [x.name for x in e]
+            logger.debug("got server emojis as: %s", str(server_emojis))
+            incoming_message =  self._extract_emoji(message.content, server_emojis)
 
-        #s[s.find("<:"):s.find(">")+1]
-
-        message.content[message.content.find("<:"):message.content.find(">")+1]
-
+        else:
+            incoming_message = message.content
 
         # Strip nicknames for pyborg
         l = list()
-        for x in message.content.split(): 
+        for x in incoming_message.split(): 
             if x.startswith("<@!"):
                 x = "#nick"
             l.append(x)
 
-        logger.debug(str(l))
+        logger.debug("post nick replace: %s", str(l))
         line = " ".join(l)
         line = normalize_awoos(line)
 
