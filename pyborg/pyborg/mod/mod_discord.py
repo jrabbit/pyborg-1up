@@ -74,7 +74,8 @@ class PyborgDiscord(discord.Client):
             logger.info(incoming_message)
             return incoming_message
         else:
-            logger.info("someone did a fucky wucky")
+            logger.info("_extract_emoji:someone did a fucky wucky")
+            logger.debug("_extract_emoji:OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!")
             return msg
 
     async def on_message(self, message: discord.Message) -> None:

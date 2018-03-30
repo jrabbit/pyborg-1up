@@ -538,7 +538,7 @@ class pyborg(object):
             else:
                 num_cpw = 0.0
             msg = "I know %d words (%d contexts, %.2f per word), %d lines." % (num_w, num_c, num_cpw, num_l)
-                
+
         # Do i know this word
         elif command_list[0] == "!known":
             if len(command_list) == 2:
@@ -998,7 +998,6 @@ class pyborg(object):
         #         if w in self.words:
         #             logger.debug(self.words[w])
         #             k = len(self.words[w])
-                    
         #             d[w] = k
         #     logger.debug("find_known_words: %s", d)
         #     idx = [x for x,y  in d.items() if y > 3]

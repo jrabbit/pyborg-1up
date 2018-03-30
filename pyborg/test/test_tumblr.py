@@ -7,20 +7,25 @@ import unittest
 if sys.version_info < (3,):
     import mock
     import pyborg
-       
 
     class TestBot(unittest.TestCase):
-        settings = {'auth': {'consumer_key': 'KEY',
-                             'consumer_secret': 'SECRET',
-                             'oauth_secret': 'TOKEN',
-                             'oauth_token': 'TOKEN'},
-                    'pyborg': {'multiplex': False},
-                    'tumblr': {'blog': 'billoreilly.tumblr.com',
-                               'cooldown': 20,
-                               'ignore': [],
-                               'last_look': datetime.datetime(2016, 8, 18, 7, 25, 30, 164769),
-                               'learning': False,
-                               'tags': ['hello bill']}}
+        settings = {
+            'auth': {
+                'consumer_key': 'KEY',
+                'consumer_secret': 'SECRET',
+                'oauth_secret': 'TOKEN',
+                'oauth_token': 'TOKEN',
+            },
+            'pyborg': {'multiplex': False},
+            'tumblr': {
+                'blog': 'billoreilly.tumblr.com',
+                'cooldown': 20,
+                'ignore': [],
+                'last_look': datetime.datetime(2016, 8, 18, 7, 25, 30, 164769),
+                'learning': False,
+                'tags': ['hello bill'],
+            },
+        }
         with open("pyborg/test/fixtures/tumblr_posts.json") as fixture_f:
             posts = json.load(fixture_f)
 
@@ -28,7 +33,9 @@ if sys.version_info < (3,):
         @mock.patch('pyborg.mod.mod_tumblr.logger.info')
         @mock.patch('pyborg.pyborg.pyborg.reply')
         @mock.patch('toml.load')
-        def test_handle_post(self, patched_load, patched_pyborg, patched_info, pybpybpyb):
+        def test_handle_post(
+            self, patched_load, patched_pyborg, patched_info, pybpybpyb
+        ):
             patched_load.return_value = self.settings
             mod = pyborg.mod.mod_tumblr.PyborgTumblr("bogus.toml")
 
@@ -38,7 +45,8 @@ if sys.version_info < (3,):
             patched_load.assert_called_once_with("bogus.toml")
             patched_pyborg.return_value = "fuck it do it live"
             patched_info.assert_any_call("found post: \n%s", self.posts[0]['summary'])
-            # print(patched_info.mock_calls)
+
+        # print(patched_info.mock_calls)
 
         @mock.patch('pytumblr.TumblrRestClient.tagged')
         @mock.patch('pyborg.pyborg.pyborg')
@@ -49,7 +57,8 @@ if sys.version_info < (3,):
             mod = pyborg.mod.mod_tumblr.PyborgTumblr("bogus.toml")
             ret = mod.load_new_from_tag("hello bill")
             patched_tagged.assert_called_once_with("hello bill")
-            # self.assertEqual(ret, )
+
+        # self.assertEqual(ret, )
 
         @mock.patch('time.sleep')
         @mock.patch('pyborg.mod.mod_tumblr.PyborgTumblr.load_new_from_tag')
