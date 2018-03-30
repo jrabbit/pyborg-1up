@@ -52,6 +52,7 @@ def resolve_brain(target_brain):
     logger.debug("Resolved brain: %s", brain_path)
     return brain_path
 
+
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.option('--debug', default=False, is_flag=True)
 @click.option('--verbose/--silent', default=True)
@@ -69,6 +70,7 @@ def cli_base(verbose, debug):
 def help(ctx):
     """Show this message and exit."""
     print(ctx.parent.get_help())
+
 
 @cli_base.group()
 def brain():
@@ -104,9 +106,15 @@ def stats(target_brain):
     "Get stats about a brain"
     brain_path = resolve_brain(target_brain)
     pyb = pyborg.pyborg.pyborg(brain=brain_path)
-    print(json.dumps({"words": pyb.settings.num_words,
-                      "contexts": pyb.settings.num_contexts,
-                      "lines": len(pyb.lines)}))
+    print(
+        json.dumps(
+            {
+                "words": pyb.settings.num_words,
+                "contexts": pyb.settings.num_contexts,
+                "lines": len(pyb.lines),
+            }
+        )
+    )
 
 
 @brain.command("import")
@@ -133,8 +141,7 @@ def upgrade_to_json(target_brain):
     elif os.path.exists(target_brain):
         brain_path = target_brain
     else:
-        brain_path = os.path.join(
-            folder, "brains", "{}.zip".format(target_brain))
+        brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
     words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
     version = u"1.4.0"
     tag_name = datetime.datetime.now().strftime("%m-%d-%y-import-archive")
@@ -158,9 +165,7 @@ def upgrade_to_json(target_brain):
         words[key] = new_packed
 
     with open(save_path, 'wb') as brain_file:
-        out = {"words": words,
-               "lines": lines,
-               "version": version}
+        out = {"words": words, "lines": lines, "version": version}
         json.dump(out, brain_file)
     print("Wrote out pyborg brain into {}".format(save_path))
 
@@ -172,7 +177,7 @@ def doctor(target_brain, one_two):
     cnt = collections.Counter()
 
     brain_path = resolve_brain(target_brain)
-    # TODO: catch FileNotFoundError    
+    # TODO: catch FileNotFoundError
     if one_two:
         words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
     else:
@@ -186,7 +191,7 @@ def doctor(target_brain, one_two):
         # cnt[type(value)] += 1
         for i in value:
             cnt[type(i)] += 1
-        # print(type(key))
+    # print(type(key))
     # for item in lines:
     #     cnt[type(item)] += 1
     print(cnt)
@@ -224,24 +229,25 @@ def mastodon(ctx, base_url, conf_file):
 @mastodon.command(name="register")
 @click.argument("bot_name")
 @click.pass_context
-@click.option("--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path())
+@click.option(
+    "--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path()
+)
 def mastodon_register(ctx, cred_file, bot_name):
-    Mastodon.create_app(bot_name,
-                        api_base_url=ctx.obj['base_url'],
-                        to_file=cred_file)
+    Mastodon.create_app(bot_name, api_base_url=ctx.obj['base_url'], to_file=cred_file)
 
 
 @mastodon.command("login")
 @click.argument("username")
 @click.password_option()
 @click.pass_context
-@click.option("--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path(exists=True))
+@click.option(
+    "--cred-file",
+    default='pyborg_mastodon_clientcred.secret',
+    type=click.Path(exists=True),
+)
 def mastodon_login(ctx, cred_file, username, password):
-    mastodon = Mastodon(client_id=cred_file,
-                        api_base_url=ctx.obj['base_url'])
-    mastodon.log_in(username,
-                    password,
-                    to_file='pyborg_mastodon_usercred.secret')
+    mastodon = Mastodon(client_id=cred_file, api_base_url=ctx.obj['base_url'])
+    mastodon.log_in(username, password, to_file='pyborg_mastodon_usercred.secret')
 
 
 @cli_base.command()
@@ -271,6 +277,7 @@ def irc(conf_file):
             logger.info("Is pyborg http running?")
         else:
             raise
+
     except Exception as e:
         logger.exception(e)
         bot.teardown()
@@ -308,9 +315,10 @@ def http(reloader, port, host, brain):
 @cli_base.command('set-log-level')
 @click.argument("log-level")
 def set_logging_level(log_level):
-    ret = requests.post("http://localhost:2001/logging-level", data={"level": log_level})
+    ret = requests.post(
+        "http://localhost:2001/logging-level", data={"level": log_level}
+    )
     ret.raise_for_status()
-
 
 
 @cli_base.command()
@@ -325,6 +333,7 @@ def subtitles(conf_file, subtitle_file):
 @click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
 def twitter(conf_file):
     from pyborg.mod.mod_twitter import PyborgTwitter
+
     mod = PyborgTwitter(conf_file)
     try:
         mod.start()
@@ -335,13 +344,22 @@ def twitter(conf_file):
         mod.teardown()
         raise
 
+
 def get_api(conf_file):
     import tweepy
+
     twsettings = toml.load(conf_file)
-    auth = tweepy.OAuthHandler(twsettings['twitter']['auth']['consumer_key'], twsettings['twitter']['auth']['consumer_secret'])
-    auth.set_access_token(twsettings['twitter']['auth']['access_token'], twsettings['twitter']['auth']['access_token_secret'])
+    auth = tweepy.OAuthHandler(
+        twsettings['twitter']['auth']['consumer_key'],
+        twsettings['twitter']['auth']['consumer_secret'],
+    )
+    auth.set_access_token(
+        twsettings['twitter']['auth']['access_token'],
+        twsettings['twitter']['auth']['access_token_secret'],
+    )
     api = tweepy.API(auth)
     return api
+
 
 @cli_base.command()
 @click.argument("target-user")
@@ -350,6 +368,7 @@ def follow_twitter_user(conf_file, target_user):
     api = get_api(conf_file)
     api.create_friendship(target_user)
 
+
 # @cli_base.command()
 # @click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
 # def twitter_debug_shell(conf_file):
@@ -357,12 +376,14 @@ def follow_twitter_user(conf_file, target_user):
 #     from IPython import embed
 #     embed()
 
+
 @cli_base.command()
 @click.argument("input-file")
 @click.option("--multiplex", default=True, type=click.BOOL)
 def filein(multiplex, input_file):
     """ascii file input module"""
     from pyborg.mod.mod_filein import ModFileIn
+
     mod = ModFileIn(multiplexing=multiplex)
     mod.run(input_file)
 
@@ -372,7 +393,9 @@ def filein(multiplex, input_file):
 def discord(conf_file):
     "Run the discord client (needs python3)"
     if sys.version_info <= (3,):
-        print("You are trying to run the discord mod under python 2. \nThis won't work. Please use python 3.")
+        print(
+            "You are trying to run the discord mod under python 2. \nThis won't work. Please use python 3."
+        )
         sys.exit(6)
     bot = PyborgDiscord(conf_file)
     try:
@@ -414,8 +437,13 @@ def linein(multiplex):
 @cli_base.command()
 def version():
     print("I am a version {} pyborg!".format(pyborg.__version__))
-    print("I'm running on {} {}/{}".format(platform.python_implementation(),
-                                           platform.python_version(), platform.platform()))
+    print(
+        "I'm running on {} {}/{}".format(
+            platform.python_implementation(),
+            platform.python_version(),
+            platform.platform(),
+        )
+    )
 
 
 if __name__ == '__main__':
