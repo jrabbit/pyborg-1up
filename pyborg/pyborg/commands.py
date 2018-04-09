@@ -35,6 +35,13 @@ def words(multiplex, multi_server):
         raise NotImplementedError
 
 
+@command(internals=True)
+def known(word):
+    ret = requests.get(multi_server+"known?word={word}".format(word))
+    ret.raise_for_status()
+    return ret.text
+
+
 @command()
 def blap():
     return "https://mutualism.net/blap/its_good_to_be_sad.gif"

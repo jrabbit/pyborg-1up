@@ -79,6 +79,17 @@ def process(pyborg):
         return io.message
     return ""
 
+@bottle.route("/known")
+def known(pyborg):
+    "return number of contexts"
+    word = request.query.word
+    try:
+        c = len(pyborg.words[word])
+        msg = "{} is known ({} contexts)".format(word, c)
+        return msg
+    except KeyError:
+        return "word not known"
+
 @bottle.route("/words.json")
 def words_json(pyborg):
     return {"words": pyborg.settings.num_words,
