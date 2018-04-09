@@ -182,6 +182,21 @@ class TestPyborgFilterWord(unittest.TestCase):
         our_pyb.settings.censored = ["murder"]
         ret = our_pyb.reply("murderer")
         self.assertEqual(ret, "")
+        ret2 = our_pyb.reply("murder")
+        self.assertEqual(ret2, "")
+        ret3 = our_pyb.reply("murderize")
+        self.assertEqual(ret3, "")
+
+
+class TestPyborgIsFiltered(unittest.TestCase):
+    small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
+    def test_is_filter_regex(self):
+        our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
+        our_pyb.settings.censored = ["fuck"]
+        self.assertTrue(our_pyb._is_censored("fuck"))
+        self.assertFalse(our_pyb._is_censored("hello"))
+        self.assertTrue(our_pyb._is_censored("fucker"))
+
 
 
 class TestPyborgReply(unittest.TestCase):

@@ -945,10 +945,10 @@ class pyborg(object):
     def _is_censored(self, word):
         """DRY."""
         for censored in self.settings.censored:
-            pattern = "^%s$" % censored
-            if re.search(pattern, word):
+            if re.search(censored, word):
                 print("Censored word %s" % word)
-                return False
+                return True
+        return False
 
 
     def reply(self, body):
