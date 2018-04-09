@@ -65,3 +65,4 @@ target/
 venv/
 pyborg/pyborg-irc.cfg
 .mypy_cache/
+archive.zip
