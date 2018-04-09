@@ -1247,8 +1247,7 @@ class pyborg(object):
                         digit += 1
 
                 for censored in self.settings.censored:
-                    pattern = "^%s$" % censored
-                    if re.search(pattern, words[x]):
+                    if re.search(censored, words[x]):
                         print("Censored word %s" %words[x])
                         return
                 if len(words[x]) > 13 \

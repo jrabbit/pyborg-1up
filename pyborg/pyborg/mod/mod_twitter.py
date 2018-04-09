@@ -114,6 +114,8 @@ class PyborgTwitter(object):
             if self.settings['pyborg']['learning']:
                 self.learn(line)
             reply = self.reply(line)
+            if reply == "#nick":
+                return
             if reply:
                 reply = reply.replace("#nick", "@"+tweet.user.screen_name)
                 try:
