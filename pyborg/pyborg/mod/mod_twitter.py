@@ -92,6 +92,19 @@ class PyborgTwitter(object):
         else:
             return False
 
+    def _bail_if_only_images(self, tweet: tweepy.Status) -> bool:
+        # [x["indices"] for x in s.extended_entities["media"]]
+        # AttributeError: 'Status' object has no attribute 'extended_entities'
+        full = len(tweet.text)
+        indices = [x["indices"] for x in tweet.extended_entities["media"]]
+        for idx_start, idx_end in indices:
+            full =- (idx_end - idx_start)
+        if full == 0:
+            return True
+        else:
+            return False
+
+
     def handle_tweet(self, tweet: tweepy.Status) -> None:
         parsed_date = arrow.get(tweet.created_at)
         logger.debug(parsed_date)
@@ -104,6 +117,8 @@ class PyborgTwitter(object):
                 text = tweet.text
             # if hasattr(tweet, "quote_tweet"):
             # doesn't actually get the full quote tweet??? so fuck that
+            if self._bail_if_only_images(tweet):
+                return
             l = list()
             for x in text.split(): 
                 if x.startswith("@"):
