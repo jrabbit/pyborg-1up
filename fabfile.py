@@ -13,11 +13,12 @@ def deploy():
         run("git pull")
         run("git stash pop")
         # restart units
-        for unit in ["pyborg_discord.service", "pyborg_http.service"]:
+        for unit in ["pyborg_discord.service", "pyborg_http.service", "pyborg_twitter.service"]:
             run("systemctl restart {}".format(unit))
 
 
 def release():
+    "make a release of pyborg"
     with lcd("pyborg"):
         local("rm -rf build") # clean build
         local("python --version")
@@ -25,4 +26,5 @@ def release():
         print("run `gpg -ba` on the files and upload with `twine`")
 
 def lint():
+    "run mypy etc"
     pass
