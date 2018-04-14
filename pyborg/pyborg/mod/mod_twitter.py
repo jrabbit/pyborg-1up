@@ -96,13 +96,20 @@ class PyborgTwitter(object):
         # [x["indices"] for x in s.extended_entities["media"]]
         # AttributeError: 'Status' object has no attribute 'extended_entities'
         full = len(tweet.text)
-        indices = [x["indices"] for x in tweet.extended_entities["media"]]
-        for idx_start, idx_end in indices:
-            full =- (idx_end - idx_start)
-        if full == 0:
-            return True
-        else:
+        try:
+            indices = [x["indices"] for x in tweet.extended_entities["media"]]
+            for idx_start, idx_end in indices:
+                full =- (idx_end - idx_start)
+            if full == 0:
+                return True
+            else:
+                return False
+        except AttributeError:
             return False
+        except:
+            logger.exception()
+            return False
+
 
 
     def handle_tweet(self, tweet: tweepy.Status) -> None:

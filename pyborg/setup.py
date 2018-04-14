@@ -29,16 +29,16 @@ setup(
     name="pyborg",
     version=__version__,
     packages=["pyborg", "pyborg.util", "pyborg.mod"],
-    scripts=['pyborg-irc.py', 'pyborg_experimental.py'],
+    scripts=["pyborg-irc.py", "pyborg_experimental.py"],
     author="Jack Laxson",
     author_email="jackjrabbit@gmail.com",
     description="Markov chain bot for irc which generates replies to messages",
     license="GPL v3 or later",
     install_requires=requires,
-    entry_points='''
+    entry_points="""
           [console_scripts]
           pyborg=pyborg_experimental:cli_base
-      ''',
+      """,
     url="https://github.com/jrabbit/pyborg-1up/",
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
