@@ -9,7 +9,7 @@ from pyborg import __version__
 requires = [
     "irc>=15.1.1",
     "toml",
-    "arrow==0.10.0",
+    "arrow>=0.10.0",
     "PyTumblr==0.0.6",
     "requests",
     "bottle",
