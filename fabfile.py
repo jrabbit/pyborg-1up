@@ -25,6 +25,9 @@ def release():
         local("python setup.py bdist_wheel sdist")
         print("run `gpg -ba` on the files and upload with `twine`")
 
+def outdated():
+    local("pipenv run pip list -o --format=columns")
+
 def lint():
     "run mypy etc"
     pass

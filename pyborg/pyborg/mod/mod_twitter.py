@@ -107,7 +107,7 @@ class PyborgTwitter(object):
         except AttributeError:
             return False
         except:
-            logger.exception()
+            logger.exception("Error in _bail_if_only_images")
             return False
 
 

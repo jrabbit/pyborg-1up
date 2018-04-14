@@ -25,13 +25,12 @@ multidict = {version = "==3.3.0", markers = "python_version >= '3.0'"}
 websockets = {version = "==3.4", markers = "python_version >= '3.0'"}
 aiohttp = {version = "==1.0.5", markers = "python_version >= '3.0'"}
 async_timeout = {version = "*", markers = "python_version >= '3.0'"}
-arrow = "==0.10.0"
+arrow = ">=0.10.0"
 attrs = "*"
 bottle = "==0.12.13"
 certifi = "*"
 chardet = "==3.0.4"
 click = ">=6.7"
-dateutils = "==0.6.6"
 "discord.py" = {version = "*", markers = "python_version >= '3.0'"}
 "httplib2" = "==0.10.3"
 httpretty = "==0.8.14"
@@ -45,7 +44,7 @@ irc = "==16.0"
 "jaraco.logging" = "==1.5"
 "jaraco.stream" = "==1.1.2"
 "jaraco.text" = "==1.9.2"
-"Mastodon.py" = "==1.0.8"
+"Mastodon.py" = "*"
 more-itertools = "==3.2.0"
 "oauth2" = "==1.9.0.post1"
 praw = "==5.1.0"

@@ -18,6 +18,7 @@ requires = [
     "humanize",
     "praw",
     "Mastodon.py",
+    "tweepy",
     "lxml",
     "attrs",
     "statsd",

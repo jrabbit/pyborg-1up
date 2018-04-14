@@ -15,7 +15,7 @@ class PyborgSubtitles(object):
     conf_file = attr.ib()
     subs_file = attr.ib()
     paused = attr.ib(default=False)
-    riffs = attr.ib(default=dict())
+    riffs = attr.ib(default=dict(), type=dict)
     pre_processed = attr.ib(default=False)
 
     # def __attrs_post_init__(self):
