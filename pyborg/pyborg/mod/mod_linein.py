@@ -63,7 +63,9 @@ class ModLineIn(object):
     def start(self):
         print("PyBorg offline chat!")
         print("Type !quit to leave")
-        self.name = prompt("What is your name? ", default='%s' % getpass.getuser())
+        default = getpass.getuser()
+        print("[{}]".format(default))
+        self.name = prompt("What is your name? ")
         if self.name is "\n":
             self.name = default
         while 1:

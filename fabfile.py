@@ -23,7 +23,7 @@ def deploy():
 def release():
     "make a release of pyborg"
     with lcd("pyborg"):
-        local("rm -rf build") # clean build
+        local("rm -rf build")  # clean build
         local("python --version")
         local("python setup.py bdist_wheel sdist")
         print("run `gpg -ba` on the files and upload with `twine`")
