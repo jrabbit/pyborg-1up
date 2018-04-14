@@ -11,6 +11,7 @@ import tweepy
 
 logger = logging.getLogger(__name__)
 
+
 class NoBlankLogFilter(logging.Filter):
     def filter(self, record):
         if isinstance(record.args, tuple):
@@ -23,15 +24,17 @@ class NoBlankLogFilter(logging.Filter):
         else:
             return True
 
+
 logging.getLogger("tweepy.binder").addFilter(NoBlankLogFilter())
 
 # def follow_user_cli(api:tweepy.API, target_user: str) -> None:
 #     api.create_friendship(target_user)
 
+
 class PyborgTwitter(object):
     def __init__(self, conf_file):
         self.toml_file = conf_file
-        self.settings = toml.load(conf_file)
+        self.settings: Dict = toml.load(conf_file)
         self.last_look = arrow.get(self.settings['twitter']['last_look'])
         self.multiplexing = True
         self.multi_server = self.settings['pyborg']['multi_server']
@@ -99,18 +102,16 @@ class PyborgTwitter(object):
         try:
             indices = [x["indices"] for x in tweet.extended_entities["media"]]
             for idx_start, idx_end in indices:
-                full =- (idx_end - idx_start)
+                full =- (idx_end - idx_start)  # noqa WHY THE FUCK
             if full == 0:
                 return True
             else:
                 return False
         except AttributeError:
             return False
-        except:
+        except Exception:
             logger.exception("Error in _bail_if_only_images")
             return False
-
-
 
     def handle_tweet(self, tweet: tweepy.Status) -> None:
         parsed_date = arrow.get(tweet.created_at)
@@ -126,23 +127,23 @@ class PyborgTwitter(object):
             # doesn't actually get the full quote tweet??? so fuck that
             if self._bail_if_only_images(tweet):
                 return
-            l = list()
-            for x in text.split(): 
+            tweete_list = list()
+            for x in text.split():
                 if x.startswith("@"):
                     x = "#nick"
-                l.append(x)
-            logger.debug(str(l))
-            line = " ".join(l)
+                tweete_list.append(x)
+            logger.debug(str(tweete_list))
+            line = " ".join(tweete_list)
             if self.settings['pyborg']['learning']:
                 self.learn(line)
             reply = self.reply(line)
             if reply == "#nick":
                 return
             if reply:
-                reply = reply.replace("#nick", "@"+tweet.user.screen_name)
+                reply = reply.replace("#nick", "@" + tweet.user.screen_name)
                 try:
                     if random.choice([True, False, False]) or self.is_reply_to_me(tweet):
-                        # auto_populate_reply_metadata 
+                        # auto_populate_reply_metadata
                         # https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update
                         self.api.update_status(reply, in_reply_to_status_id=int(tweet.id), auto_populate_reply_metadata=True)
                     else:
@@ -150,7 +151,6 @@ class PyborgTwitter(object):
                 except tweepy.error.TweepError as e:
                     # trying to avoid tweepy.error.TweepError: [{'code': 187, 'message': 'Status is a duplicate.'}]
                     logger.exception(e)
-
 
     def teardown(self) -> None:
         self.settings['twitter']['last_look'] = self.last_look

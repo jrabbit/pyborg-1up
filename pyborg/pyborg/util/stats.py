@@ -1,6 +1,7 @@
 import statsd
 
-c = statsd.StatsClient('localhost', 8125, prefix='pyborg')
+c = statsd.StatsClient("localhost", 8125, prefix="pyborg")
+
 
 def send_stats(pyb):
     c.gauge("words", pyb.settings.num_words)

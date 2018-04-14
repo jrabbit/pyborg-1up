@@ -11,7 +11,6 @@ from pyborg.util.stats import send_stats
 logger = logging.getLogger(__name__)
 
 
-
 @bottle.route("/")
 def index(pyborg):
     return """<h1>Welcome to PyBorg/http</h1>
@@ -19,6 +18,7 @@ def index(pyborg):
     <a href="/words.json">Words info (json)</a>""".format(pyborg.ver_string)
 
 # Basic API
+
 
 @bottle.route("/learn", method="POST")
 def learn(pyborg):
@@ -34,7 +34,6 @@ def reply(pyborg):
         body = body.decode("utf-8")
     logger.debug(type(body))
     return pyborg.reply(body)
-
 
 
 @bottle.route("/save", method="POST")
@@ -63,6 +62,7 @@ class DumbyIOMod(object):
 
     commandlist = ""
     message = None
+
     def output(self, message, args):
         self.message = message
         self.args = args
@@ -97,6 +97,7 @@ def known(pyborg):
         return msg
     except KeyError:
         return "word not known"
+
 
 @bottle.route("/words.json")
 def words_json(pyborg):

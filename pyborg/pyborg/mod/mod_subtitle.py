@@ -54,7 +54,7 @@ class PyborgSubtitles(object):
                 else:
                     print(">", self.reply(text))
             time.sleep(subtitle.duration_seconds)
-        
+
         self.teardown()
 
     def pre_process(self) -> None:
@@ -62,7 +62,6 @@ class PyborgSubtitles(object):
             reply = self.reply(self.clean(sub.main_text))
             if reply:
                 self.riffs[i] = reply
-
 
     def reply(self, body) -> Union[str, None]:
         """thin wrapper for reply to switch to multiplex mode"""
