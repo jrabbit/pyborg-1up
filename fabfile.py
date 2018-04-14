@@ -3,8 +3,10 @@ from fabric.api import cd, env, lcd, local, run, settings
 env.use_ssh_config = True
 env.hosts = ["trotsky"]
 
+
 def bandit():
     local("/home/jack/.virtualenvs/bandit/bin/bandit -r pyborg")
+
 
 def deploy():
     local("git push --all")
@@ -26,11 +28,13 @@ def release():
         local("python setup.py bdist_wheel sdist")
         print("run `gpg -ba` on the files and upload with `twine`")
 
+
 def outdated():
     local("pipenv run pip list -o --format=columns")
+
 
 def lint():
     "run mypy etc"
     with settings(warn_only=True):
         local("pipenv run mypy pyborg/pyborg")
-        local('flake8')
+        local('flake8 --count')

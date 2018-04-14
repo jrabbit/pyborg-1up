@@ -9,16 +9,16 @@ import pyborg.pyborg
 
 logger = logging.getLogger(__name__)
 
-class PyborgTumblr(object):
 
+class PyborgTumblr(object):
     """Takes a toml config file path and a pyborg.pyborg.pyborg instance."""
 
     def __init__(self, toml_file):
         self.toml_file = toml_file
         self.settings = toml.load(toml_file)
-        self.client = pytumblr.TumblrRestClient(self.settings['auth']['consumer_key'], 
-                                                self.settings['auth']['consumer_secret'], 
-                                                self.settings['auth']['oauth_token'], 
+        self.client = pytumblr.TumblrRestClient(self.settings['auth']['consumer_key'],
+                                                self.settings['auth']['consumer_secret'],
+                                                self.settings['auth']['oauth_token'],
                                                 self.settings['auth']['oauth_secret'])
         self.last_look = arrow.get(self.settings['tumblr']['last_look'])
         self.multiplexing = self.settings['pyborg']['multiplex']
@@ -30,7 +30,7 @@ class PyborgTumblr(object):
     def load_new_from_tag(self, tag):
         posts = self.client.tagged(tag)
         # setattr(self, "date-%s" %)
-        new_posts = filter( lambda x: arrow.get(x['date']) > self.last_look, posts)
+        new_posts = filter(lambda x: arrow.get(x['date']) > self.last_look, posts)
         self.last_look = arrow.utcnow()
         logger.debug("loaded new posts")
         return new_posts
@@ -40,7 +40,7 @@ class PyborgTumblr(object):
             self.pyborg.learn(post['body'])
 
         logger.info("found post: \n%s", post['summary'])
-        msg =  self.pyborg.reply(post['summary'])
+        msg = self.pyborg.reply(post['summary'])
         if msg:
             logger.info("Reblogging with comment: %s", msg)
             self.client.reblog(self.settings['tumblr']['blog'], id=post['id'], reblog_key=post['reblog_key'], comment=msg)

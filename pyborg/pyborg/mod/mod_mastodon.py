@@ -10,6 +10,7 @@ from mastodon import Mastodon
 
 logger = logging.getLogger(__name__)
 
+
 class PyborgMastodon(object):
     """docstring for PyborgMastodon"""
     def __init__(self, conf_file):
@@ -25,7 +26,7 @@ class PyborgMastodon(object):
             toml.dump(self.settings, f)
         if not self.multiplexing:
             self.pyborg.save_all()
-    
+
     def learn(self, body):
         if self.multiplexing:
             try:
@@ -63,7 +64,7 @@ class PyborgMastodon(object):
 
     def should_reply_direct(self, usern):
         should_reply = []
-        should_reply.extend([a['acct'] for a in self.mastodon.account_followers(self.my_id)]) # is this cached?
+        should_reply.extend([a['acct'] for a in self.mastodon.account_followers(self.my_id)])  # is this cached?
         return usern in should_reply
 
     def is_reply_to_me(self, item):
@@ -83,7 +84,7 @@ class PyborgMastodon(object):
             logger.debug(arrow.get(item["created_at"]) - self.last_look)
             if (arrow.get(item["created_at"]) > self.last_look or True) and item["account"]["id"] is not self.my_id:
                 logger.debug("Got New Toot: {}".format(item))
-                fromacct = item['account']['acct'] # to check if we've banned them?
+                fromacct = item['account']['acct']  # to check if we've banned them?
                 parsed_html = lxml.html.fromstring(item['content'])
                 body = parsed_html.text_content()
                 if self.settings['pyborg']['learning']:
@@ -96,9 +97,9 @@ class PyborgMastodon(object):
 
     def start(self):
         self.mastodon = Mastodon(
-            client_id = 'pyborg_mastodon_clientcred.secret',
-            access_token = 'pyborg_mastodon_usercred.secret',
-            api_base_url = self.settings['mastodon']['base_url']
+            client_id='pyborg_mastodon_clientcred.secret',
+            access_token='pyborg_mastodon_usercred.secret',
+            api_base_url=self.settings['mastodon']['base_url']
         )
         self.my_id = self.mastodon.account_verify_credentials()['id']
 
@@ -112,4 +113,3 @@ class PyborgMastodon(object):
             self.last_look = arrow.utcnow()
             logger.debug("Sleeping for {} seconds".format(self.settings['mastodon']['cooldown']))
             time.sleep(self.settings['mastodon']['cooldown'])
-

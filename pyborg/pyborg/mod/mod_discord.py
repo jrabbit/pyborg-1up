@@ -59,11 +59,11 @@ class PyborgDiscord(discord.Client):
     def clean_msg(self, message: discord.Message) -> str:
         return ' '.join(message.content.split())
 
-    def _extract_emoji(self, msg: str, server_emojis:List[str]) -> str:
+    def _extract_emoji(self, msg: str, server_emojis: List[str]) -> str:
         """extract an emoji, returns a str ready to be munged"""
         #s[s.find("<:"):s.find(">")+1] the general idea here
         start = msg.find("<:")
-        attempted_emoji = msg[start+2:msg.find(":",start+2)]
+        attempted_emoji = msg[start + 2: msg.find(":", start + 2)]
         logger.info("_extract_emoji:attempting to emoji: %s", attempted_emoji)
         if attempted_emoji in server_emojis:
             # now replace the range from start to end with the extracted emoji
@@ -83,7 +83,7 @@ class PyborgDiscord(discord.Client):
         logger.debug(message.content)
         if message.content and message.content[0] == "!":
             command_name = message.content[1:]
-            if command_name in  ["list", "help"]:
+            if command_name in ["list", "help"]:
                 help_text = "I have a bunch of commands:"
                 for k, v in self.registry.registered.items():
                     help_text += " !{}".format(k)
@@ -104,14 +104,14 @@ class PyborgDiscord(discord.Client):
             e = message.server.emojis
             server_emojis = [x.name for x in e]
             logger.debug("got server emojis as: %s", str(server_emojis))
-            incoming_message =  self._extract_emoji(message.content, server_emojis)
+            incoming_message = self._extract_emoji(message.content, server_emojis)
 
         else:
             incoming_message = message.content
 
         # Strip nicknames for pyborg
         l = list()
-        for x in incoming_message.split(): 
+        for x in incoming_message.split():
             if x.startswith("<@!"):
                 x = "#nick"
             l.append(x)
@@ -131,7 +131,7 @@ class PyborgDiscord(discord.Client):
                 logger.debug("Sending message...")
                 # if custom emoji: replace to <:weedminion:392111795642433556>
                 # message.server map to full custom emoji
-                emoji_map = {x.name:x for x in message.server.emojis}
+                emoji_map = {x.name: x for x in message.server.emojis}
                 for word in msg.split():
                     if word in emoji_map:
                         e = emoji_map[word]

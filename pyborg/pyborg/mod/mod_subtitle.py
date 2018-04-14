@@ -10,6 +10,7 @@ import toml
 
 logger = logging.getLogger(__name__)
 
+
 @attr.s
 class PyborgSubtitles(object):
     conf_file = attr.ib()

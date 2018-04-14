@@ -1,4 +1,6 @@
 import fileinput
+import logging
+import os
 
 import attr
 import click
@@ -7,6 +9,9 @@ import requests
 from pyborg import pyborg
 
 folder = click.get_app_dir("Pyborg")
+
+logger = logging.getLogger(__name__)
+
 
 @attr.s
 class ModFileIn(object):
@@ -24,14 +29,14 @@ class ModFileIn(object):
             ret.raise_for_status()
             words = ret.json()
         else:
-            words = {"words": len(self.pyborg.words), "lines":len(self.pyborg.lines)}
+            words = {"words": len(self.pyborg.words), "lines": len(self.pyborg.lines)}
         print("I knew {} words ({} lines) before reading {}".format(words['words'], words['lines'], f_name))
         counter = 0
         for line in fileinput.input(f_name):
             counter = counter + 1
             try:
                 self.learn(line)
-                
+
             except KeyboardInterrupt:
                 self.save()
                 print("Premature termination :-(")
@@ -44,7 +49,7 @@ class ModFileIn(object):
             ret2.raise_for_status()
             words = ret2.json()
         else:
-            words = {"words": len(self.pyborg.words), "lines":len(self.pyborg.lines)}
+            words = {"words": len(self.pyborg.words), "lines": len(self.pyborg.lines)}
         print("I know {} words ({} lines) now.".format(words['words'], words['lines']))
 
     def learn(self, msg):

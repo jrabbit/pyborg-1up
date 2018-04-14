@@ -3,6 +3,7 @@ import os
 
 import bottle
 import six
+import click
 from bottle import request
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.stats import send_stats
@@ -41,6 +42,7 @@ def save(pyborg):
     pyborg.save_brain()
     return "Saved to {}".format(pyborg.brain_path)
 
+
 @bottle.route("/info")
 def info(pyborg):
     return pyborg.ver_string, pyborg.brain_path
@@ -54,13 +56,17 @@ def stats(pyborg):
 
 # Advanced API
 
+
 class DumbyIOMod(object):
+
     """fake IO mod for pyborg interop"""
+
     commandlist = ""
     message = None
     def output(self, message, args):
         self.message = message
         self.args = args
+
 
 @bottle.route("/process", method="POST")
 def process(pyborg):
@@ -80,6 +86,7 @@ def process(pyborg):
         return io.message
     return ""
 
+
 @bottle.route("/known")
 def known(pyborg):
     "return number of contexts"
@@ -97,9 +104,11 @@ def words_json(pyborg):
             "contexts": pyborg.settings.num_contexts,
             "lines": len(pyborg.lines)}
 
+
 @bottle.route("/commands.json")
 def commands_json(pyborg):
     return pyborg.commanddict
+
 
 @bottle.route("/logging-level", method="POST")
 def set_log_level():

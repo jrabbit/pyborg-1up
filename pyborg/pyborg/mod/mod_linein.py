@@ -21,16 +21,10 @@
 #
 import getpass
 import logging
-import string
-import sys
 
 import requests
-import six
 from prompt_toolkit import prompt
 from prompt_toolkit.history import InMemoryHistory
-from prompt_toolkit.contrib.completers import WordCompleter
-
-from pyborg import pyborg
 
 logger = logging.getLogger(__name__)
 history = InMemoryHistory()
@@ -46,7 +40,6 @@ history = InMemoryHistory()
 #         if document.text.startswith("!"):
 #             return Suggestion("!quit")
 #         return None
-
 
 
 class ModLineIn(object):
@@ -80,12 +73,12 @@ class ModLineIn(object):
                 continue
             if body == "!quit":
                 return
-            
+
             # Pass message to borg
             if self.multiplexed:
                 d = {"body": body, "reply_rate": 100, "learning": 1, "owner": 1}
                 resp = requests.post("http://localhost:2001/process", data=d)
-                
+
                 if resp.status_code == requests.codes.ok:
                     self.output(resp.text, None)
                 else:
