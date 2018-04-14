@@ -7,11 +7,12 @@ import requests
 import toml
 import venusian
 from pyborg.util.awoo import normalize_awoos
-from typing import Dict, Tuple, Union, List
+from typing import Dict, Union, List
 
-#https://github.com/Rapptz/discord.py/blob/master/discord/ext/commands/bot.py#L146
+# https://github.com/Rapptz/discord.py/blob/master/discord/ext/commands/bot.py#L146
 
 logger = logging.getLogger(__name__)
+
 
 class Registry(object):
     """Command registry of decorated pyborg commands"""
@@ -21,14 +22,15 @@ class Registry(object):
 
     def add(self, name, ob, internals):
         if internals:
-            self.registered[name] = partial(ob, self.mod.multiplexing,  multi_server="http://{}:2001/".format(self.mod.multi_server))
+            self.registered[name] = partial(ob, self.mod.multiplexing, multi_server="http://{}:2001/".format(self.mod.multi_server))
         else:
             self.registered[name] = ob
 
 
 class PyborgDiscord(discord.Client):
-    """This is the pyborg discord client module. 
+    """This is the pyborg discord client module.
     It connects over http to a running pyborg/http service."""
+
     def __init__(self, toml_file):
         super(PyborgDiscord, self).__init__()
         self.toml_file = toml_file
@@ -61,13 +63,13 @@ class PyborgDiscord(discord.Client):
 
     def _extract_emoji(self, msg: str, server_emojis: List[str]) -> str:
         """extract an emoji, returns a str ready to be munged"""
-        #s[s.find("<:"):s.find(">")+1] the general idea here
+        # s[s.find("<:"):s.find(">")+1] the general idea here
         start = msg.find("<:")
         attempted_emoji = msg[start + 2: msg.find(":", start + 2)]
         logger.info("_extract_emoji:attempting to emoji: %s", attempted_emoji)
         if attempted_emoji in server_emojis:
             # now replace the range from start to end with the extracted emoji
-            end = msg.find(">", start)+1
+            end = msg.find(">", start) + 1
             before, _, after = msg.partition(msg[start:end])
             logger.debug(_)
             incoming_message = before + attempted_emoji + after
@@ -110,14 +112,14 @@ class PyborgDiscord(discord.Client):
             incoming_message = message.content
 
         # Strip nicknames for pyborg
-        l = list()
+        line_list = list()
         for x in incoming_message.split():
             if x.startswith("<@!"):
                 x = "#nick"
-            l.append(x)
+            line_list.append(x)
 
-        logger.debug("post nick replace: %s", str(l))
-        line = " ".join(l)
+        logger.debug("post nick replace: %s", str(line_list))
+        line = " ".join(line_list)
         line = normalize_awoos(line)
 
         if self.settings['discord']['learning']:

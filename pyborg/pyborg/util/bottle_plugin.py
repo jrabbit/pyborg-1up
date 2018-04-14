@@ -1,6 +1,9 @@
-import attr
 import inspect
+
+import attr
 from pyborg.pyborg import pyborg
+
+
 @attr.s
 class BottledPyborg(object):
     brain_path = attr.ib()
@@ -12,7 +15,7 @@ class BottledPyborg(object):
 
     def close(self):
         self.pyb.save_brain()
-        
+
     def apply(self, callback, route):
         keyword = "pyborg"
         args = inspect.getargspec(route.callback)[0]
