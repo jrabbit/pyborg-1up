@@ -127,10 +127,10 @@ def filter_message(message, bot):
 class FakeCfg2(object):
     """fake it until you make it"""
 
-    aliases = attr.ib(default={})
+    aliases = attr.ib(default={}, type=dict)
     num_aliases = attr.ib(default=0)
     censored = attr.ib(default=CENSORED_REASONABLE_DEFAULTS, repr=False)
-    ignore_list = attr.ib(default=[])
+    ignore_list = attr.ib(default=[], type=list)
     max_words = attr.ib(default=6000)
     num_words = attr.ib(default=0)
     num_contexts = attr.ib(default=0)

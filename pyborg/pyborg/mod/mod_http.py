@@ -1,4 +1,5 @@
 import logging
+import os
 
 import bottle
 import six
@@ -111,5 +112,7 @@ def set_log_level():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    bottle.install(BottledPyborg())
+    folder = click.get_app_dir("Pyborg")
+    brain_path = os.path.join(folder, "brains", "current.pyborg.json")
+    bottle.install(BottledPyborg(brain_path=brain_path))
     bottle.run(host="localhost", port=2001, reloader=True)

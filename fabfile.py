@@ -1,4 +1,5 @@
-from fabric.api import run, local, cd,env, lcd
+from fabric.api import cd, env, lcd, local, run, settings
+
 env.use_ssh_config = True
 env.hosts = ["trotsky"]
 
@@ -30,4 +31,6 @@ def outdated():
 
 def lint():
     "run mypy etc"
-    pass
+    with settings(warn_only=True):
+        local("pipenv run mypy pyborg/pyborg")
+        local('flake8')
