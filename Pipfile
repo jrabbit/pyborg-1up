@@ -13,6 +13,8 @@ mock = "*"
 sphinx-click = "*"
 click = "*"
 sphinx-autobuild = "*"
+"backports.shutil_get_terminal_size" = {version = "*", markers = "python_version <= '3.0'"}
+funcsigs = "*"
 mypy = {version = "*", markers = "python_version >= '3.0'"}
 typed-ast = {version = "*", markers = "python_version >= '3.0'"}
 
