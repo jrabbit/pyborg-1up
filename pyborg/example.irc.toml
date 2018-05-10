@@ -19,6 +19,7 @@ speaking = true
 quitmsg = "Bye :-("
 # Connect to pyborg instance over http for shared db?
 multiplex = true
+multiplex_server = "localhost"
 [server]
     server = "chat.freenode.net"
     port = 6697

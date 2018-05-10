@@ -1,0 +1,8 @@
+[pyborg]
+multi_server = "localhost"
+learning = true
+
+[mastodon]
+cooldown = 20
+base_url = "https://botsin.space"
+last_look = 2016-01-20T00:42:15.179043+00:00

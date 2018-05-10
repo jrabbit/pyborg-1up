@@ -3,3 +3,4 @@ learning = true
 token = "FAKETOKEN"
 [pyborg]
 multiplex = true
+multiplex_server = "localhost"

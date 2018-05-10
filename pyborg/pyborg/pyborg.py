@@ -2,7 +2,7 @@
 #
 # PyBorg: The python AI bot.
 #
-# Copyright (c) 2000, 2006, 2013-2016 Tom Morton, Sebastien Dailly, Jack Laxson
+# Copyright (c) 2000, 2006, 2013-2017 Tom Morton, Sebastien Dailly, Jack Laxson
 #
 #
 # This bot was inspired by the PerlBorg, by Eric Bock.
@@ -11,12 +11,12 @@
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-#        
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -25,20 +25,32 @@
 # Seb Dailly <seb.dailly@gmail.com>
 #
 
+from __future__ import absolute_import
+
+
+import collections
+import datetime
+import json
 import logging
 import os
 import random
 import re
-import struct
 import sys
 import time
+import uuid
 import zipfile
 from random import randint
 from zlib import crc32
 
-import marshal  # buffered marshal is bloody fast. wish i'd found this before :)
-
+import attr
+import click
+import marshal
+import six
 import toml
+
+from pyborg.util.util_cli import mk_folder
+from pyborg.util.censored_defaults import CENSORED_REASONABLE_DEFAULTS
+
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +59,11 @@ try:
     logger.debug("Got nltk!")
 except ImportError:
     nltk = None
-    logger.debug("No nltk, won't be useing advanced part of speech tagging.")
+    logger.debug("No nltk, won't be using advanced part of speech tagging.")
+
+if six.PY3:
+    xrange = range
+
 
 def filter_message(message, bot):
     """
@@ -56,15 +72,13 @@ def filter_message(message, bot):
     padding ? and ! with ". " so they also terminate lines
     and converting to lower case.
     """
-    
-    
     # to lowercase
     message = message.lower()
 
     # remove garbage
-    message = message.replace("\"", "") # remove "s
-    message = message.replace("\n", " ") # remove newlines
-    message = message.replace("\r", " ") # remove carriage returns
+    message = message.replace("\"", "")  # remove "s
+    message = message.replace("\n", " ")  # remove newlines
+    message = message.replace("\r", " ")  # remove carriage returns
 
     # remove matching brackets (unmatched ones are likely smileys :-) *cough*
     # should except out when not found.
@@ -73,12 +87,12 @@ def filter_message(message, bot):
         while 1:
             index = message.index("(", index)
             # Remove matching ) bracket
-            i = message.index(")", index+1)
-            message = message[0:i]+message[i+1:]
+            i = message.index(")", index + 1)
+            message = message[0:i] + message[i + 1:]
             # And remove the (
-            message = message[0:index]+message[index+1:]
+            message = message[0:index] + message[index + 1:]
     except ValueError as e:
-        pass
+        logger.debug("filter_message error: %s", e)
 
     message = message.replace(";", ",")
     message = message.replace("?", " ? ")
@@ -89,16 +103,16 @@ def filter_message(message, bot):
     message = message.replace(":", " : ")
 
     # Find ! and ? and append full stops.
-#   message = message.replace(". ", ".. ")
-#   message = message.replace("? ", "?. ")
-#   message = message.replace("! ", "!. ")
+    #   message = message.replace(". ", ".. ")
+    #   message = message.replace("? ", "?. ")
+    #   message = message.replace("! ", "!. ")
 
-    #And correct the '...'
-#   message = message.replace("..  ..  .. ", ".... ")
+    #   And correct the '...'
+    #   message = message.replace("..  ..  .. ", ".... ")
 
     words = message.split()
-    for x in xrange(0, len(words)):
-        #is there aliases ?
+    for x in range(0, len(words)):
+        # is there aliases ?
         for z in bot.settings.aliases.keys():
             for alias in bot.settings.aliases[z]:
                 pattern = "^%s$" % alias
@@ -107,6 +121,24 @@ def filter_message(message, bot):
 
     message = " ".join(words)
     return message
+
+
+@attr.s
+class FakeCfg2(object):
+    """fake it until you make it"""
+
+    aliases = attr.ib(default={}, type=dict)
+    num_aliases = attr.ib(default=0)
+    censored = attr.ib(default=CENSORED_REASONABLE_DEFAULTS, repr=False)
+    ignore_list = attr.ib(default=[], type=list)
+    max_words = attr.ib(default=6000)
+    num_words = attr.ib(default=0)
+    num_contexts = attr.ib(default=0)
+    no_save = attr.ib(default=False)
+    learning = attr.ib(default=True)
+
+    def save(self, *args):
+        logger.debug("Settings save called. Current state: %s", self)
 
 
 class FakeCfg(object):
@@ -122,15 +154,20 @@ class FakeCfg(object):
         self.ignore_list = []
         self.learning = True
 
-    def save(*args):
+    def save(self, *args):
         pass
-        
+
+
+class FakeAns(object):
+    """this is a cool thing"""
+    def __init__(self):
+        self.sentences = {}
+
 
 class pyborg(object):
-    from . import cfgfile
 
-    ver_string = "I am a version 1.2.0 PyBorg"
-    saves_version = "1.2.0"
+    ver_string = "I am a version 1.4.0 PyBorg"
+    saves_version = "1.4.0"
 
     # Main command list
     commandlist = "Pyborg commands:\n!checkdict, !contexts, !help, !known, !learning, !rebuilddict, \
@@ -154,7 +191,116 @@ class pyborg(object):
         "owner": "Usage : !owner password\nAdd the user in the owner list"
     }
 
-    def __init__(self):
+    @staticmethod
+    def load_brain_2(brain_path):
+        """1.2.0 marshal.zip loader 
+        Returns tuple (words, lines)"""
+        
+        saves_version = b"1.2.0"
+        # folder = click.get_app_dir("Pyborg")
+        
+        try:
+            zfile = zipfile.ZipFile(brain_path,'r')
+            for filename in zfile.namelist():
+                data = zfile.read(filename)
+                f = open(filename, 'w+b')
+                f.write(data)
+                f.close()
+        except (EOFError, IOError) as e:
+            logger.debug(e)
+            print("no zip found")
+            logger.info("No archive.zip (pyborg brain) found.")
+
+        with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
+            x = vers.read()
+            logger.debug("Saves Version: %s", x)
+            if x != saves_version:
+                print("Error loading dictionary\nPlease convert it before launching pyborg")
+                logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
+                logger.debug("Pyborg version: %s", saves_version)
+                sys.exit(1)
+            words = marshal.loads(words.read())
+            lines = marshal.loads(lines.read())
+        return words, lines
+
+    @staticmethod
+    def load_brain_json(brain_path):
+        """Load the new format"""
+        saves_version = u"1.4.0"
+        # folder = click.get_app_dir("Pyborg")
+        logger.debug("Trying to open brain %s", brain_path)
+        with open(brain_path) as f:
+            if six.PY2:
+                raw_json = f.read().decode('utf-8', 'replace')
+            elif six.PY3:
+                raw_json = f.read()
+        logger.debug(raw_json)
+        try:
+            brain = json.loads(raw_json)
+        except json.decoder.JSONDecodeError as e:
+            logger.exception(e)
+            logger.info("Tried to open brain %s", brain_path)
+            sys.exit(12)
+
+        if brain['version'] == saves_version:
+            logger.debug(brain['lines'])
+            lines = {int(x): y for x, y in brain['lines'].items()}
+            return brain['words'], lines
+        else:
+            print("Error loading dictionary\nPlease convert it before launching pyborg")
+            logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
+            logger.debug("Pyborg version: %s", saves_version)
+            sys.exit(1)
+
+    def save_brain(self):
+        """
+        Save brain as 1.4.0 JSON-Unsigned format
+        """
+        logger.info("Writing dictionary...")
+
+        saves_version = u"1.4.0"
+        folder = click.get_app_dir("Pyborg")
+        logger.info("Saving pyborg brain to %s", self.brain_path)
+        cnt = collections.Counter()
+        for key, value in self.words.items():
+            cnt[type(key)] += 1
+            # cnt[type(value)] += 1
+            for i in value:
+                cnt[type(i)] += 1
+        logger.debug("Types: %s", cnt)
+        logger.debug("Words: %s", self.words)
+        logger.debug("Lines: %s", self.lines)
+
+        brain = {'version': saves_version, 'words': self.words, 'lines': self.lines}
+        tmp_file = os.path.join(folder, "tmp", "current.pyborg.json")
+        with open(tmp_file, 'w') as f:
+            # this can fail half way...
+            json.dump(brain, f)
+        # if we didn't crash
+        os.rename(tmp_file, self.brain_path)
+        logger.debug("Successful writing of brain & renaming. Quitting.")
+
+    def save_all(self):
+        self.save_brain()
+
+    def load_settings(self):
+        toml_path = os.path.join(click.get_app_dir("Pyborg"), "pyborg.toml")
+
+        if os.path.exists(click.get_app_dir("Pyborg")) and not os.path.exists(toml_path):
+            settings = {'pyborg-core': {"max_words": False}}
+            toml.dump(settings, open(toml_path, "w"))
+
+        d = toml.load(toml_path)['pyborg-core']
+        if d['max_words']:
+            cfg = FakeCfg2(max_words=d['max_words'])
+        else:
+            cfg = FakeCfg2(max_words=50000)
+        return cfg
+
+    def __repr__(self):
+        return "{} with {} words and {} lines. With a settings of: {}".format(self.ver_string, len(self.words), len(self.lines), self.settings)
+
+    def __init__(self, brain=None):
         """
         Open the dictionary. Resize as required.
         """
@@ -172,38 +318,27 @@ class pyborg(object):
         #       "aliases":    ("A list of similars words", {}),
         #       "no_save" :("If True, Pyborg don't saves the dictionary and configuration on disk", "False")
         #     } )
-        self.settings = FakeCfg()
-        # self.answers = self.cfgfile.cfgset()
-        # self.answers.load("answers.txt",
-        #     { "sentences":  ("A list of prepared answers", {})
-        #     } )
-        self.unfilterd = {}
+        self.settings = self.load_settings()
 
+        self.answers = FakeAns()
+        self.unfilterd = {}
+        mk_folder()
         # Read the dictionary
         print("Reading dictionary...")
+        if brain is None:
+            self.brain_path = 'archive.zip'
+        else:
+            self.brain_path = brain
         try:
-            zfile = zipfile.ZipFile('archive.zip','r')
-            for filename in zfile.namelist():
-                data = zfile.read(filename)
-                f = open(filename, 'w+b')
-                f.write(data)
-                f.close()
-        except (EOFError, IOError) as e:
-            print("no zip found")
-        try:
-            with open("version", "rb") as vers, open("words.dat", "rb") as words, open("lines.dat", "rb") as lines:
-                x = vers.read()
-                logger.debug("Saves Version: %s", x)
-                if x != self.saves_version:
-                    print("Error loading dictionary\nPlease convert it before launching pyborg")
-                    logger.debug("Pyborg version: %s", self.saves_version)
-                    sys.exit(1)
-                self.words = marshal.loads(words.read())
-                self.lines = marshal.loads(lines.read())
+            self.words, self.lines = self.load_brain_json(self.brain_path)
         except (EOFError, IOError) as e:
             # Create mew database
             self.words = {}
             self.lines = {}
+            logger.error(e)
+            folder = click.get_app_dir("Pyborg")
+            name = datetime.datetime.now().strftime("%m-%d-%y-auto-{}.pyborg.json").format(str(uuid.uuid4())[:4])
+            self.brain_path = os.path.join(folder, "brains", name)
             print("Error reading saves. New database created.")
 
         # Is a resizing required?
@@ -217,7 +352,7 @@ class pyborg(object):
             self.settings.num_contexts = num_contexts
             # Save new values
             self.settings.save()
-            
+
         # Is an aliases update required ?
         compteur = 0
         for x in self.settings.aliases.keys():
@@ -227,13 +362,13 @@ class pyborg(object):
             self.settings.num_aliases = compteur
 
             for x in self.words.keys():
-                #is there aliases ?
+                # is there aliases ?
                 if x[0] != '~':
                     for z in self.settings.aliases.keys():
                         for alias in self.settings.aliases[z]:
                             pattern = "^%s$" % alias
                             if self.re.search(pattern, x):
-                                print("replace %s with %s" %(x, z))
+                                print("replace %s with %s" % (x, z))
                                 self.replace(x, z)
 
             for x in self.words.keys():
@@ -243,8 +378,7 @@ class pyborg(object):
                     self.unlearn(x)
                     print("unlearned aliases %s" % x)
 
-
-        #unlearn words in the unlearn.txt file.
+        # unlearn words in the unlearn.txt file.
         try:
             f = open("unlearn.txt", "r")
             while 1:
@@ -260,14 +394,12 @@ class pyborg(object):
 
         self.settings.save()
 
-
-
-    def save_all(self):
+    def save_all_2(self):
         if self.settings.no_save != "True":
             print("Writing dictionary...")
 
             try:
-                zfile = zipfile.ZipFile('archive.zip', 'r')
+                zfile = zipfile.ZipFile(self.brain_path, 'r')
                 for filename in zfile.namelist():
                     data = zfile.read(filename)
                     f = open(filename, 'w+b')
@@ -287,7 +419,7 @@ class pyborg(object):
                 f.write(self.saves_version)
 
             # zip the files
-            with zipfile.ZipFile("archive.zip", "w") as f:
+            with zipfile.ZipFile(self.brain_path, "w") as f:
                 f.write('words.dat')
                 f.write('lines.dat')
                 f.write('version')
@@ -306,7 +438,7 @@ class pyborg(object):
             for key in self.words.keys():
                 wordlist.append([key, len(self.words[key])])
             wordlist.sort(key=lambda x: x[1])
-            map((lambda x: f.write(str(x[0])+"\n\r")), wordlist)
+            list(map((lambda x: f.write(str(x[0]) + "\n\r")), wordlist))
             f.close()
 
             f = open("sentences.txt", "w")
@@ -317,24 +449,24 @@ class pyborg(object):
                 wordlist.append([key, self.unfilterd[key]])
             # wordlist.sort(lambda x, y: cmp(y[1], x[1]))
             wordlist.sort(key=lambda x: x[1])
-            map((lambda x: f.write(str(x[0])+"\n")), wordlist)
+            list(map((lambda x: f.write(str(x[0]) + "\n")), wordlist))
             f.close()
 
             # Save settings
             self.settings.save()
-
 
     def process_msg(self, io_module, body, replyrate, learn, args, owner=0):
         """
         Process message 'body' and pass back to IO module with args.
         If owner==1 allow owner commands.
         """
-
+        logger.debug("process_msg: %s", locals())
         # add trailing space so sentences are broken up correctly
         body = body + " "
 
         # Parse commands
         if body[0] == "!":
+            logger.debug("sending do_commands...")
             self.do_commands(io_module, body, args, owner)
             return
 
@@ -346,7 +478,7 @@ class pyborg(object):
             self.learn(body)
 
         # Make a reply if desired
-        if randint(0, 99) < replyrate:
+        if randint(0, 99) < int(replyrate):
 
             message = ""
 
@@ -355,7 +487,7 @@ class pyborg(object):
                 pattern = "^%s$" % sentence
                 if re.search(pattern, body):
                     message = self.answers.sentences[sentence][
-                        randint(0, len(self.answers.sentences[sentence])-1)]
+                        randint(0, len(self.answers.sentences[sentence]) - 1)]
                     break
                 else:
                     if body in self.unfilterd:
@@ -375,21 +507,18 @@ class pyborg(object):
                 return
             # else output
             if owner == 0:
-                time.sleep(.2*len(message))
+                time.sleep(.2 * len(message))
             io_module.output(message, args)
 
-    
     def do_commands(self, io_module, body, args, owner):
         """
         Respond to user comands.
         """
         msg = ""
-
         command_list = body.split()
+        logger.debug("do_commands.command_list: %s", command_list)
         command_list[0] = command_list[0].lower()
-
         # Guest commands.
-    
         # Version string
         if command_list[0] == "!version":
             msg = self.ver_string
@@ -400,11 +529,11 @@ class pyborg(object):
             num_c = self.settings.num_contexts
             num_l = len(self.lines)
             if num_w != 0:
-                num_cpw = num_c/float(num_w) # contexts per word
+                num_cpw = num_c / float(num_w)  # contexts per word
             else:
                 num_cpw = 0.0
             msg = "I know %d words (%d contexts, %.2f per word), %d lines." % (num_w, num_c, num_cpw, num_l)
-                
+
         # Do i know this word
         elif command_list[0] == "!known":
             if len(command_list) == 2:
@@ -424,10 +553,9 @@ class pyborg(object):
                 for x in words:
                     if x in self.words:
                         c = len(self.words[x])
-                        msg += x+"/"+str(c)+" "
+                        msg += x + "/" + str(c) + " "
                     else:
-                        msg += x+"/0 "
-    
+                        msg += x + "/0 "
         # Owner commands
         if owner == 1:
             # Save dictionary
@@ -466,7 +594,6 @@ class pyborg(object):
                     self.settings.max_words = limit
                     msg += "now " + command_list[1]
 
-            
             # Check for broken links in the dictionary
             elif command_list[0] == "!checkdict":
                 t = time.time()
@@ -475,9 +602,9 @@ class pyborg(object):
                 for w in self.words.keys():
                     wlist = self.words[w]
 
-                    for i in xrange(len(wlist)-1, -1, -1):
-                        line_idx, word_num = struct.unpack("iH", wlist[i])
-
+                    for i in xrange(len(wlist) - 1, -1, -1):
+                        line_idx = wlist[i]['hashval']
+                        word_num = wlist[i]['index']
                         # Nasty critical error we should fix
                         if line_idx not in self.lines:
                             print("Removing broken link '%s' -> %d" % (w, line_idx))
@@ -487,9 +614,7 @@ class pyborg(object):
                             # Check pointed to word is correct
                             split_line = self.lines[line_idx][0].split()
                             if split_line[word_num] != w:
-                                print("Line '%s' word %d is not '%s' as expected." % \
-                                    (self.lines[line_idx][0],
-                                    word_num, w))
+                                print("Line '%s' word %d is not '%s' as expected." % (self.lines[line_idx][0], word_num, w))
                                 num_bad = num_bad + 1
                                 del wlist[i]
                     if len(wlist) == 0:
@@ -497,10 +622,7 @@ class pyborg(object):
                         self.settings.num_words = self.settings.num_words - 1
                         print("\"%s\" vaped totally" % w)
 
-                msg = "Checked dictionary in %0.2fs. Fixed links: %d broken, %d bad." % \
-                    (time.time()-t,
-                    num_broken,
-                    num_bad)
+                msg = "Checked dictionary in %0.2fs. Fixed links: %d broken, %d bad." % (time.time() - t, num_broken, num_bad)
 
             # Rebuild the dictionary by discarding the word links and
             # re-parsing each line
@@ -520,14 +642,9 @@ class pyborg(object):
                     for k in old_lines.keys():
                         self.learn(old_lines[k][0], old_lines[k][1])
 
-                    msg = "Rebuilt dictionary in %0.2fs. Words %d (%+d), contexts %d (%+d)" % \
-                            (time.time()-t,
-                            old_num_words,
-                            self.settings.num_words - old_num_words,
-                            old_num_contexts,
-                            self.settings.num_contexts - old_num_contexts)
+                    msg = "Rebuilt dictionary in %0.2fs. Words %d (%+d), contexts %d (%+d)" % (time.time() - t, old_num_words, self.settings.num_words - old_num_words, old_num_contexts, self.settings.num_contexts - old_num_contexts)
 
-            #Remove rares words
+            # Remove rares words
             elif command_list[0] == "!purge":
                 t = time.time()
 
@@ -543,7 +660,6 @@ class pyborg(object):
                 c_max = int(c_max)
 
                 for w in self.words.keys():
-                
                     digit = 0
                     char = 0
                     for c in w:
@@ -552,28 +668,25 @@ class pyborg(object):
                         if c.isdigit():
                             digit += 1
 
-                
-                #Compte les mots inferieurs a cette limite
+                # Compte les mots inferieurs a cette limite
                     c = len(self.words[w])
-                    if c < 2 or ( digit and char ):
+                    if c < 2 or (digit and char):
                         liste.append(w)
                         compteur += 1
                         if compteur == c_max:
                             break
 
                 if c_max < 1:
-                    #io_module.output(str(compteur)+" words to remove", args)
-                    io_module.output("%s words to remove" %compteur, args)
+                    # io_module.output(str(compteur)+" words to remove", args)
+                    io_module.output("%s words to remove" % compteur, args)
                     return
 
-                #supprime les mots
+                # supprime les mots
                 for w in liste[0:]:
                     self.unlearn(w)
 
-                msg = "Purge dictionary in %0.2fs. %d words removed" % \
-                        (time.time()-t,
-                        compteur)
-                
+                msg = "Purge dictionary in %0.2fs. %d words removed" % (time.time() - t, compteur)
+
             # Change a typo in the dictionary
             elif command_list[0] == "!replace":
                 if len(command_list) < 3:
@@ -592,23 +705,23 @@ class pyborg(object):
                 context = context.lower()
                 if context == "":
                     return
-                io_module.output("Contexts containing \""+context+"\":", args)
+                io_module.output("Contexts containing \"" + context + "\":", args)
                 # Build context list
                 # Pad it
-                context = " "+context+" "
+                context = " " + context + " "
                 c = []
                 # Search through contexts
                 for x in self.lines.keys():
                     # get context
                     ctxt = self.lines[x][0]
                     # add leading whitespace for easy sloppy search code
-                    ctxt = " "+ctxt+" "
+                    ctxt = " " + ctxt + " "
                     if ctxt.find(context) != -1:
                         # Avoid duplicates (2 of a word
                         # in a single context)
                         if len(c) == 0:
                             c.append(self.lines[x][0])
-                        elif c[len(c)-1] != self.lines[x][0]:
+                        elif c[len(c) - 1] != self.lines[x][0]:
                             c.append(self.lines[x][0])
                 x = 0
                 while x < 5:
@@ -618,7 +731,7 @@ class pyborg(object):
                 if len(c) == 5:
                     return
                 if len(c) > 10:
-                    io_module.output("...({} skipped)...".format(len(c)-10), args)
+                    io_module.output("...({} skipped)...".format(len(c) - 10), args)
                 x = len(c) - 5
                 if x < 5:
                     x = 5
@@ -633,13 +746,13 @@ class pyborg(object):
                 context = context.lower()
                 if context == "":
                     return
-                print("Looking for: "+context)
+                print("Looking for: " + context)
                 # Unlearn contexts containing 'context'
                 t = time.time()
                 self.unlearn(context)
                 # we don't actually check if anything was
                 # done..
-                msg = "Unlearn done in %0.2fs" % (time.time()-t)
+                msg = "Unlearn done in %0.2fs" % (time.time() - t)
 
             # Query/toggle bot learning
             elif command_list[0] == "!learning":
@@ -694,20 +807,20 @@ class pyborg(object):
                     if len(self.settings.aliases) == 0:
                         msg = "No aliases"
                     else:
-                        msg = "I will alias the word(s) %s" \
-                        % ", ".join(self.settings.aliases.keys())
+                        msg = "I will alias the word(s) %s" % ", ".join(self.settings.aliases.keys())
                 # add every word listed to alias list
                 elif len(command_list) == 2:
-                    if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
+                    if command_list[1][0] != '~':
+                        command_list[1] = '~' + command_list[1]
                     if command_list[1] in self.settings.aliases.keys():
-                        msg = "Thoses words : %s  are aliases to %s" \
-                        % ( " ".join(self.settings.aliases[command_list[1]]), command_list[1] )
+                        msg = "Thoses words : %s  are aliases to %s" % (" ".join(self.settings.aliases[command_list[1]]), command_list[1])
                     else:
                         msg = "The alias %s is not known" % command_list[1][1:]
                 elif len(command_list) > 2:
-                    #create the aliases
+                    # create the aliases
                     msg = "The words : "
-                    if command_list[1][0] != '~': command_list[1] = '~' + command_list[1]
+                    if command_list[1][0] != '~':
+                        command_list[1] = '~' + command_list[1]
                     if not(command_list[1] in self.settings.aliases.keys()):
                         self.settings.aliases[command_list[1]] = [command_list[1][1:]]
                         self.replace(command_list[1][1:], command_list[1])
@@ -715,7 +828,7 @@ class pyborg(object):
                     for x in xrange(2, len(command_list)):
                         msg += "%s " % command_list[x]
                         self.settings.aliases[command_list[1]].append(command_list[x])
-                        #replace each words by his alias
+                        # replace each words by his alias
                         self.replace(command_list[x], command_list[1])
                     msg += "have been aliases to %s" % command_list[1]
 
@@ -724,11 +837,11 @@ class pyborg(object):
                 # Close the dictionary
                 self.save_all()
                 sys.exit()
-                
+
             # Save changes
             self.settings.save()
-    
-        if msg != "":   
+
+        if msg != "":
             io_module.output(msg, args)
 
     def replace(self, old, new):
@@ -739,17 +852,18 @@ class pyborg(object):
         try:
             pointers = self.words[old]
         except KeyError as e:
-            return old+" not known."
+            return old + " not known."
         changed = 0
 
         for x in pointers:
             # pointers consist of (line, word) to self.lines
-            l, w = struct.unpack("iH", x)
+            l = self.words[x['hashval']]
+            w = self.words[x['index']]
             line = self.lines[l][0].split()
             number = self.lines[l][1]
             if line[w] != old:
                 # fucked dictionary
-                print("Broken link: %s %s" % (x, self.lines[l][0] ))
+                print("Broken link: %s %s" % (x, self.lines[l][0]))
                 continue
             else:
                 line[w] = new
@@ -763,7 +877,7 @@ class pyborg(object):
         else:
             self.words[new] = self.words[old]
         del self.words[old]
-        return "%d instances of %s replaced with %s" % ( changed, old, new )
+        return "%d instances of %s replaced with %s" % (changed, old, new)
 
     def unlearn(self, context):
         """
@@ -773,15 +887,15 @@ class pyborg(object):
         """
         # Pad thing to look for
         # We pad so we don't match 'shit' when searching for 'hit', etc.
-        context = " "+context+" "
+        context = " " + context + " "
         # Search through contexts
         # count deleted items
         dellist = []
         # words that will have broken context due to this
         wordlist = []
-        for x in self.lines.keys():
+        for x in self.lines.copy().keys():
             # get context. pad
-            c = " "+self.lines[x][0]+" "
+            c = " " + self.lines[x][0] + " "
             if c.find(context) != -1:
                 # Split line up
                 wlist = self.lines[x][0].split()
@@ -792,20 +906,28 @@ class pyborg(object):
                 dellist.append(x)
                 del self.lines[x]
         words = self.words
-        unpack = struct.unpack
         # update links
         for x in wordlist:
             word_contexts = words[x]
             # Check all the word's links (backwards so we can delete)
-            for y in xrange(len(word_contexts)-1, -1, -1):
+            for y in xrange(len(word_contexts) - 1, -1, -1):
                 # Check for any of the deleted contexts
-                if unpack("iH", word_contexts[y])[0] in dellist:
+                hashval = word_contexts[y]['hashval']
+                if hashval in dellist:
                     del word_contexts[y]
                     self.settings.num_contexts = self.settings.num_contexts - 1
             if len(words[x]) == 0:
                 del words[x]
                 self.settings.num_words = self.settings.num_words - 1
-                print("\"%s\" vaped totally" %x)
+                print("\"%s\" vaped totally" % x)
+
+    def _is_censored(self, word):
+        """DRY."""
+        for censored in self.settings.censored:
+            if re.search(censored, word):
+                print("Censored word %s" % word)
+                return True
+        return False
 
     def reply(self, body):
         """
@@ -820,18 +942,20 @@ class pyborg(object):
         if len(words) == 0:
             logging.debug("Did not find any words to reply to.")
             return ""
-        
+
         # remove words on the ignore list
         words = [x for x in words if x not in self.settings.ignore_list and not x.isdigit()]
-
+        logging.debug("reply: cleaned words: %s", words)
         # Find rarest word (excluding those unknown)
         index = []
         known = -1
         # The word has to have been seen in already 3 contexts differents for being choosen
         known_min = 3
         for w in words:
+            logger.debug("known_loop: locals: %s", locals())
             if w in self.words:
                 k = len(self.words[w])
+                logger.debug("known_loop: k?? %s", k)
             else:
                 continue
             if (known == -1 or k < known) and k > known_min:
@@ -842,8 +966,25 @@ class pyborg(object):
                 index.append(w)
                 continue
         # Index now contains list of rarest known words in sentence
-        if len(index)==0:
+        # index = words
+
+        # def find_known_words(words):
+        #     d = dict()
+        #     for w in words:
+        #         if w in self.words:
+        #             logger.debug(self.words[w])
+        #             k = len(self.words[w])
+        #             d[w] = k
+        #     logger.debug("find_known_words: %s", d)
+        #     idx = [x for x,y  in d.items() if y > 3]
+        #     logger.debug("find_known_words: %s", idx)
+        #     return idx
+
+        # index = find_known_words(words)
+
+        if len(index) == 0:
             logging.debug("No words with atleast 3 contexts were found.")
+            logging.debug("reply:index: %s", index)
             return ""
 
         # Begin experimental NLP code
@@ -856,7 +997,7 @@ class pyborg(object):
                 ret = 1
             return ret
         if nltk:
-            # uses punkt 
+            # uses punkt
             tokenized = nltk.word_tokenize(body)
             # uses averaged_perceptron_tagger
             tagged = nltk.pos_tag(tokenized)
@@ -866,130 +1007,134 @@ class pyborg(object):
             word = random.choice(population)
             # make sure the word is known
             counter = 0
-            while word not in index and counter < 200:
+            while word not in self.words and counter < 200:
                 word = random.choice(population)
                 counter += 1
             logging.debug("Ran choice %d times", counter)
         else:
-            word = index[randint(0, len(index)-1)]
+            word = index[randint(0, len(index) - 1)]
 
         # Build sentence backwards from "chosen" word
+        if self._is_censored(word):
+            logger.debug("chosen word: %s***%s is censored. ignoring.", (word[0], word[-1]))
+            return
         sentence = [word]
         done = 0
         while done == 0:
-            #create a dictionary wich will contain all the words we can found before the "chosen" word
-            pre_words = {"" : 0}
-            #this is for prevent the case when we have an ignore_listed word
+            # create a dictionary wich will contain all the words we can found before the "chosen" word
+            pre_words = {"": 0}
+            # this is for prevent the case when we have an ignore_listed word
             word = str(sentence[0].split(" ")[0])
-            for x in xrange(0, len(self.words[word]) -1 ):
-                l, w = struct.unpack("iH", self.words[word][x])
+            for x in xrange(0, len(self.words[word]) - 1):
+                logger.debug(locals())
+                logger.debug('trying to unpack: %s', self.words[word][x])
+                l = self.words[word][x]['hashval']
+                w = self.words[word][x]['index']
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
                 cwords = context.split()
-                #if the word is not the first of the context, look the previous one
+                # if the word is not the first of the context, look the previous one
                 if cwords[w] != word:
                     print(context)
                 if w:
-                    #look if we can found a pair with the choosen word, and the previous one
-                    if len(sentence) > 1 and len(cwords) > w+1:
-                        if sentence[1] != cwords[w+1]:
+                    # look if we can found a pair with the choosen word, and the previous one
+                    if len(sentence) > 1 and len(cwords) > w + 1:
+                        if sentence[1] != cwords[w + 1]:
                             continue
 
-                    #if the word is in ignore_list, look the previous word
-                    look_for = cwords[w-1]
+                    # if the word is in ignore_list, look the previous word
+                    look_for = cwords[w - 1]
                     if look_for in self.settings.ignore_list and w > 1:
-                        look_for = cwords[w-2]+" "+look_for
+                        look_for = cwords[w - 2] + " " + look_for
 
-                    #saves how many times we can found each word
+                    # saves how many times we can found each word
                     if look_for not in pre_words:
                         pre_words[look_for] = num_context
-                    else :
+                    else:
                         pre_words[look_for] += num_context
-
 
                 else:
                     pre_words[""] += num_context
 
-            #Sort the words
-            liste = pre_words.items()
-            liste.sort(lambda x,y: cmp(y[1],x[1]))
-            
+            # Sort the words
+            liste = list(pre_words.items())  # this is a view in py3
+            liste.sort(key=lambda x: x[1])
             numbers = [liste[0][1]]
-            for x in xrange(1, len(liste) ):
-                numbers.append(liste[x][1] + numbers[x-1])
+            for x in xrange(1, len(liste)):
+                numbers.append(liste[x][1] + numbers[x - 1])
 
-            #take one them from the list ( randomly )
-            mot = randint(0, numbers[len(numbers) -1])
+            # take one them from the list ( randomly )
+            mot = randint(0, numbers[len(numbers) - 1])
             for x in xrange(0, len(numbers)):
                 if mot <= numbers[x]:
                     mot = liste[x][0]
                     break
 
-            #if the word is already choosen, pick the next one
+            # if the word is already choosen, pick the next one
             while mot in sentence:
                 x += 1
-                if x >= len(liste) -1:
+                if x >= len(liste) - 1:
                     mot = ''
                 logging.info("the choosening: %s", liste[x])
                 mot = liste[x][0]
 
-            mot = mot.split(" ")
+            # logger.debug("mot1: %s", len(mot))
+            mot = mot.split()
             mot.reverse()
-            if mot == ['']:
+            if mot == []:
                 done = 1
             else:
-                map( (lambda x: sentence.insert(0, x) ), mot )
+                list(map((lambda x: sentence.insert(0, x)), mot))
 
         pre_words = sentence
         sentence = sentence[-2:]
 
         # Now build sentence forwards from "chosen" word
 
-        #We've got
-        #cwords:    ... cwords[w-1] cwords[w]   cwords[w+1] cwords[w+2]
-        #sentence:  ... sentence[-2]    sentence[-1]    look_for    look_for ?
+        # We've got
+        # cwords:    ... cwords[w-1] cwords[w]   cwords[w+1] cwords[w+2]
+        # sentence:  ... sentence[-2]    sentence[-1]    look_for    look_for ?
 
-        #we are looking, for a cwords[w] known, and maybe a cwords[w-1] known, what will be the cwords[w+1] to choose.
-        #cwords[w+2] is need when cwords[w+1] is in ignored list
-
-
+        # we are looking, for a cwords[w] known, and maybe a cwords[w-1] known, what will be the cwords[w+1] to choose.
+        # cwords[w+2] is need when cwords[w+1] is in ignored list
         done = 0
         while done == 0:
-            #create a dictionary wich will contain all the words we can found before the "chosen" word
-            post_words = {"" : 0}
+            # create a dictionary wich will contain all the words we can found before the "chosen" word
+            post_words = {"": 0}
             word = str(sentence[-1].split(" ")[-1])
-            for x in xrange(0, len(self.words[word]) ):
-                l, w = struct.unpack("iH", self.words[word][x])
+            for x in xrange(0, len(self.words[word])):
+                l = self.words[word][x]['hashval']
+                w = self.words[word][x]['index']
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
                 cwords = context.split()
-                #look if we can found a pair with the choosen word, and the next one
+                # look if we can found a pair with the choosen word, and the next one
                 if len(sentence) > 1:
-                    if sentence[len(sentence)-2] != cwords[w-1]:
+                    if sentence[len(sentence) - 2] != cwords[w - 1]:
                         continue
 
-                if w < len(cwords)-1:
-                    #if the word is in ignore_list, look the next word
-                    look_for = cwords[w+1]
-                    if look_for in self.settings.ignore_list and w < len(cwords) -2:
-                        look_for = look_for+" "+cwords[w+2]
+                if w < len(cwords) - 1:
+                    # if the word is in ignore_list, look the next word
+                    look_for = cwords[w + 1]
+                    if (look_for in self.settings.ignore_list or look_for in self.settings.censored) and w < len(cwords) - 2:
+                        look_for = look_for + " " + cwords[w + 2]
 
                     if look_for not in post_words:
                         post_words[look_for] = num_context
-                    else :
+                    else:
                         post_words[look_for] += num_context
                 else:
                     post_words[""] += num_context
-            #Sort the words
-            liste = post_words.items()
-            liste.sort(lambda x,y: cmp(y[1],x[1]))
+            # Sort the words
+            liste = list(post_words.items())
+            liste.sort(key=lambda x: x[1])
             numbers = [liste[0][1]]
-            
-            for x in xrange(1, len(liste) ):
-                numbers.append(liste[x][1] + numbers[x-1])
 
-            #take one them from the list ( randomly )
-            mot = randint(0, numbers[len(numbers) -1])
+            for x in xrange(1, len(liste)):
+                numbers.append(liste[x][1] + numbers[x - 1])
+
+            # take one them from the list ( randomly )
+            mot = randint(0, numbers[len(numbers) - 1])
             for x in xrange(0, len(numbers)):
                 if mot <= numbers[x]:
                     mot = liste[x][0]
@@ -998,40 +1143,48 @@ class pyborg(object):
             x = -1
             while mot in sentence:
                 x += 1
-                if x >= len(liste) -1:
+                if x >= len(liste) - 1:
                     mot = ''
                     break
                 mot = liste[x][0]
 
-
-            mot = mot.split(" ")
-            if mot == ['']:
+            # logger.debug("mot2: %s", len(mot))
+            mot = mot.split()
+            if mot == []:
                 done = 1
             else:
-                map( (lambda x: sentence.append(x) ), mot )
-
+                list(map(lambda x: sentence.append(x), mot))
         sentence = pre_words[:-2] + sentence
 
-        #Replace aliases
+        # Replace aliases
         for x in xrange(0, len(sentence)):
-            if sentence[x][0] == "~": sentence[x] = sentence[x][1:]
+            if sentence[x][0] == "~":
+                sentence[x] = sentence[x][1:]
 
-        #Insert space between each words
-        map( (lambda x: sentence.insert(1+x*2, " ") ), xrange(0, len(sentence)-1) ) 
+        # Insert space between each words
+        list(map((lambda x: sentence.insert(1 + x * 2, " ")), xrange(0, len(sentence) - 1)))
 
-        #correct the ' & , spaces problem
-        #code is not very good and can be improve but does his job...
+        # correct the ' & , spaces problem
+        # code is not very good and can be improve but does his job...
         for x in xrange(0, len(sentence)):
             if sentence[x] == "'":
-                sentence[x-1] = ""
-                sentence[x+1] = ""
+                sentence[x - 1] = ""
+                sentence[x + 1] = ""
             if sentence[x] == ",":
-                sentence[x-1] = ""
-
+                sentence[x - 1] = ""
+        # logger.debug("final locals: %s", locals())
         # yolo
-        l = [x.decode('utf-8') for x in sentence]
-        # return as string..
-        return u"".join(l)
+        for w in sentence:
+            if self._is_censored(w):
+                logger.debug("word in sentence: %s***%s is censored. escaping.", (w[0], w[-1]))
+                return None
+        if six.PY2:
+            sentence_list = [x.decode('utf-8') for x in sentence]
+            # return as string..
+            final = u"".join(sentence_list)
+        else:
+            final = "".join(sentence)
+        return final
 
     def learn(self, body, num_context=1):
         """
@@ -1039,10 +1192,11 @@ class pyborg(object):
         to this.
         """
 
-        def learn_line(self, body, num_context):
+        def learn_line(body, num_context):
             """
             Learn from a sentence.
             """
+            logger.debug("entering learn_line")
             words = body.split()
             # Ignore sentences of < 1 words XXX was <3
             if len(words) < 1:
@@ -1050,7 +1204,8 @@ class pyborg(object):
 
             # voyelles = "aÃ Ã¢eÃ©Ã¨ÃªiÃ®Ã¯oÃ¶Ã´uÃ¼Ã»y"
             voyelles = "aeiouy"
-            for x in xrange(0, len(words)):
+            logger.debug("reply:learn_line:words: %s", words)
+            for x in range(0, len(words)):
 
                 nb_voy = 0
                 digit = 0
@@ -1064,60 +1219,66 @@ class pyborg(object):
                         digit += 1
 
                 for censored in self.settings.censored:
-                    pattern = "^%s$" % censored
-                    if re.search(pattern, words[x]):
-                        print("Censored word %s" %words[x])
+                    if re.search(censored, words[x]):
+                        print("Censored word %s" % words[x])
                         return
-
                 if len(words[x]) > 13 \
-                or ( ((nb_voy*100) / len(words[x]) < 26) and len(words[x]) > 5 ) \
-                or ( char and digit ) \
-                or ( words[x] in self.words ) == 0 and self.settings.learning == 0:
-                    #if one word as more than 13 characters, don't learn
-                    #       ( in french, this represent 12% of the words )
-                    #and d'ont learn words where there are less than 25% of voyels
-                    #don't learn the sentence if one word is censored
-                    #don't learn too if there are digits and char in the word
-                    #same if learning is off
+                        or (((nb_voy * 100) / len(words[x]) < 26) and len(words[x]) > 5) \
+                        or (char and digit) \
+                        or (words[x] in self.words) == 0 and self.settings.learning == 0:
+                    # if one word as more than 13 characters, don't learn
+                    # (in french, this represent 12% of the words)
+                    # and d'ont learn words where there are less than 25% of voyels
+                    # don't learn the sentence if one word is censored
+                    # don't learn too if there are digits and char in the word
+                    # same if learning is off
+                    logger.debug("reply:learn_line: Bailing because reasons?")
                     return
-                elif ( "-" in words[x] or "_" in words[x] ) :
-                    words[x]="#nick"
-
+                elif ("-" in words[x] or "_" in words[x]):
+                    words[x] = "#nick"
 
             num_w = self.settings.num_words
             if num_w != 0:
-                num_cpw = self.settings.num_contexts/float(num_w) # contexts per word
+                num_cpw = self.settings.num_contexts / float(num_w)  # contexts per word
             else:
                 num_cpw = 0
 
             cleanbody = " ".join(words)
 
             # Hash collisions we don't care about. 2^32 is big :-)
-            hashval = crc32(cleanbody)
+            # Ok so this takes a bytes object... in python3 thats a pain
+            if six.PY3:
+                cleanbody_b = bytes(cleanbody, "utf-8")
+                # ok so crc32 got changed in 3...
+                hashval = crc32(cleanbody_b) & 0xffffffff
+            else:
+                hashval = crc32(cleanbody) & 0xffffffff
 
+            logger.debug(hashval)
             # Check context isn't already known
-            if  hashval not in self.lines:
-                if not(num_cpw > 100 and self.settings.learning == 0):
-                    
+            if hashval not in self.lines:
+                if not (num_cpw > 100 and self.settings.learning == 0):
                     self.lines[hashval] = [cleanbody, num_context]
                     # Add link for each word
-                    for x in xrange(0, len(words)):
+                    for x in range(0, len(words)):
                         if words[x] in self.words:
                             # Add entry. (line number, word number)
-                            self.words[words[x]].append(struct.pack("iH", hashval, x))
+                            self.words[words[x]].append({"hashval": hashval, "index": x})
                         else:
-                            self.words[words[x]] = [ struct.pack("iH", hashval, x) ]
+                            self.words[words[x]] = [{"hashval": hashval, "index": x}]
                             self.settings.num_words += 1
                         self.settings.num_contexts += 1
-            else :
+            else:
                 self.lines[hashval][1] += num_context
 
             # if max_words reached, don't learn more
-            if self.settings.num_words >= self.settings.max_words: self.settings.learning = 0
+            if self.settings.num_words >= self.settings.max_words:
+                self.settings.learning = 0
 
         # Split body text into sentences and parse them
         # one by one.
         body += " "
+        logger.debug("reply:replying to %s", body)
         # map ( (lambda x : learn_line(self, x, num_context)), body.split(". "))
         for part in body.split('. '):
-            learn_line(self, part, num_context)
+            learn_line(part, num_context)

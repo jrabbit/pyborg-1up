@@ -2,5 +2,6 @@
 cooldown = 20
 learning = true
 last_look = 2016-08-20T02:45:28.663962+00:00
+hate_filter_disable = false
 [pyborg]
 multiplex = false

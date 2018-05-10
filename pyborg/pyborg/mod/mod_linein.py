@@ -2,7 +2,7 @@
 #
 # PyBorg Offline line input module
 #
-# Copyright (c) 2000, 2006, 2016 Tom Morton, Sebastien Dailly, Jack Laxson
+# Copyright (c) 2000, 2006, 2016-2017 Tom Morton, Sebastien Dailly, Jack Laxson
 #
 #
 # This program is free software; you can redistribute it and/or
@@ -19,13 +19,27 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-import string
-import sys
+import getpass
+import logging
 
-import baker
 import requests
+from prompt_toolkit import prompt
+from prompt_toolkit.history import InMemoryHistory
 
-from pyborg import pyborg
+logger = logging.getLogger(__name__)
+history = InMemoryHistory()
+
+
+# class PyborgCommandSuggest(AutoSuggest):
+#    "NB: for pt v2"
+#     def __init__(self):
+#         super(PyborgCommandSuggest, self).__init__()
+
+#     def get_suggestion(self, buffer, document):
+#         #use document.text
+#         if document.text.startswith("!"):
+#             return Suggestion("!quit")
+#         return None
 
 
 class ModLineIn(object):
@@ -43,57 +57,43 @@ class ModLineIn(object):
         self.multiplexed = multiplexed
         if not multiplexed:
             self.pyborg = my_pyborg()
+        # self.completer = WordCompleter(["!quit"])
         self.start()
 
     def start(self):
-        print "PyBorg offline chat!\n"
-        print "Type !quit to leave"
-        print "What is your name"
-        self.name = raw_input("? ")
+        print("PyBorg offline chat!")
+        print("Type !quit to leave")
+        default = getpass.getuser()
+        print("[{}]".format(default))
+        self.name = prompt("What is your name? ")
+        if self.name is "\n":
+            self.name = default
         while 1:
-            try:
-                body = raw_input("> ")
-            except (KeyboardInterrupt, EOFError), e:
-                print
-                return
+            # body = prompt('> ', history=history, completer=self.completer)
+            body = prompt('> ', history=history)
             if body == "":
                 continue
-            if body[0] == "!":
-                if self.linein_commands(body):
-                    continue
+            if body == "!quit":
+                return
+
             # Pass message to borg
             if self.multiplexed:
                 d = {"body": body, "reply_rate": 100, "learning": 1, "owner": 1}
                 resp = requests.post("http://localhost:2001/process", data=d)
-                resp.raise_for_status()
-                self.output(resp.text, None)
+
+                if resp.status_code == requests.codes.ok:
+                    self.output(resp.text, None)
+                else:
+                    logger.error(resp)
             else:
                 self.pyborg.process_msg(self, body, 100, 1, (self.name), owner=1)
 
-    def linein_commands(self, body):
-        command_list = string.split(body)
-        command_list[0] = string.lower(command_list[0])
-
-        if command_list[0] == "!quit":
-            sys.exit(0)
+    def save(self):
+        self.pyborg.save_all()
 
     def output(self, message, args):
         """
         Output a line of text.
         """
         message = message.replace("#nick", self.name)
-        print message
-
-
-@baker.command(default=True, shortopts={"multiplex": "m", })
-def start(multiplex=False):
-    my_pyborg = pyborg.pyborg
-    try:
-        ModLineIn(my_pyborg, multiplex)
-    except SystemExit:
-        pass
-    if not multiplex:
-        my_pyborg.save_all()
-
-if __name__ == "__main__":
-    baker.run()
+        print(message)

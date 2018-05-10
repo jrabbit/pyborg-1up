@@ -1,0 +1,32 @@
+version: "3"
+services:
+  pyborgd:
+    build: .
+    image: "jrabbit/pyborg"
+    command: pipenv run pyborg http --host 0.0.0.0
+    volumes:
+      # - .:/usr/src/pyborg
+      # - ./pyborg/archive.zip:/usr/src/pyborg/archive.zip
+      - ./docker-brains:/root/.config/pyborg/brains/
+    expose: 
+      - "2001"
+    ports:
+      - "2001:2001"
+  irc:
+    build: .
+    image: "jrabbit/pyborg"
+    command: pipenv run pyborg irc
+    depends_on:
+      - pyborgd
+  discord:
+    build:
+      context: .
+      dockerfile: Dockerfile.py3
+    image: "jrabbit/pyborg:3"
+    environment:
+      - PYBORG_HOST=pyborgd
+    # env_file: .env
+    volumes:
+      - ./pyborg/example.discord.toml:/etc/pyborg/discord.toml
+    #   - .:/usr/src/pyborg
+    command: pipenv run pyborg discord --conf-file /etc/pyborg/discord.toml
