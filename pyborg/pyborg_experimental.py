@@ -9,6 +9,7 @@ import platform
 import shutil
 import struct
 import sys
+import os
 
 import click
 import humanize
@@ -251,7 +252,7 @@ def mastodon_login(ctx, cred_file, username, password):
 
 
 @cli_base.command()
-@click.option("--conf-file", default="example.irc.toml")
+@click.option("--conf-file", type=click.Path(), default=os.path.join(folder,"example.irc.toml"))
 def irc(conf_file):
     pyb = pyborg.pyborg.pyborg
     settings = toml.load(conf_file)
@@ -286,7 +287,7 @@ def irc(conf_file):
 
 
 @cli_base.command()
-@click.option("--conf-file", default="example.tumblr.toml")
+@click.option("--conf-file", type=click.Path(), default=os.path.join(folder,"example.tumblr.toml"))
 def tumblr(conf_file):
     bot = PyborgTumblr(conf_file)
     try:
@@ -390,6 +391,7 @@ def filein(multiplex, input_file):
 
 @cli_base.command()
 @click.option("--conf-file", default=os.path.join(folder, "pyborg.discord.toml"))
+>>>>>>> 0e3ed21ddb44d00e7a510d01793a29ff4c3e18ef
 def discord(conf_file):
     "Run the discord client (needs python3)"
     if sys.version_info <= (3,):
