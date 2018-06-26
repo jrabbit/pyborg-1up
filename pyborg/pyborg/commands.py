@@ -35,11 +35,13 @@ def words(multiplex, multi_server):
         raise NotImplementedError
 
 
-@command(internals=True)
-def known(word, multiplex, multi_server):
-
-    ret = requests.get(multi_server + "known?word={word}".format(word))
+@command(internals=True, pass_msg=True)
+def known(multiplex, multi_server, msg=None):
+    message = msg.split()[1:]
+    logger.info(message)
+    ret = requests.get(multi_server + "known?word={}".format(message[0]))
     ret.raise_for_status()
+    logger.info(ret.text)
     return ret.text
 
 

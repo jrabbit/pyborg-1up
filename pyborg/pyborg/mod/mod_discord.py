@@ -20,11 +20,15 @@ class Registry(object):
         self.registered = {}
         self.mod = mod
 
-    def add(self, name, ob, internals):
+    def add(self, name, ob, internals, pass_msg):
         if internals:
             self.registered[name] = partial(ob, self.mod.multiplexing, multi_server="http://{}:2001/".format(self.mod.multi_server))
+            self.registered[name].pass_msg = False
+        if pass_msg:
+            self.registered[name].pass_msg = True
         else:
             self.registered[name] = ob
+            self.registered[name].pass_msg = False
 
 
 class PyborgDiscord(discord.Client):
@@ -84,7 +88,7 @@ class PyborgDiscord(discord.Client):
         """message.content  ~= <@221134985560588289> you should play dota"""
         logger.debug(message.content)
         if message.content and message.content[0] == "!":
-            command_name = message.content[1:]
+            command_name = message.content.split()[0][1:]
             if command_name in ["list", "help"]:
                 help_text = "I have a bunch of commands:"
                 for k, v in self.registry.registered.items():
@@ -94,7 +98,11 @@ class PyborgDiscord(discord.Client):
                 if command_name in self.registry.registered:
                     command = self.registry.registered[command_name]
                     logger.info("Running command %s", command)
-                    await self.send_message(message.channel, command())
+                    logger.info("pass message?: %s", command.pass_msg)
+                    if command.pass_msg:
+                        await self.send_message(message.channel, command(msg=message.content))
+                    else:
+                        await self.send_message(message.channel, command())
         if message.author == self.user:
             logger.info("Not learning/responding to self")
             return
