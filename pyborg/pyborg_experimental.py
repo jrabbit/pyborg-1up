@@ -391,7 +391,6 @@ def filein(multiplex, input_file):
 
 @cli_base.command()
 @click.option("--conf-file", default=os.path.join(folder, "pyborg.discord.toml"))
->>>>>>> 0e3ed21ddb44d00e7a510d01793a29ff4c3e18ef
 def discord(conf_file):
     "Run the discord client (needs python3)"
     if sys.version_info <= (3,):
