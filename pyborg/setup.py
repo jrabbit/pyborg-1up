@@ -30,7 +30,7 @@ setup(
     name="pyborg",
     version=__version__,
     packages=["pyborg", "pyborg.util", "pyborg.mod"],
-    scripts=["pyborg-irc.py", "pyborg_experimental.py"],
+    scripts=["pyborg_experimental.py"],
     author="Jack Laxson",
     author_email="jackjrabbit@gmail.com",
     description="Markov chain bot for irc which generates replies to messages",
