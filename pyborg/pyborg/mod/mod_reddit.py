@@ -113,7 +113,7 @@ class PyborgReddit(object):
             time.sleep(self.settings['reddit']['cooldown'])
 
     def teardown(self):
-        self.settings['reddit']['last_look'] = self.last_look
+        self.settings['reddit']['last_look'] = self.last_look.datetime
         with open(self.toml_file, "w") as f:
             toml.dump(self.settings, f)
         if not self.multiplexing:

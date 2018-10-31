@@ -21,7 +21,7 @@ class PyborgMastodon(object):
         self.multi_server = self.settings['pyborg']['multi_server']
 
     def teardown(self):
-        self.settings['mastodon']['last_look'] = self.last_look
+        self.settings['mastodon']['last_look'] = self.last_look.datetime
         with open(self.toml_file, "w") as f:
             toml.dump(self.settings, f)
         if not self.multiplexing:

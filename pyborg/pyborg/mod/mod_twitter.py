@@ -153,7 +153,7 @@ class PyborgTwitter(object):
                     logger.exception(e)
 
     def teardown(self) -> None:
-        self.settings['twitter']['last_look'] = self.last_look
+        self.settings['twitter']['last_look'] = self.last_look.datetime
         with open(self.toml_file, "w") as f:
             toml.dump(self.settings, f)
         if not self.multiplexing:
