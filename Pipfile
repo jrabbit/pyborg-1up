@@ -24,6 +24,7 @@ typed-ast = {version = "*", markers = "python_version >= '3.0'"}
 
 aeidon = {version = "*", markers = "python_version >= '3.0'"}
 multidict = {version = "*", markers = "python_version >= '3.0'"}
+websockets = {version = "*", markers = "python_version >= '3.0'"}
 arrow = ">=0.10.0"
 attrs = "*"
 bottle = "==0.12.13"
