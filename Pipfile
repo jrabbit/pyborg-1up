@@ -23,10 +23,7 @@ typed-ast = {version = "*", markers = "python_version >= '3.0'"}
 [packages]
 
 aeidon = {version = "*", markers = "python_version >= '3.0'"}
-multidict = {version = "==3.3.0", markers = "python_version >= '3.0'"}
-websockets = {version = "==3.4", markers = "python_version >= '3.0'"}
-aiohttp = {version = "==1.0.5", markers = "python_version >= '3.0'"}
-async_timeout = {version = "*", markers = "python_version >= '3.0'"}
+multidict = {version = "*", markers = "python_version >= '3.0'"}
 arrow = ">=0.10.0"
 attrs = "*"
 bottle = "==0.12.13"
@@ -34,23 +31,12 @@ certifi = "*"
 chardet = "==3.0.4"
 click = ">=6.7"
 "discord.py" = {version = "*", markers = "python_version >= '3.0'"}
-"httplib2" = "==0.10.3"
-httpretty = "==0.8.14"
 humanize = "==0.5.1"
 inflect = "==0.2.5"
 irc = "==16.0"
-"jaraco.classes" = "==1.4.1"
-"jaraco.collections" = "==1.5.1"
-"jaraco.functools" = "==1.16"
-"jaraco.itertools" = "==2.0.1"
-"jaraco.logging" = "==1.5"
-"jaraco.stream" = "==1.1.2"
-"jaraco.text" = "==1.9.2"
 "Mastodon.py" = "*"
-more-itertools = "==3.2.0"
 "oauth2" = "==1.9.0.post1"
-praw = "==5.1.0"
-prawcore = "==0.12.0"
+praw = "*"
 PyTumblr = "==0.0.6"
 pytz = "*"
 requests = ">=2.18"
