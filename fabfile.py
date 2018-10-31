@@ -37,4 +37,4 @@ def lint():
     "run mypy etc"
     with settings(warn_only=True):
         local("pipenv run mypy pyborg/pyborg")
-        local('flake8 --count')
+        local('flake8 --config=tox.ini --count pyborg')

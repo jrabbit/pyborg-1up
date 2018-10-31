@@ -1,12 +1,9 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [dev-packages]
-
 green = "*"
 coverage = "*"
 mock = "*"
@@ -17,11 +14,9 @@ sphinx-autobuild = "*"
 funcsigs = "*"
 mypy = {version = "*", markers = "python_version >= '3.0'"}
 typed-ast = {version = "*", markers = "python_version >= '3.0'"}
-
-
+"flake8" = "*"
 
 [packages]
-
 aeidon = {version = "*", markers = "python_version >= '3.0'"}
 multidict = {version = "*", markers = "python_version >= '3.0'"}
 websockets = {version = "*", markers = "python_version >= '3.0'"}
