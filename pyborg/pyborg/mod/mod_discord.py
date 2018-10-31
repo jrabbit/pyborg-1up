@@ -21,13 +21,13 @@ class Registry(object):
         self.mod = mod
 
     def add(self, name, ob, internals, pass_msg):
+        self.registered[name] = ob
         if internals:
             self.registered[name] = partial(ob, self.mod.multiplexing, multi_server="http://{}:2001/".format(self.mod.multi_server))
             self.registered[name].pass_msg = False
         if pass_msg:
             self.registered[name].pass_msg = True
         else:
-            self.registered[name] = ob
             self.registered[name].pass_msg = False
 
 
