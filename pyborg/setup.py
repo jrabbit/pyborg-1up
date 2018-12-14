@@ -1,10 +1,15 @@
 #! /usr/bin/env python
 import sys
+from os import path
 
 from setuptools import setup
 
 from pyborg import __version__
 
+
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 requires = [
     "irc>=15.1.1",
@@ -34,6 +39,8 @@ setup(
     author="Jack Laxson",
     author_email="jackjrabbit@gmail.com",
     description="Markov chain bot for irc which generates replies to messages",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     license="GPL v3 or later",
     install_requires=requires,
     entry_points="""
