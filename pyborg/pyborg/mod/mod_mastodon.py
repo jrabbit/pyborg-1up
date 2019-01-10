@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class PyborgMastodon(object):
-    """docstring for PyborgMastodon"""
+    """it does toots"""
     def __init__(self, conf_file):
         self.toml_file = conf_file
         self.settings = toml.load(conf_file)
@@ -38,7 +38,7 @@ class PyborgMastodon(object):
             except requests.exceptions.ConnectionError as e:
                 logger.exception(e)
                 self.teardown()
-                sys.exit(7)
+                sys.exit(17)
         else:
             self.pyborg.learn(body)
 
@@ -58,7 +58,7 @@ class PyborgMastodon(object):
             except requests.exceptions.ConnectionError as e:
                 logger.exception(e)
                 self.teardown()
-                sys.exit(7)
+                sys.exit(17)
         else:
             return self.pyborg.reply(body)
 
@@ -96,6 +96,7 @@ class PyborgMastodon(object):
                     logger.info("Couldn't toot.")
 
     def start(self):
+        "This actually runs the bot"
         self.mastodon = Mastodon(
             client_id='pyborg_mastodon_clientcred.secret',
             access_token='pyborg_mastodon_usercred.secret',
