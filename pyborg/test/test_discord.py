@@ -7,7 +7,7 @@ try:
 except ImportError:
     import mock
 
-if sys.version_info >= (3,):
+if sys.version_info >= (3,) and sys.version_info <= (3,7):
     from functools import partial
     import asyncio
 
