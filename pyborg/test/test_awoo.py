@@ -1,11 +1,4 @@
-import sys
 import unittest
-import logging
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 from pyborg.util.awoo import normalize_awoos
 

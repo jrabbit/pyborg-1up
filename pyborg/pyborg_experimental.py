@@ -4,7 +4,6 @@ import collections
 import datetime
 import json
 import logging
-import os
 import platform
 import shutil
 import struct
@@ -33,7 +32,7 @@ if sys.version_info <= (3,):
 if sys.version_info >= (3,):
     from pyborg.mod.mod_subtitle import PyborgSubtitles
     # until we get discord.py rewrite there's no 3.7 support
-    if sys.version_info <= (3,7):
+    if sys.version_info <= (3, 7):
         from pyborg.mod.mod_discord import PyborgDiscord
 
 logger = logging.getLogger(__name__)
@@ -254,7 +253,7 @@ def mastodon_login(ctx, cred_file, username, password):
 
 
 @cli_base.command()
-@click.option("--conf-file", type=click.Path(), default=os.path.join(folder,"example.irc.toml"))
+@click.option("--conf-file", type=click.Path(), default=os.path.join(folder, "example.irc.toml"))
 def irc(conf_file):
     pyb = pyborg.pyborg.pyborg
     settings = toml.load(conf_file)
@@ -289,7 +288,7 @@ def irc(conf_file):
 
 
 @cli_base.command()
-@click.option("--conf-file", type=click.Path(), default=os.path.join(folder,"example.tumblr.toml"))
+@click.option("--conf-file", type=click.Path(), default=os.path.join(folder, "example.tumblr.toml"))
 def tumblr(conf_file):
     bot = PyborgTumblr(conf_file)
     try:
