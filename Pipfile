@@ -25,14 +25,14 @@ async_timeout = {version = "*", markers = "python_version >= '3.0'"}
 arrow = ">=0.10.0"
 "backports.functools_lru_cache" = {version = "*", markers = "python_version <= '3.0'"}
 attrs = "*"
-bottle = "==0.12.13"
+bottle = "==0.12.16"
 certifi = "*"
 chardet = "==3.0.4"
 click = ">=6.7"
 "discord.py" = {version = "*", markers = "python_version >= '3.0'"}
 humanize = "==0.5.1"
 inflect = "==0.2.5"
-irc = "==16.0"
+irc = ">=16.0<17.0"
 "Mastodon.py" = "*"
 "oauth2" = "==1.9.0.post1"
 praw = "*"

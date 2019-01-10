@@ -16,7 +16,7 @@ else:
     with open(path.join(this_directory, "README.md")) as f:
         long_description = f.read()
 requires = [
-    "irc>=15.1.1",
+    "irc>=15.1.1<17", # 17 is py3 only
     "toml",
     "arrow>=0.10.0",
     "PyTumblr==0.0.6",
