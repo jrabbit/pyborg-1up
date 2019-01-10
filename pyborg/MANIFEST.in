@@ -2,3 +2,4 @@ include *.py
 include example.irc.toml
 include LICENSE
 include ChangeLog
+include README.md
