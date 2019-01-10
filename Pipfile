@@ -42,7 +42,7 @@ requests = ">=2.18"
 statsd = "*"
 toml = "*"
 update_checker = "==0.16"
-venusian = "==1.1.0"
+venusian = "==1.2.0"
 lxml = "*"
 "4392609" = {path = "pyborg", editable = true}
 prompt_toolkit = "*"
