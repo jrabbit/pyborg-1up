@@ -23,6 +23,7 @@ websockets = {version = "*", markers = "python_version >= '3.0'"}
 aiohttp = {version = "*", markers = "python_version >= '3.0'"}
 async_timeout = {version = "*", markers = "python_version >= '3.0'"}
 arrow = ">=0.10.0"
+"backports.functools_lru_cache" = {version = "*", markers = "python_version <= '3.0'"}
 attrs = "*"
 bottle = "==0.12.13"
 certifi = "*"

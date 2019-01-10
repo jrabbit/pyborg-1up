@@ -32,7 +32,9 @@ if sys.version_info <= (3,):
 
 if sys.version_info >= (3,):
     from pyborg.mod.mod_subtitle import PyborgSubtitles
-    from pyborg.mod.mod_discord import PyborgDiscord
+    # until we get discord.py rewrite there's no 3.7 support
+    if sys.version_info <= (3,7):
+        from pyborg.mod.mod_discord import PyborgDiscord
 
 logger = logging.getLogger(__name__)
 
@@ -395,9 +397,12 @@ def discord(conf_file):
     "Run the discord client (needs python3)"
     if sys.version_info <= (3,):
         print(
-            "You are trying to run the discord mod under python 2. \nThis won't work. Please use python 3."
+            "You are trying to run the discord mod under python 2. \nThis won't work. Please use python 3 (<3.7)."
         )
         sys.exit(6)
+    if sys.version_info >= (3, 7):
+        print("The discord library we use doesn't support 3.7 in a stable release yet. Try using a recent 3.6 python.")
+        sys.exit(7)
     bot = PyborgDiscord(conf_file)
     try:
         bot.our_start()

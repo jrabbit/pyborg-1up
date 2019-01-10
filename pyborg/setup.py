@@ -8,9 +8,13 @@ from pyborg import __version__
 
 
 this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
-
+if sys.version_info >= (3,):
+    with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+        long_description = f.read()
+else:
+    # do python2
+    with open(path.join(this_directory, "README.md")) as f:
+        long_description = f.read()
 requires = [
     "irc>=15.1.1",
     "toml",
