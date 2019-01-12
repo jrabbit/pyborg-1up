@@ -79,7 +79,7 @@ class PyborgMastodon(object):
             if item["in_reply_to_account_id"] == self.my_id:
                 return True
             elif item["type"] == "mention":
-                if any([True for mention in item["mentions"] if mention['id'] == self.my_id]):
+                if any([True for mention in item["status"]["mentions"] if mention['id'] == self.my_id]):
                     return True
                 else:
                     # Is this actually possible?
