@@ -14,6 +14,7 @@ def deploy(c, restart=False):
         if restart:
             for unit in ["pyborg_discord", "pyborg_http", "pyborg_twitter", "pyborg_mastodon"]:
                 conn.sudo("systemctl restart {}".format(unit), pty=True)
+        print("Deploy Completed.")
 
 @task
 def bandit(c):
