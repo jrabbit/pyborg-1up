@@ -78,16 +78,17 @@ class PyborgMastodon(object):
         try:
             if item["in_reply_to_account_id"] == self.my_id:
                 return True
-            elif item["type"] == "mention":
-                if any([True for mention in item["status"]["mentions"] if mention['id'] == self.my_id]):
+            else:
+                return False
+        except KeyError:
+            if item["type"] == "mention":
+                if any([True for mention in item["mentions"] if mention['id'] == self.my_id]):
                     return True
                 else:
                     # Is this actually possible?
                     return False
             else:
                 return False
-        except KeyError:
-            return False
 
     def handle_toots(self, toots: List[Dict]) -> None:
         for item in toots:
@@ -102,8 +103,12 @@ class PyborgMastodon(object):
                 if self.settings['pyborg']['learning']:
                     self.learn(body)
                 reply = self.reply(body)
-                if reply and (self.should_reply_direct(fromacct) or self.is_reply_to_me(item)):
-                    self.mastodon.status_post(reply, in_reply_to_id=item['id'])
+                if reply:
+                    logger.debug("got reply from http: %s", reply)
+                    if (self.should_reply_direct(fromacct) or self.is_reply_to_me(item)):
+                        self.mastodon.status_post(reply, in_reply_to_id=item['id'])
+                    else:
+                        logger.info("Got reply but declined to toot. recv'd body: %s", body)
                 else:
                     logger.info("Couldn't toot.")
 
