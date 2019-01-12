@@ -1,6 +1,8 @@
 import logging
 import time
 import sys
+import os.path
+from typing import List, Dict, Optional
 
 import arrow
 import lxml.html
@@ -10,9 +12,10 @@ from mastodon import Mastodon
 
 logger = logging.getLogger(__name__)
 
-
 class PyborgMastodon(object):
     """it does toots"""
+
+    # todo: attrs
     def __init__(self, conf_file):
         self.toml_file = conf_file
         self.settings = toml.load(conf_file)
@@ -20,14 +23,15 @@ class PyborgMastodon(object):
         self.multiplexing = True
         self.multi_server = self.settings['pyborg']['multi_server']
 
-    def teardown(self):
+    def teardown(self) -> None:
         self.settings['mastodon']['last_look'] = self.last_look.datetime
         with open(self.toml_file, "w") as f:
             toml.dump(self.settings, f)
         if not self.multiplexing:
-            self.pyborg.save_all()
+            raise NotImplementedError("Use multiplexing.")
+            # self.pyborg.save_all()
 
-    def learn(self, body):
+    def learn(self, body) -> None:
         if self.multiplexing:
             try:
                 ret = requests.post("http://{}:2001/learn".format(self.multi_server), data={"body": body})
@@ -40,9 +44,10 @@ class PyborgMastodon(object):
                 self.teardown()
                 sys.exit(17)
         else:
-            self.pyborg.learn(body)
+            raise NotImplementedError("Use multiplexing.")
+            # self.pyborg.learn(body)
 
-    def reply(self, body):
+    def reply(self, body) -> Optional[str]:
         if self.multiplexing:
             try:
                 ret = requests.post("http://{}:2001/reply".format(self.multi_server), data={"body": body})
@@ -51,7 +56,7 @@ class PyborgMastodon(object):
                     logger.debug("got reply: %s", reply)
                 elif ret.status_code > 499:
                     logger.error("Internal Server Error in pyborg_http. see logs.")
-                    return
+                    return None
                 else:
                     ret.raise_for_status()
                 return reply
@@ -60,14 +65,15 @@ class PyborgMastodon(object):
                 self.teardown()
                 sys.exit(17)
         else:
-            return self.pyborg.reply(body)
+            raise NotImplementedError("use multiplexing.")
+            # return self.pyborg.reply(body)
 
-    def should_reply_direct(self, usern):
+    def should_reply_direct(self, usern) -> bool:
         should_reply = []
         should_reply.extend([a['acct'] for a in self.mastodon.account_followers(self.my_id)])  # is this cached?
         return usern in should_reply
 
-    def is_reply_to_me(self, item):
+    def is_reply_to_me(self, item: Dict) -> bool:
         logger.debug(item)
         try:
             if item["in_reply_to_account_id"] == self.my_id:
@@ -77,7 +83,7 @@ class PyborgMastodon(object):
         except KeyError:
             return False
 
-    def handle_toots(self, toots):
+    def handle_toots(self, toots: List[Dict]) -> None:
         for item in toots:
             # logger.debug(arrow.get(item["created_at"]) > self.last_look)
             logger.debug(item['content'])
@@ -95,18 +101,18 @@ class PyborgMastodon(object):
                 else:
                     logger.info("Couldn't toot.")
 
-    def start(self):
+    def start(self, folder=".") -> None:
         "This actually runs the bot"
         self.mastodon = Mastodon(
-            client_id='pyborg_mastodon_clientcred.secret',
-            access_token='pyborg_mastodon_usercred.secret',
+            client_id=os.path.join(folder, 'pyborg_mastodon_clientcred.secret'),
+            access_token=os.path.join(folder, 'pyborg_mastodon_usercred.secret'),
             api_base_url=self.settings['mastodon']['base_url']
         )
         self.my_id = self.mastodon.account_verify_credentials()['id']
 
         while True:
             tl = self.mastodon.timeline()
-            toots = []
+            toots: List[Dict] = []
             mentions = [notif['status'] for notif in self.mastodon.notifications() if notif['type'] == "mention"]
             toots.extend(tl)
             toots.extend(mentions)

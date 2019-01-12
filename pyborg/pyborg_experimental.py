@@ -204,10 +204,10 @@ def check_server(server):
     response.raise_for_status()
 
 
-def run_mastodon(conf_file):
+def run_mastodon(conf_file, secret_folder):
     bot = PyborgMastodon(conf_file)
     try:
-        bot.start()
+        bot.start(folder=secret_folder)
     except KeyboardInterrupt:
         bot.teardown()
         sys.exit()
@@ -220,12 +220,14 @@ def run_mastodon(conf_file):
 @click.pass_context
 @click.option("--base-url", default='https://mastodon.social')
 @click.option("--conf-file", default=os.path.join(folder, "pyborg.mastodon.toml"))
-def mastodon(ctx, base_url, conf_file):
+@click.option("--secret-folder", default=folder)
+def mastodon(ctx, base_url, conf_file, secret_folder):
     "Run the mastodon mod; run register and login first"
     ctx.obj = dict()
     ctx.obj['base_url'] = base_url
+    ctx.obj['secret_folder'] = secret_folder
     if ctx.invoked_subcommand is None:
-        run_mastodon(conf_file)
+        run_mastodon(conf_file, secret_folder)
 
 
 @mastodon.command(name="register")
@@ -235,7 +237,7 @@ def mastodon(ctx, base_url, conf_file):
     "--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path()
 )
 def mastodon_register(ctx, cred_file, bot_name):
-    Mastodon.create_app(bot_name, api_base_url=ctx.obj['base_url'], to_file=cred_file)
+    Mastodon.create_app(bot_name, api_base_url=ctx.obj['base_url'], to_file=os.path.join(ctx.obj['secret_folder'],cred_file))
 
 
 @mastodon.command("login")
@@ -249,7 +251,7 @@ def mastodon_register(ctx, cred_file, bot_name):
 )
 def mastodon_login(ctx, cred_file, username, password):
     mastodon = Mastodon(client_id=cred_file, api_base_url=ctx.obj['base_url'])
-    mastodon.log_in(username, password, to_file='pyborg_mastodon_usercred.secret')
+    mastodon.log_in(username, password, to_file=os.path.join(ctx.obj['secret_folder'], 'pyborg_mastodon_usercred.secret'))
 
 
 @cli_base.command()
