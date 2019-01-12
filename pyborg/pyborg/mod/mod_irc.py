@@ -79,7 +79,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
     def replace_nicks(self, body, e):
         if "#nick" in body:
             #wtf do we want here
-            randuser = random.choice(self.channels[e.target].users())
+            randuser = random.choice(self.channels[e.target].users()) #nosec
             body = body.replace("#nick", randuser)
             logger.debug("Replaced #nicks: %s", body)
         return body
@@ -148,7 +148,7 @@ class ModIRC(irc.bot.SingleServerIRCBot):
             if self.settings['speaking'] and self.chans[e.target.lower()]['speaking']:                
                 reply_chance_inverse = 100 - self.chans[e.target.lower()]['reply_chance']
                 logger.debug("Inverse Reply Chance = %d", reply_chance_inverse)
-                rnd = random.uniform(0,100)
+                rnd = random.uniform(0,100) #nosec
                 logger.debug("Random float: %d", rnd)
                 if rnd > reply_chance_inverse:
                     msg = self.reply(e.arguments[0].encode('utf-8'))

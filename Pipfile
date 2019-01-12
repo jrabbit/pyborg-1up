@@ -16,6 +16,7 @@ mypy = {version = "*",markers = "python_version >= '3.0'"}
 typed-ast = {version = "*",markers = "python_version >= '3.0'"}
 "flake8" = "*"
 invoke = "*"
+fabric2 = "*"
 
 [packages]
 aeidon = {version = "*",markers = "python_version >= '3.0'"}

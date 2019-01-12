@@ -79,11 +79,11 @@ class PyborgMastodon(object):
 
     def handle_toots(self, toots):
         for item in toots:
-            logger.debug(arrow.get(item["created_at"]) > self.last_look)
+            # logger.debug(arrow.get(item["created_at"]) > self.last_look)
             logger.debug(item['content'])
             logger.debug(arrow.get(item["created_at"]) - self.last_look)
-            if (arrow.get(item["created_at"]) > self.last_look or True) and item["account"]["id"] is not self.my_id:
-                logger.debug("Got New Toot: {}".format(item))
+            if (arrow.get(item["created_at"]) > self.last_look) and item["account"]["id"] is not self.my_id:
+                logger.info("Got New Toot: {}".format(item))
                 fromacct = item['account']['acct']  # to check if we've banned them?
                 parsed_html = lxml.html.fromstring(item['content'])
                 body = parsed_html.text_content()
