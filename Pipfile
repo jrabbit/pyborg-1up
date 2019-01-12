@@ -17,6 +17,7 @@ typed-ast = {version = "*",markers = "python_version >= '3.0'"}
 "flake8" = "*"
 invoke = "*"
 fabric2 = "*"
+ipython = "*"
 
 [packages]
 aeidon = {version = "*",markers = "python_version >= '3.0'"}
