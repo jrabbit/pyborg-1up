@@ -35,7 +35,7 @@ Notes
 
 Pyborg is skipping version 1.3; this was used for a transitory database/"brain" restructuring that was underwhelming. 
 
-Ancient original tarballs may be found at http://download.gna.org/pyborg/
+Ancient original tarballs were hosted at Gna! which is now gone. [Thankfully Internet Archive has a copy!](https://web.archive.org/web/20170225141934/http://download.gna.org/pyborg/) 
 
 Pyborg was originally developed by Tom Morton and Sébastien Dailly.
 
