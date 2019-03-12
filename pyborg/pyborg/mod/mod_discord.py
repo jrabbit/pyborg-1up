@@ -23,7 +23,8 @@ class Registry(object):
     def add(self, name, ob, internals, pass_msg):
         self.registered[name] = ob
         if internals:
-            self.registered[name] = partial(ob, self.mod.multiplexing, multi_server="http://{}:2001/".format(self.mod.multi_server))
+            self.registered[name] = partial(ob, self.mod.multiplexing, multi_server="http://{}:{}/".format(self.mod.multi_server, self.mod.multi_port))
+
             self.registered[name].pass_msg = False
         if pass_msg:
             self.registered[name].pass_msg = True
@@ -41,6 +42,7 @@ class PyborgDiscord(discord.Client):
         self.settings: Dict = toml.load(self.toml_file)
         self.multiplexing = self.settings['pyborg']['multiplex']
         self.multi_server = self.settings['pyborg']['multiplex_server']
+        self.multi_port = self.settings['pyborg']['multiplex_port']
         self.registry = Registry(self)
         if not self.multiplexing:
             # self.pyborg = pyborg.pyborg.pyborg()
@@ -48,6 +50,17 @@ class PyborgDiscord(discord.Client):
             raise NotImplementedError
         else:
             self.pyborg = None
+        def RepresentsInt(s):
+            try:
+                int(s)
+                return True
+            except ValueError:
+                return False
+        if not self.multi_port:
+            self.multi_port = 2001
+        elif not RepresentsInt(self.multi_port):
+            self.multi_port = 2001
+
 
     def our_start(self) -> None:
         self.scan()
@@ -154,7 +167,7 @@ class PyborgDiscord(discord.Client):
     def learn(self, body: str) -> None:
         """thin wrapper for learn to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
-            ret = requests.post("http://{}:2001/learn".format(self.multi_server), data={"body": body})
+            ret = requests.post("http://{}:{}/learn".format(self.multi_server, self.multi_port), data={"body": body})
             if ret.status_code > 499:
                 logger.error("Internal Server Error in pyborg_http. see logs.")
             else:
@@ -163,7 +176,7 @@ class PyborgDiscord(discord.Client):
     def reply(self, body: str) -> Union[str, None]:
         """thin wrapper for reply to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
-            ret = requests.post("http://{}:2001/reply".format(self.multi_server), data={"body": body})
+            ret = requests.post("http://{}:{}/reply".format(self.multi_server, self.multi_port), data={"body": body})
             if ret.status_code == requests.codes.ok:
                 reply = ret.text
                 logger.debug("got reply: %s", reply)
