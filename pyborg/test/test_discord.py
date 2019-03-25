@@ -2,12 +2,8 @@ import logging
 import sys
 import unittest
 
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-
 if sys.version_info >= (3,) and sys.version_info <= (3, 7):
+    from unittest import mock
     from functools import partial
     import asyncio
 
