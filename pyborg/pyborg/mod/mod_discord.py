@@ -133,7 +133,7 @@ class PyborgDiscord(discord.Client):
         if self.settings['discord']['learning']:
             self.learn(line)
 
-        if self.user.mentioned_in(message):
+        if self.user.mentioned_in(message) or self._plaintext_name(message):
             await self.send_typing(message.channel)
             msg = self.reply(line)
             logger.debug("on message: %s" % msg)
@@ -150,6 +150,16 @@ class PyborgDiscord(discord.Client):
                 msg = msg.replace("@everyone", "`@everyone`")
                 msg = msg.replace("@here", "`@here`")
                 await self.send_message(message.channel, msg)
+
+    def _plaintext_name(self, message: discord.Message) -> bool:
+        "returns true if should ping with plaintext nickname per-server if configured"
+        try:
+            if self.settings["discord"]["plaintext_ping"]:
+                return message.server.me.display_name.lower() in message.content.lower()
+            else:
+                return False
+        except KeyError:
+            return False
 
     def learn(self, body: str) -> None:
         """thin wrapper for learn to switch to multiplex mode"""
