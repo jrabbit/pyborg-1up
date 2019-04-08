@@ -39,9 +39,10 @@ class TestReplys(unittest.TestCase):
                 'stealth': False}
 
     @mock.patch('pyborg.mod.mod_irc.ModIRC.strip_nicks', side_effect=lambda x, _: x)
+    @mock.patch('pyborg.mod.mod_irc.ModIRC.reply')
     @mock.patch('pyborg.mod.mod_irc.ModIRC.learn')
     @mock.patch('irc.connection')
-    def test_respond(self, c, learn, stripnicks):
+    def test_learn_on_message(self, c, learn, reply, stripnicks):
         mod = pyborg.mod.mod_irc.ModIRC(pyborg.pyborg.pyborg, self.settings)
         src = mock.Mock()
         src.nick.return_value = "foobar"
@@ -111,7 +112,7 @@ class TestReplys(unittest.TestCase):
         self.assertEqual(mod.strip_nicks(msg, our_event), "#nick is the best bot maker!")
 
 
-@unittest.skip
+@unittest.skip("idk why this has been disabled - 2019")
 class TestLaunch(unittest.TestCase):
     settings = {'multiplex': True,
             'nickname': 'PyBorg',
