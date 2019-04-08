@@ -137,9 +137,12 @@ class PyborgDiscord(discord.Client):
             line_list.append(x)
 
         line = " ".join(line_list)
-        if self.settings["discord"]["plaintext_ping"]:
-            line = line.replace(message.server.me.display_name, "#nick")
-            line = line.replace(message.server.me.display_name.lower(), "#nick")
+        try:
+            if self.settings["discord"]["plaintext_ping"]:
+                line = line.replace(message.server.me.display_name, "#nick")
+                line = line.replace(message.server.me.display_name.lower(), "#nick")
+        except KeyError:
+            pass
 
         logger.debug("post nick replace: %s", line)
         line = normalize_awoos(line)
