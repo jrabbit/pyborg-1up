@@ -6,6 +6,8 @@ import pyborg.commands
 import requests
 import toml
 import venusian
+import attr
+
 from pyborg.util.awoo import normalize_awoos
 from typing import Dict, Union, List
 
@@ -23,7 +25,7 @@ class Registry(object):
     def add(self, name, ob, internals, pass_msg):
         self.registered[name] = ob
         if internals:
-            self.registered[name] = partial(ob, self.mod.multiplexing, multi_server="http://{}:2001/".format(self.mod.multi_server))
+            self.registered[name] = partial(ob, self.mod.multiplexing, multi_server="http://{}:{}/".format(self.mod.multi_server, self.mod.multi_port))
             self.registered[name].pass_msg = False
         if pass_msg:
             self.registered[name].pass_msg = True
@@ -31,23 +33,31 @@ class Registry(object):
             self.registered[name].pass_msg = False
 
 
+@attr.s
 class PyborgDiscord(discord.Client):
     """This is the pyborg discord client module.
     It connects over http to a running pyborg/http service."""
+    toml_file = attr.ib()
+    multi_port = attr.ib(default=2001)
+    multiplexing = attr.ib(default=True)
+    multi_server = attr.ib(default="localhost")
+    registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
 
-    def __init__(self, toml_file):
-        super(PyborgDiscord, self).__init__()
-        self.toml_file = toml_file
-        self.settings: Dict = toml.load(self.toml_file)
-        self.multiplexing = self.settings['pyborg']['multiplex']
-        self.multi_server = self.settings['pyborg']['multiplex_server']
-        self.registry = Registry(self)
+    def __attrs_post_init__(self):
+        self.settings = toml.load(self.toml_file)
+        try:
+            self.multiplexing = self.settings['pyborg']['multiplex']
+            self.multi_server = self.settings['pyborg']['multiplex_server']
+            self.multi_port = self.settings['pyborg']['multiplex_port']
+        except KeyError:
+            logger.info("Missing config key, you get defaults.")
         if not self.multiplexing:
             # self.pyborg = pyborg.pyborg.pyborg()
             # pyb config parsing isn't ready for python 3.
             raise NotImplementedError
         else:
             self.pyborg = None
+        super().__init__()
 
     def our_start(self) -> None:
         self.scan()
@@ -164,7 +174,7 @@ class PyborgDiscord(discord.Client):
     def learn(self, body: str) -> None:
         """thin wrapper for learn to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
-            ret = requests.post("http://{}:2001/learn".format(self.multi_server), data={"body": body})
+            ret = requests.post("http://{}:{}/learn".format(self.multi_server, self.multi_port), data={"body": body})
             if ret.status_code > 499:
                 logger.error("Internal Server Error in pyborg_http. see logs.")
             else:
@@ -173,7 +183,7 @@ class PyborgDiscord(discord.Client):
     def reply(self, body: str) -> Union[str, None]:
         """thin wrapper for reply to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
-            ret = requests.post("http://{}:2001/reply".format(self.multi_server), data={"body": body})
+            ret = requests.post("http://{}:{}/reply".format(self.multi_server, self.multi_port), data={"body": body})
             if ret.status_code == requests.codes.ok:
                 reply = ret.text
                 logger.debug("got reply: %s", reply)
