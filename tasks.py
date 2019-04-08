@@ -18,6 +18,16 @@ def deploy(c, restart=False, sync=False):
         print("Deploy Completed.")
 
 @task
+def release(c, clean=True):
+    "cut a release of pyborg"
+    with c.cd("pyborg"):
+        if clean:
+            c.run("rm -rf build")
+        c.run("pipenv run python --version", echo=True)
+        c.run("pipenv run python setup.py bdist_wheel sdist")
+        print("now run `gpg -ba` on the files in dist/ and upload with `twine`")
+
+@task
 def bandit(c):
     c.run("pipenv run bandit --exclude=build,test -s B311 -r pyborg", pty=True)
 
