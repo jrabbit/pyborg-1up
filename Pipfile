@@ -32,7 +32,7 @@ bottle = "==0.12.16"
 certifi = "*"
 chardet = "==3.0.4"
 click = ">=6.7"
-"discord.py" = {version = "*",markers = "python_version >= '3.0'"}
+"discord.py" = {version = "*<1",markers = "python_version >= '3.0'"}
 humanize = "==0.5.1"
 inflect = "==0.2.5"
 irc = "<17.0"

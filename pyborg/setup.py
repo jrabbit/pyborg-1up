@@ -34,7 +34,7 @@ requires = [
     "prompt_toolkit",
 ]
 if sys.version_info >= (3,):
-    requires.extend(["discord.py", "aeidon"])
+    requires.extend(["discord.py<1", "aeidon"])
 setup(
     name="pyborg",
     version=__version__,
