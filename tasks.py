@@ -20,3 +20,17 @@ def deploy(c, restart=False, sync=False):
 @task
 def bandit(c):
     c.run("pipenv run bandit --exclude=build,test -s B311 -r pyborg", pty=True)
+
+@task
+def test(c):
+    c.run("tox")
+
+@task
+def outdated(c):
+    c.run("pipenv run pip list -o --format=columns")
+
+@task
+def lint(c, mypy=True):
+    if mypy:
+        c.run("pipenv run mypy pyborg/pyborg", warn=True)
+    c.run("flake8 --config=tox.ini --count pyborg", warn=True)

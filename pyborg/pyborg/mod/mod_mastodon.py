@@ -27,6 +27,7 @@ class PyborgMastodon(object):
         self.settings['mastodon']['last_look'] = self.last_look.datetime
         with open(self.toml_file, "w") as f:
             toml.dump(self.settings, f)
+            logging.info("saved mastodon config at: %s", self.toml_file)
         if not self.multiplexing:
             raise NotImplementedError("Use multiplexing.")
             # self.pyborg.save_all()
