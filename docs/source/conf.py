@@ -18,6 +18,8 @@
 #
 import os
 import sys
+import datetime
+
 # sys.path.insert(0, os.path.abspath('../../pyborg/'))
 sys.path.insert(0, os.path.abspath('..'))
 
@@ -56,7 +58,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pyborg-1up'
-copyright = u'2016, Tom Morton, Sébastien Dailly, Jack Laxson'
+copyright = u'{}, Tom Morton, Sébastien Dailly, Jack Laxson'.format(datetime.datetime.now().year)
 author = u'Tom Morton, Sébastien Dailly, Jack Laxson'
 
 # The version info for the project you're documenting, acts as replacement for
