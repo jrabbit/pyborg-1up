@@ -13,6 +13,7 @@ Contents:
    api
    deploy
    enduser
+   changes
 
 
 
