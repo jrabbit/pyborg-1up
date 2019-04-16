@@ -418,6 +418,7 @@ def discord(conf_file):
 @cli_base.command()
 @click.option("--conf-file", default="pyborg.reddit.toml")
 def reddit(conf_file):
+    "Runs the reddit module"
     bot = PyborgReddit(conf_file)
     try:
         bot.start()
@@ -432,6 +433,8 @@ def reddit(conf_file):
 @cli_base.command()
 @click.option("--multiplex", default=True, type=click.BOOL)
 def linein(multiplex):
+    "This is a commandline repl for interacting with pyborg locally"
+
     my_pyborg = pyborg.pyborg.pyborg
     try:
         mod = ModLineIn(my_pyborg, multiplex)
