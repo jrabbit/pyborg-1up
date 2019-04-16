@@ -9,7 +9,7 @@ import venusian
 import attr
 
 from pyborg.util.awoo import normalize_awoos
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Callable
 
 # https://github.com/Rapptz/discord.py/blob/master/discord/ext/commands/bot.py#L146
 
@@ -18,11 +18,11 @@ logger = logging.getLogger(__name__)
 
 class Registry(object):
     """Command registry of decorated pyborg commands"""
-    def __init__(self, mod):
-        self.registered = {}
+    def __init__(self, mod: PyborgDiscord) -> None:
+        self.registered: Dict[str, Callable] = {}
         self.mod = mod
 
-    def add(self, name, ob, internals, pass_msg):
+    def add(self, name: str, ob: Callable, internals: bool, pass_msg: bool) -> None:
         self.registered[name] = ob
         if internals:
             self.registered[name] = partial(ob, self.mod.multiplexing, multi_server="http://{}:{}/".format(self.mod.multi_server, self.mod.multi_port))
