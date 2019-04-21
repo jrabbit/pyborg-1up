@@ -2,7 +2,7 @@
 #
 # PyBorg: The python AI bot.
 #
-# Copyright (c) 2000, 2006, 2013-2017 Tom Morton, Sebastien Dailly, Jack Laxson
+# Copyright (c) 2000, 2006, 2013-2019 Tom Morton, Sebastien Dailly, Jack Laxson
 #
 #
 # This bot was inspired by the PerlBorg, by Eric Bock.
