@@ -163,6 +163,26 @@ class TestPyborgLearning(unittest.TestCase):
         print(our_pyb)
         self.assertNotEqual(len(our_pyb.words), 0)
 
+@mock.patch("toml.load")
+class TestPyborgUnlearnWord(unittest.TestCase):
+    small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
+
+    def test_unlearn_unknown_small(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
+        our_pyb.unlearn("Romania")
+
+    def test_unlearn_known_linked_small(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
+        our_pyb.unlearn("edgar")
+        self.assertNotIn("edgar", our_pyb.words)
+
+    def test_unlearn_known_leaf_small(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
+        our_pyb.unlearn("the")
+        self.assertNotIn("the", our_pyb.words)
 
 class TestPyborgFilterWord(unittest.TestCase):
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
