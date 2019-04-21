@@ -16,8 +16,9 @@ mypy = {version = "*",markers = "python_version >= '3.0'"}
 typed-ast = {version = "*",markers = "python_version >= '3.0'"}
 "flake8" = "*"
 invoke = "*"
-fabric2 = {version = "*", markers = "python_version >= '3.0'"}
-ipython = {version = "*", markers = "python_version >= '3.0'"}
+fabric2 = {version = "*",markers = "python_version >= '3.0'"}
+ipython = {version = "*",markers = "python_version >= '3.0'"}
+asynctest = "*"
 
 [packages]
 aeidon = {version = "*",markers = "python_version >= '3.0'"}
