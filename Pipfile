@@ -26,6 +26,7 @@ multidict = {version = "*",markers = "python_version >= '3.0'"}
 websockets = {version = "*",markers = "python_version >= '3.0'"}
 aiohttp = {version = "*",markers = "python_version >= '3.0'"}
 async_timeout = {version = "*",markers = "python_version >= '3.0'"}
+yarl = {version = "*",markers = "python_version >= '3.0'"}
 arrow = ">=0.10.0"
 "backports.functools_lru_cache" = {version = "*",markers = "python_version <= '3.0'"}
 more-itertools = "<6"
