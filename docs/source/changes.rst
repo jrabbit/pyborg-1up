@@ -8,4 +8,5 @@ Next (1.4.0)
 ------------
 
 - Added nickname plaintext pings in discord module.
+- Discord.py 1.0 support
 
