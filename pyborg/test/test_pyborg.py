@@ -5,6 +5,7 @@ import tempfile
 import unittest
 
 import pyborg.pyborg
+from pyborg.mod.mod_http import DumbyIOMod
 
 try:
     from unittest import mock
@@ -183,6 +184,18 @@ class TestPyborgUnlearnWord(unittest.TestCase):
         our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
         our_pyb.unlearn("the")
         self.assertNotIn("the", our_pyb.words)
+
+@mock.patch("toml.load", return_value = {"pyborg-core": {"max_words": False}})
+class TestPyborgPurgeWord(unittest.TestCase):
+    small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
+
+    def test_purge_word_command(self, patched_toml):
+        our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
+        iomod = DumbyIOMod()
+        msg = "!purge"
+        our_pyb.process_msg(iomod, msg, 0, True, None, 1)
+        print(iomod.messages)
+
 
 class TestPyborgFilterWord(unittest.TestCase):
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"

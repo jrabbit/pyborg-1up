@@ -799,7 +799,7 @@ class pyborg(object):
                         self.settings.censored.remove(command_list[x].lower())
                         msg = "done"
                     except ValueError as e:
-                        pass
+                        logger.exception(e)
 
             elif command_list[0] == "!alias":
                 # no arguments. list aliases words
@@ -840,7 +840,7 @@ class pyborg(object):
 
             # Save changes
             self.settings.save()
-
+        logger.info(msg)
         if msg != "":
             io_module.output(msg, args)
 
@@ -851,7 +851,7 @@ class pyborg(object):
         """
         try:
             pointers = self.words[old]
-        except KeyError as e:
+        except KeyError:
             return old + " not known."
         changed = 0
 
