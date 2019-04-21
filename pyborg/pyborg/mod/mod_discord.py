@@ -10,6 +10,7 @@ import attr
 
 from pyborg.util.awoo import normalize_awoos
 from typing import Dict, Union, List, Callable
+from types import ModuleType
 
 # https://github.com/Rapptz/discord.py/blob/master/discord/ext/commands/bot.py#L146
 
@@ -20,13 +21,13 @@ logger = logging.getLogger(__name__)
 class PyborgDiscord(discord.Client):
     """This is the pyborg discord client module.
     It connects over http to a running pyborg/http service."""
-    toml_file = attr.ib()
-    multi_port = attr.ib(default=2001)
-    multiplexing = attr.ib(default=True)
-    multi_server = attr.ib(default="localhost")
+    toml_file: str = attr.ib()  # any old path
+    multi_port: int = attr.ib(default=2001)
+    multiplexing: bool = attr.ib(default=True)
+    multi_server: str = attr.ib(default="localhost")
     registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
 
-    def __attrs_post_init__(self):
+    def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
         try:
             self.multiplexing = self.settings['pyborg']['multiplex']
@@ -86,16 +87,16 @@ class PyborgDiscord(discord.Client):
                 help_text = "I have a bunch of commands:"
                 for k, v in self.registry.registered.items():
                     help_text += " !{}".format(k)
-                await self.send_message(message.channel, help_text)
+                await message.channel.send(help_text)
             else:
                 if command_name in self.registry.registered:
                     command = self.registry.registered[command_name]
                     logger.info("Running command %s", command)
                     logger.info("pass message?: %s", command.pass_msg)
                     if command.pass_msg:
-                        await self.send_message(message.channel, command(msg=message.content))
+                        await message.channel.send(command(msg=message.content))
                     else:
-                        await self.send_message(message.channel, command())
+                        await message.channel.send(command())
         if message.author == self.user:
             logger.info("Not learning/responding to self")
             return
@@ -104,7 +105,7 @@ class PyborgDiscord(discord.Client):
         # DEBUG:pyborg.mod.mod_discord:<:weedminion:392111795642433556>
         # is this cached? is this fast? who the fuck knows
         if "<:" in message.content:
-            e = message.server.emojis
+            e = message.guild.emojis
             server_emojis = [x.name for x in e]
             logger.debug("got server emojis as: %s", str(server_emojis))
             incoming_message = self._extract_emoji(message.content, server_emojis)
@@ -122,8 +123,8 @@ class PyborgDiscord(discord.Client):
         line = " ".join(line_list)
         try:
             if self.settings["discord"]["plaintext_ping"]:
-                line = line.replace(message.server.me.display_name, "#nick")
-                line = line.replace(message.server.me.display_name.lower(), "#nick")
+                line = line.replace(message.guild.me.display_name, "#nick")
+                line = line.replace(message.guild.me.display_name.lower(), "#nick")
         except KeyError:
             pass
 
@@ -134,28 +135,28 @@ class PyborgDiscord(discord.Client):
             self.learn(line)
 
         if self.user.mentioned_in(message) or self._plaintext_name(message):
-            await self.send_typing(message.channel)
-            msg = self.reply(line)
-            logger.debug("on message: %s" % msg)
-            if msg:
-                logger.debug("Sending message...")
-                # if custom emoji: replace to <:weedminion:392111795642433556>
-                # message.server map to full custom emoji
-                emoji_map = {x.name: x for x in message.server.emojis}
-                for word in msg.split():
-                    if word in emoji_map:
-                        e = emoji_map[word]
-                        msg = msg.replace(word, "<:{}:{}>".format(e.name, e.id))
-                msg = msg.replace("#nick", str(message.author.mention))
-                msg = msg.replace("@everyone", "`@everyone`")
-                msg = msg.replace("@here", "`@here`")
-                await self.send_message(message.channel, msg)
+            async with message.channel.typing():
+                msg = self.reply(line)
+                logger.debug("on message: %s" % msg)
+                if msg:
+                    logger.debug("Sending message...")
+                    # if custom emoji: replace to <:weedminion:392111795642433556>
+                    # message.server map to full custom emoji
+                    emoji_map = {x.name: x for x in message.guild.emojis}
+                    for word in msg.split():
+                        if word in emoji_map:
+                            e = emoji_map[word]
+                            msg = msg.replace(word, "<:{}:{}>".format(e.name, e.id))
+                    msg = msg.replace("#nick", str(message.author.mention))
+                    msg = msg.replace("@everyone", "`@everyone`")
+                    msg = msg.replace("@here", "`@here`")
+                    await message.channel.send(msg)
 
     def _plaintext_name(self, message: discord.Message) -> bool:
         "returns true if should ping with plaintext nickname per-server if configured"
         try:
             if self.settings["discord"]["plaintext_ping"]:
-                return message.server.me.display_name.lower() in message.content.lower()
+                return message.guild.me.display_name.lower() in message.content.lower()
             else:
                 return False
         except KeyError:
@@ -189,7 +190,7 @@ class PyborgDiscord(discord.Client):
     def teardown(self) -> None:
         pass
 
-    def scan(self, module=pyborg.commands) -> None:
+    def scan(self, module: ModuleType=pyborg.commands) -> None:
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
 
