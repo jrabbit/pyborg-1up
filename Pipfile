@@ -18,7 +18,7 @@ typed-ast = {version = "*",markers = "python_version >= '3.0'"}
 invoke = "*"
 fabric2 = {version = "*",markers = "python_version >= '3.0'"}
 ipython = {version = "*",markers = "python_version >= '3.0'"}
-asynctest = "*"
+asynctest = {version = "*",markers = "python_version >= '3.0'"}
 
 [packages]
 aeidon = {version = "*",markers = "python_version >= '3.0'"}
