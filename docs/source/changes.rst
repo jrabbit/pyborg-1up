@@ -8,5 +8,4 @@ Next (1.4.0)
 ------------
 
 - Added nickname plaintext pings in discord module.
-- Discord.py 1.0 support
-
+- Discord.py 1.0 support (allows 3.7+ support in pyborg)
