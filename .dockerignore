@@ -1,2 +1,6 @@
 .tox
 .git
+pyborg/dist
+pyborg/build
+docs/
+misc/
