@@ -141,23 +141,6 @@ class FakeCfg2(object):
         logger.debug("Settings save called. Current state: %s", self)
 
 
-class FakeCfg(object):
-    """fake it until you make it"""
-    def __init__(self):
-        self.num_words = 6003
-        self.aliases = {}
-        self.num_aliases = 0
-        self.censored = []
-        self.no_save = False
-        self.num_contexts = 26505
-        self.max_words = 6000
-        self.ignore_list = []
-        self.learning = True
-
-    def save(self, *args):
-        pass
-
-
 class FakeAns(object):
     """this is a cool thing"""
     def __init__(self):
@@ -339,11 +322,11 @@ class pyborg(object):
             folder = click.get_app_dir("Pyborg")
             name = datetime.datetime.now().strftime("%m-%d-%y-auto-{}.pyborg.json").format(str(uuid.uuid4())[:4])
             self.brain_path = os.path.join(folder, "brains", name)
-            print("Error reading saves. New database created.")
+            logger.info("Error reading saves. New database created.")
 
         # Is a resizing required?
         if len(self.words) != self.settings.num_words:
-            print("Updating dictionary information...")
+            logger.info("Updating dictionary information...")
             self.settings.num_words = len(self.words)
             num_contexts = 0
             # Get number of contexts
@@ -358,7 +341,7 @@ class pyborg(object):
         for x in self.settings.aliases.keys():
             compteur += len(self.settings.aliases[x])
         if compteur != self.settings.num_aliases:
-            print("check dictionary for new aliases")
+            logger.info("check dictionary for new aliases")
             self.settings.num_aliases = compteur
 
             for x in self.words.keys():
@@ -368,15 +351,15 @@ class pyborg(object):
                         for alias in self.settings.aliases[z]:
                             pattern = "^%s$" % alias
                             if self.re.search(pattern, x):
-                                print("replace %s with %s" % (x, z))
+                                logger.info("replace %s with %s" % (x, z))
                                 self.replace(x, z)
 
             for x in self.words.keys():
                 if not (x in self.settings.aliases.keys()) and x[0] == '~':
-                    print("unlearn %s" % x)
+                    logger.info("unlearn %s" % x)
                     self.settings.num_aliases -= 1
                     self.unlearn(x)
-                    print("unlearned aliases %s" % x)
+                    logger.info("unlearned aliases %s" % x)
 
         # unlearn words in the unlearn.txt file.
         try:
@@ -647,45 +630,13 @@ class pyborg(object):
             # Remove rares words
             elif command_list[0] == "!purge":
                 t = time.time()
-
-                liste = []
-                compteur = 0
-
                 if len(command_list) == 2:
                     # limite d occurences a effacer
-                    c_max = command_list[1].lower()
+                    c_max = int(command_list[1])
                 else:
                     c_max = 0
-
-                c_max = int(c_max)
-
-                for w in self.words.keys():
-                    digit = 0
-                    char = 0
-                    for c in w:
-                        if c.isalpha():
-                            char += 1
-                        if c.isdigit():
-                            digit += 1
-
-                # Compte les mots inferieurs a cette limite
-                    c = len(self.words[w])
-                    if c < 2 or (digit and char):
-                        liste.append(w)
-                        compteur += 1
-                        if compteur == c_max:
-                            break
-
-                if c_max < 1:
-                    # io_module.output(str(compteur)+" words to remove", args)
-                    io_module.output("%s words to remove" % compteur, args)
-                    return
-
-                # supprime les mots
-                for w in liste[0:]:
-                    self.unlearn(w)
-
-                msg = "Purge dictionary in %0.2fs. %d words removed" % (time.time() - t, compteur)
+                number_removed = self.purge(c_max, io_module=io_module)
+                msg = "Purge dictionary in %0.2fs. %d words removed" % (time.time() - t, number_removed)
 
             # Change a typo in the dictionary
             elif command_list[0] == "!replace":
@@ -878,6 +829,39 @@ class pyborg(object):
             self.words[new] = self.words[old]
         del self.words[old]
         return "%d instances of %s replaced with %s" % (changed, old, new)
+
+    def purge(self, max_contexts, io_module=None):
+        "Remove rare words from the dictionary. Returns number of words removed."
+        liste = []
+        compteur = 0
+    
+        for w in self.words.keys():
+            digit = 0
+            char = 0
+            for c in w:
+                if c.isalpha():
+                    char += 1
+                if c.isdigit():
+                    digit += 1
+    
+        # Compte les mots inferieurs a cette limite
+            c = len(self.words[w])
+            if c < 2 or (digit and char):
+                liste.append(w)
+                compteur += 1
+                if compteur == max_contexts:
+                    break
+    
+        if max_contexts < 1:
+            # io_module.output(str(compteur)+" words to remove", args)
+            if io_module:
+                # I'm not gonna pass pyborg.process.args. This breaks the api technically.
+                io_module.output("%s words to remove" % compteur, [])
+    
+        # supprime les mots
+        for w in liste[0:]:
+            self.unlearn(w)
+        return len(liste[0:])
 
     def unlearn(self, context):
         """
