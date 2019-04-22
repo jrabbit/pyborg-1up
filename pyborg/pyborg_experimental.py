@@ -242,7 +242,7 @@ def mastodon(ctx, base_url, conf_file, secret_folder):
     "--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path()
 )
 def mastodon_register(ctx, cred_file, bot_name):
-    Mastodon.create_app(bot_name, api_base_url=ctx.obj['base_url'], to_file=os.path.join(ctx.obj['secret_folder'],cred_file))
+    Mastodon.create_app(bot_name, api_base_url=ctx.obj['base_url'], to_file=os.path.join(ctx.obj['secret_folder'], cred_file))
 
 
 @mastodon.command("login")
