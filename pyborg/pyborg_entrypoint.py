@@ -71,6 +71,11 @@ def help(ctx):
     """Show this message and exit."""
     print(ctx.parent.get_help())
 
+@cli_base.command("folder")
+def folder_info():
+    "where pyborg will look for brains and toml confs"
+    print(folder)
+    logger.debug("folder: this uses https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir and should work most of the time")
 
 @cli_base.group()
 def brain():
@@ -323,6 +328,10 @@ def http(reloader, port, host, brain):
 @cli_base.command('set-log-level')
 @click.argument("log-level")
 def set_logging_level(log_level):
+    """configure mod_http's log level after launch
+    
+    use the levels from `logging`: (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    """
     ret = requests.post(
         "http://localhost:2001/logging-level", data={"level": log_level}
     )
