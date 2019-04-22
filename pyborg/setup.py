@@ -39,7 +39,7 @@ setup(
     name="pyborg",
     version=__version__,
     packages=["pyborg", "pyborg.util", "pyborg.mod"],
-    scripts=["pyborg_experimental.py"],
+    scripts=["pyborg_entrypoint.py"],
     author="Jack Laxson",
     author_email="jackjrabbit@gmail.com",
     description="Markov chain bot for irc which generates replies to messages",
@@ -49,7 +49,7 @@ setup(
     install_requires=requires,
     entry_points="""
           [console_scripts]
-          pyborg=pyborg_experimental:cli_base
+          pyborg=pyborg_entrypoint:cli_base
       """,
     url="https://github.com/jrabbit/pyborg-1up/",
     classifiers=[

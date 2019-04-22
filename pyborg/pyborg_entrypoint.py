@@ -333,6 +333,7 @@ def set_logging_level(log_level):
 @click.argument("subtitle-file")
 @click.option("--conf-file", default=os.path.join(folder, "subtitle.toml"))
 def subtitles(conf_file, subtitle_file):
+    "learn from subtitles! python3 only! thx aeidon"
     subs = PyborgSubtitles(conf_file=conf_file, subs_file=subtitle_file)
     subs.start()
 
