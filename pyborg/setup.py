@@ -42,7 +42,7 @@ setup(
     scripts=["pyborg_entrypoint.py"],
     author="Jack Laxson",
     author_email="jackjrabbit@gmail.com",
-    description="Markov chain bot for irc which generates replies to messages",
+    description="Markov chain bot for many protocols (discord, irc, twitter, mastodon, file, linein) which generates replies to messages",
     long_description=long_description,
     long_description_content_type='text/markdown',
     license="GPL v3 or later",
@@ -59,5 +59,6 @@ setup(
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
 )

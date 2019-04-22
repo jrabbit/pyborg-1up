@@ -29,6 +29,8 @@ async_timeout = {version = "*",markers = "python_version >= '3.0'"}
 yarl = {version = "*",markers = "python_version >= '3.0'"}
 arrow = ">=0.10.0"
 "backports.functools_lru_cache" = {version = "*",markers = "python_version <= '3.0'"}
+"ipaddress" = {version = "*",markers = "python_version <= '3.0'"}
+"enum34" = {version = "*",markers = "python_version <= '3.0'"}
 more-itertools = "<6"
 tornado = "<6"
 attrs = "*"
