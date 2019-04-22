@@ -42,9 +42,14 @@ def bandit(c):
     "security audit tool"
     c.run("pipenv run bandit --exclude=build,test -s B311 -r pyborg", pty=True)
 
+@task
+def docs(c):
+    "run autobuilder for local docs generation"
+    c.run("pipenv run sphinx-autobuild docs/source docs/build", pty=True)
 
 @task
 def test(c):
+    "this runs tox, just use tox :)"
     c.run("tox")
 
 
