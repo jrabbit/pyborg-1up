@@ -12,4 +12,4 @@ WORKDIR /usr/src/
 
 RUN pip install pipenv && pipenv install
 
-CMD ["pipenv", "run", "pyborg", "linein"]
+CMD ["pipenv", "run", "pyborg", "linein", "--multiplex", "false"]
