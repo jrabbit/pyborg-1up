@@ -177,20 +177,25 @@ def upgrade_to_json(target_brain):
 @click.argument('target_brain', default="current")
 def doctor(target_brain, one_two):
     cnt = collections.Counter()
-
     brain_path = resolve_brain(target_brain)
-    # TODO: catch FileNotFoundError
-    if one_two:
-        words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
-    else:
-        words, lines = pyborg.pyborg.pyborg.load_brain_json(brain_path)
+
+    try:
+        if one_two:
+            words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
+        else:
+            words, lines = pyborg.pyborg.pyborg.load_brain_json(brain_path)
+
+    except FileNotFoundError as e:
+        logger.debug("brain not found", exc_info=e)
+        print("we couldn't open that brain.")
+        print("we looked in: {}".format(brain_path))
+        sys.exit(8)
 
     # Type check the brain
     assert isinstance(words, dict)
     assert isinstance(lines, dict)
     for key, value in words.items():
         cnt[type(key)] += 1
-        # cnt[type(value)] += 1
         for i in value:
             cnt[type(i)] += 1
     # print(type(key))
@@ -257,6 +262,7 @@ def mastodon_login(ctx, cred_file, username, password):
 @cli_base.command()
 @click.option("--conf-file", type=click.Path(), default=os.path.join(folder, "example.irc.toml"))
 def irc(conf_file):
+    "runs the irc2 module a slim, secure pyborg irc bot"
     pyb = pyborg.pyborg.pyborg
     settings = toml.load(conf_file)
     if settings['multiplex']:
@@ -369,6 +375,7 @@ def get_api(conf_file):
 @click.argument("target-user")
 @click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
 def follow_twitter_user(conf_file, target_user):
+    "follow a twitter user over the api"
     api = get_api(conf_file)
     api.create_friendship(target_user)
 
@@ -398,12 +405,9 @@ def discord(conf_file):
     "Run the discord client (needs python3)"
     if sys.version_info <= (3,):
         print(
-            "You are trying to run the discord mod under python 2. \nThis won't work. Please use python 3 (<3.7)."
+            "You are trying to run the discord mod under python 2. \nThis won't work. Please use python 3 (3.6+)."
         )
         sys.exit(6)
-    if sys.version_info >= (3, 7):
-        print("The discord library we use doesn't support 3.7 in a stable release yet. Try using a recent 3.6 python.")
-        sys.exit(7)
     bot = PyborgDiscord(conf_file)
     try:
         bot.our_start()

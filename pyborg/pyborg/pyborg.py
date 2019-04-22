@@ -264,6 +264,7 @@ class pyborg(object):
         logger.debug("Successful writing of brain & renaming. Quitting.")
 
     def save_all(self):
+        "Legacy wraper for save_brain()"
         self.save_brain()
 
     def load_settings(self):
@@ -363,18 +364,11 @@ class pyborg(object):
 
         # unlearn words in the unlearn.txt file.
         try:
-            f = open("unlearn.txt", "r")
-            while 1:
-                word = f.readline().strip('\n')
-                if word == "":
-                    break
-                if word in self.words:
-                    self.unlearn(word)
-            f.close()
+            with open("unlearn.txt", 'r') as f:
+                for line in f.readlines():
+                    self.unlearn(line)
         except (EOFError, IOError) as e:
-            # No words to unlearn
-            pass
-
+            logger.exception("No words to unlearn", e)
         self.settings.save()
 
     def save_all_2(self):
