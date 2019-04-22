@@ -21,7 +21,6 @@ from mastodon import Mastodon
 from pyborg.mod.mod_http import bottle
 from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_linein import ModLineIn
-from pyborg.mod.mod_mastodon import PyborgMastodon
 from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.util_cli import mk_folder
@@ -30,10 +29,9 @@ if sys.version_info <= (3,):
     from pyborg.mod.mod_tumblr import PyborgTumblr
 
 if sys.version_info >= (3,):
+    from pyborg.mod.mod_mastodon import PyborgMastodon
     from pyborg.mod.mod_subtitle import PyborgSubtitles
-    # until we get discord.py rewrite there's no 3.7 support
-    if sys.version_info <= (3, 7):
-        from pyborg.mod.mod_discord import PyborgDiscord
+    from pyborg.mod.mod_discord import PyborgDiscord
 
 logger = logging.getLogger(__name__)
 

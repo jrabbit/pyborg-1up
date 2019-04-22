@@ -8,7 +8,7 @@ if sys.version_info >= (3,):
     import asyncio
 
     import asynctest
-    
+
     import pyborg
     from pyborg.util.utils_testing import do_nothing
 
@@ -18,7 +18,7 @@ if sys.version_info >= (3,):
         def setUp(self):
             self.loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self.loop)
-            #self.loop.set_debug(True)
+            # self.loop.set_debug(True)
 
         def tearDown(self):
             self.loop.close()
