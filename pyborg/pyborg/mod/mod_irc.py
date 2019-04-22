@@ -9,11 +9,7 @@ import irc.strings
 import pyborg.pyborg
 import pyborg.commands
 import venusian
-
-try:
-    import requests
-except ImportError:
-    requests = None
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +19,7 @@ class Registry(object):
         self.registered = {}
         self.mod_irc = mod_irc
 
-    def add(self, name, ob, internals):
+    def add(self, name, ob, internals, pass_msg):
         if internals:
             self.registered[name] = partial(ob, self.mod_irc.settings['multiplex'],  multi_server="http://localhost:2001/")
         else:

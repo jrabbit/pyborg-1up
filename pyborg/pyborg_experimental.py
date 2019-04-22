@@ -258,7 +258,7 @@ def mastodon_login(ctx, cred_file, username, password):
 
 
 @cli_base.command()
-@click.option("--conf-file", type=click.Path(), default=os.path.join(folder, "example.irc.toml"))
+@click.option("--conf-file", type=click.Path(), default=os.path.join(folder, "irc.toml"))
 def irc(conf_file):
     "runs the irc2 module a slim, secure pyborg irc bot"
     pyb = pyborg.pyborg.pyborg
