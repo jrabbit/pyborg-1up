@@ -54,8 +54,8 @@ def resolve_brain(target_brain):
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.option('--debug', default=False, is_flag=True)
-@click.option('--verbose/--silent', default=True)
+@click.option('--debug', default=False, is_flag=True, help="control log level")
+@click.option('--verbose/--silent', default=True, help="control log level")
 def cli_base(verbose, debug):
     mk_folder()
     # only the first basicConfig() is respected.
