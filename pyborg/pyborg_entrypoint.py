@@ -303,7 +303,10 @@ def irc(conf_file):
 @cli_base.command()
 @click.option("--conf-file", type=click.Path(), default=os.path.join(folder, "tumblr.toml"))
 def tumblr(conf_file):
+    "watch a tumblr tag for posts to respond to"
+
     bot = PyborgTumblr(conf_file)
+
     try:
         bot.start()
     except KeyboardInterrupt:
@@ -352,6 +355,7 @@ def subtitles(conf_file, subtitle_file):
 @cli_base.command()
 @click.option("--conf-file", default=os.path.join(folder, "twitter.toml"))
 def twitter(conf_file):
+    "be your own horse_ebooks: twitter module"
     from pyborg.mod.mod_twitter import PyborgTwitter
 
     mod = PyborgTwitter(conf_file)
@@ -460,6 +464,7 @@ def linein(multiplex):
 
 @cli_base.command()
 def version():
+    "output a version summary"
     print("I am a version {} pyborg!".format(pyborg.__version__))
     print(
         "I'm running on {} {}/{}".format(
