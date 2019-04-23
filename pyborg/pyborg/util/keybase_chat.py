@@ -2,6 +2,7 @@ import sys
 import json
 import subprocess
 
+
 def main(args):
     "keybase chat util for pyborg testing entrypoint"
     command = ["keybase", "chat", "api", "-m", json.dumps({"method": "list"})]

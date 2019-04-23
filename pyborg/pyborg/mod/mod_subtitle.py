@@ -35,7 +35,7 @@ class PyborgSubtitles(object):
         self.run()
 
     def clean(self, subtitle: str) -> str:
-        text = subtitle.replace("{\i1}", "").replace("{\i0}", "")
+        text = subtitle.replace(r"{\i1}", "").replace(r"{\i0}", "")
         return text
 
     def run(self) -> None:

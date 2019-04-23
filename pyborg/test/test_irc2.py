@@ -70,7 +70,6 @@ class TestReplys(unittest.TestCase):
             our_event.arguments[0].split(":")[1].encode('utf-8'))
         reply.assert_called_with(b" yolo swagins")
 
-
     @mock.patch('pyborg.mod.mod_irc.ModIRC.strip_nicks', side_effect=lambda x, _: x)
     @mock.patch('pyborg.mod.mod_irc.ModIRC.reply')
     @mock.patch('pyborg.mod.mod_irc.ModIRC.learn')
@@ -88,7 +87,6 @@ class TestReplys(unittest.TestCase):
         mod.on_pubmsg(c, our_event)
         learn.assert_not_called()
         reply.assert_not_called()
-
 
     @mock.patch('random.choice')
     def test_nick_replace(self, patched_choice):
@@ -163,6 +161,3 @@ class TestLaunch(unittest.TestCase):
             pyborg.mod.mod_irc.start_irc_bot()
         # patched_pyb_irc.return_value.teardown.assert_called_once_with()
         patched_pyb_irc.return_value.disconnect.assert_called_with("Caught exception")
-
-
-

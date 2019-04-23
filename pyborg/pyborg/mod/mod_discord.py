@@ -190,9 +190,10 @@ class PyborgDiscord(discord.Client):
     def teardown(self) -> None:
         pass
 
-    def scan(self, module: ModuleType=pyborg.commands) -> None:
+    def scan(self, module: ModuleType = pyborg.commands) -> None:
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
+
 
 class Registry(object):
     """Command registry of decorated pyborg commands"""
@@ -209,4 +210,3 @@ class Registry(object):
             self.registered[name].pass_msg = True
         else:
             self.registered[name].pass_msg = False
-

@@ -12,6 +12,7 @@ from mastodon import Mastodon
 
 logger = logging.getLogger(__name__)
 
+
 class PyborgMastodon(object):
     """it does toots"""
 

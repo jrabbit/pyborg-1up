@@ -1,7 +1,4 @@
 import logging
-import os
-import sys
-import tempfile
 import unittest
 
 import pyborg.pyborg
@@ -164,6 +161,7 @@ class TestPyborgLearning(unittest.TestCase):
         print(our_pyb)
         self.assertNotEqual(len(our_pyb.words), 0)
 
+
 @mock.patch("toml.load")
 class TestPyborgUnlearnWord(unittest.TestCase):
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
@@ -185,7 +183,8 @@ class TestPyborgUnlearnWord(unittest.TestCase):
         our_pyb.unlearn("the")
         self.assertNotIn("the", our_pyb.words)
 
-@mock.patch("toml.load", return_value = {"pyborg-core": {"max_words": False}})
+
+@mock.patch("toml.load", return_value={"pyborg-core": {"max_words": False}})
 class TestPyborgPurgeWord(unittest.TestCase):
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
 
@@ -199,7 +198,7 @@ class TestPyborgPurgeWord(unittest.TestCase):
 
 class TestPyborgFilterWord(unittest.TestCase):
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
-    
+
     @mock.patch("toml.load")
     def test_censored_reply(self, patched_toml):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
@@ -223,13 +222,13 @@ class TestPyborgFilterWord(unittest.TestCase):
 
 class TestPyborgIsFiltered(unittest.TestCase):
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
+
     def test_is_filter_regex(self):
         our_pyb = pyborg.pyborg.pyborg(brain=self.small_brain)
         our_pyb.settings.censored = ["fuck"]
         self.assertTrue(our_pyb._is_censored("fuck"))
         self.assertFalse(our_pyb._is_censored("hello"))
         self.assertTrue(our_pyb._is_censored("fucker"))
-
 
 
 class TestPyborgReply(unittest.TestCase):

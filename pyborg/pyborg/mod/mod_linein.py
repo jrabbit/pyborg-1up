@@ -66,7 +66,7 @@ class ModLineIn(object):
         default = getpass.getuser()
         print("[{}]".format(default))
         self.name = prompt("What is your name? ")
-        if self.name is "\n":
+        if self.name == "\n":
             self.name = default
         while 1:
             # body = prompt('> ', history=history, completer=self.completer)

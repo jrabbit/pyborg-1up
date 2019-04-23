@@ -62,7 +62,7 @@ class DumbyIOMod(object):
 
     commandlist = ""
     message = None
-    messages = [] # New for multi-line output
+    messages = []  # New for multi-line output
 
     def output(self, message, args):
         self.messages.append(message)
