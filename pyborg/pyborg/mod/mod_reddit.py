@@ -38,7 +38,7 @@ class PyborgReddit(object):
     """Takes a toml config file path"""
     CHUNKING = 100
 
-    def __init__(self, toml_file="pyborg.reddit.toml"):
+    def __init__(self, toml_file="reddit.toml"):
         self.toml_file = toml_file
         self.settings = toml.load(toml_file)
 

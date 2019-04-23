@@ -229,7 +229,7 @@ def run_mastodon(conf_file, secret_folder):
 @cli_base.group(invoke_without_command=True)
 @click.pass_context
 @click.option("--base-url", default='https://mastodon.social')
-@click.option("--conf-file", default=os.path.join(folder, "pyborg.mastodon.toml"))
+@click.option("--conf-file", default=os.path.join(folder, "mastodon.toml"))
 @click.option("--secret-folder", default=folder)
 def mastodon(ctx, base_url, conf_file, secret_folder):
     "Run the mastodon mod; run register and login first"
@@ -350,7 +350,7 @@ def subtitles(conf_file, subtitle_file):
 
 
 @cli_base.command()
-@click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
+@click.option("--conf-file", default=os.path.join(folder, "twitter.toml"))
 def twitter(conf_file):
     from pyborg.mod.mod_twitter import PyborgTwitter
 
@@ -383,7 +383,7 @@ def get_api(conf_file):
 
 @cli_base.command()
 @click.argument("target-user")
-@click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
+@click.option("--conf-file", default=os.path.join(folder, "twitter.toml"))
 def follow_twitter_user(conf_file, target_user):
     "follow a twitter user over the api"
     api = get_api(conf_file)
@@ -391,7 +391,7 @@ def follow_twitter_user(conf_file, target_user):
 
 
 # @cli_base.command()
-# @click.option("--conf-file", default=os.path.join(folder, "pyborg.twitter.toml"))
+# @click.option("--conf-file", default=os.path.join(folder, "twitter.toml"))
 # def twitter_debug_shell(conf_file):
 #     api = get_api(conf_file)
 #     from IPython import embed
@@ -410,7 +410,7 @@ def filein(multiplex, input_file):
 
 
 @cli_base.command()
-@click.option("--conf-file", default=os.path.join(folder, "pyborg.discord.toml"))
+@click.option("--conf-file", default=os.path.join(folder, "discord.toml"))
 def discord(conf_file):
     "Run the discord client (needs python3)"
     if sys.version_info <= (3,):
@@ -430,7 +430,7 @@ def discord(conf_file):
 
 
 @cli_base.command()
-@click.option("--conf-file", default="pyborg.reddit.toml")
+@click.option("--conf-file", default="reddit.toml")
 def reddit(conf_file):
     "Runs the reddit module"
     bot = PyborgReddit(conf_file)
