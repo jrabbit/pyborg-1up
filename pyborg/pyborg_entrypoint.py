@@ -53,17 +53,25 @@ def resolve_brain(target_brain):
     return brain_path
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
+@click.option('--version', 'my_version', default=False, is_flag=True, help="this is a bogus arg mapped to version command for maximum nice", hidden=True)
 @click.option('--debug', default=False, is_flag=True, help="control log level")
 @click.option('--verbose/--silent', default=True, help="control log level")
-def cli_base(verbose, debug):
+@click.pass_context
+def cli_base(ctx, verbose, debug, my_version):
     mk_folder()
     # only the first basicConfig() is respected.
     if debug:
         logging.basicConfig(level=logging.DEBUG)
     if verbose:
         logging.basicConfig(level=logging.INFO)
-
+    if my_version:
+        # Skip directly to version command like the user would expect a gnu program to.
+        ctx.invoke(version)
+        ctx.exit()
+    elif ctx.invoked_subcommand is None:
+        # still do normal things via the named help even
+        ctx.invoke(help)
 
 @cli_base.command()
 @click.pass_context
