@@ -11,6 +11,7 @@ from pyborg_entrypoint import upgrade_to_json
 
 logger = logging.getLogger(__name__)
 
+
 class TestUpgrade1_4(unittest.TestCase):
     "test upgrade from 1.2 to 1.4"
 

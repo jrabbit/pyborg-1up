@@ -55,7 +55,7 @@ if sys.version_info < (3,):
             patched_load.return_value = self.settings
             patched_tagged.return_value = self.posts
             mod = pyborg.mod.mod_tumblr.PyborgTumblr("bogus.toml")
-            ret = mod.load_new_from_tag("hello bill")
+            ret = mod.load_new_from_tag("hello bill")  # noqa: F841
             patched_tagged.assert_called_once_with("hello bill")
 
         # self.assertEqual(ret, )

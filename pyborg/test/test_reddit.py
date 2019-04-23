@@ -6,6 +6,7 @@ except ImportError:
     import mock
 import pyborg
 
+
 @unittest.skip("2019 - This breaks green(weirdly it's probably the sys.exit)/ aren't very good tests.")
 class TestLaunch(unittest.TestCase):
     @mock.patch('pyborg.mod.mod_reddit.PyborgReddit')

@@ -176,14 +176,13 @@ class pyborg(object):
 
     @staticmethod
     def load_brain_2(brain_path):
-        """1.2.0 marshal.zip loader 
+        """1.2.0 marshal.zip loader
         Returns tuple (words, lines)"""
-        
+
         saves_version = b"1.2.0"
-        # folder = click.get_app_dir("Pyborg")
-        
+
         try:
-            zfile = zipfile.ZipFile(brain_path,'r')
+            zfile = zipfile.ZipFile(brain_path, 'r')
             for filename in zfile.namelist():
                 data = zfile.read(filename)
                 f = open(filename, 'w+b')
@@ -802,7 +801,7 @@ class pyborg(object):
 
         for x in pointers:
             # pointers consist of (line, word) to self.lines
-            l = self.words[x['hashval']]
+            l = self.words[x['hashval']]  # noqa: E741
             w = self.words[x['index']]
             line = self.lines[l][0].split()
             number = self.lines[l][1]
@@ -828,7 +827,7 @@ class pyborg(object):
         "Remove rare words from the dictionary. Returns number of words removed."
         liste = []
         compteur = 0
-    
+
         for w in self.words.keys():
             digit = 0
             char = 0
@@ -837,7 +836,7 @@ class pyborg(object):
                     char += 1
                 if c.isdigit():
                     digit += 1
-    
+
         # Compte les mots inferieurs a cette limite
             c = len(self.words[w])
             if c < 2 or (digit and char):
@@ -845,13 +844,13 @@ class pyborg(object):
                 compteur += 1
                 if compteur == max_contexts:
                     break
-    
+
         if max_contexts < 1:
             # io_module.output(str(compteur)+" words to remove", args)
             if io_module:
                 # I'm not gonna pass pyborg.process.args. This breaks the api technically.
                 io_module.output("%s words to remove" % compteur, [])
-    
+
         # supprime les mots
         for w in liste[0:]:
             self.unlearn(w)
@@ -1006,7 +1005,7 @@ class pyborg(object):
             for x in xrange(0, len(self.words[word]) - 1):
                 logger.debug(locals())
                 logger.debug('trying to unpack: %s', self.words[word][x])
-                l = self.words[word][x]['hashval']
+                l = self.words[word][x]['hashval']  # noqa: E741
                 w = self.words[word][x]['index']
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
@@ -1081,7 +1080,7 @@ class pyborg(object):
             post_words = {"": 0}
             word = str(sentence[-1].split(" ")[-1])
             for x in xrange(0, len(self.words[word])):
-                l = self.words[word][x]['hashval']
+                l = self.words[word][x]['hashval']  # noqa: E741
                 w = self.words[word][x]['index']
                 context = self.lines[l][0]
                 num_context = self.lines[l][1]
