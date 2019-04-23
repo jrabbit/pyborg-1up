@@ -301,7 +301,7 @@ def irc(conf_file):
 
 
 @cli_base.command()
-@click.option("--conf-file", type=click.Path(), default=os.path.join(folder, "example.tumblr.toml"))
+@click.option("--conf-file", type=click.Path(), default=os.path.join(folder, "tumblr.toml"))
 def tumblr(conf_file):
     bot = PyborgTumblr(conf_file)
     try:

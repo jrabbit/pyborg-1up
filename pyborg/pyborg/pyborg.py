@@ -287,25 +287,12 @@ class pyborg(object):
         """
         Open the dictionary. Resize as required.
         """
-        # Attempt to load settings
-        # self.settings = toml.load("example.pyborg.toml")
-        # self.settings = self.cfgfile.cfgset()
-        # self.settings.load("pyborg.cfg",
-        #     { "num_contexts": ("Total word contexts", 0),
-        #       "num_words":  ("Total unique words known", 0),
-        #       "max_words":  ("max limits in the number of words known", 6000),
-        #       "learning":   ("Allow the bot to learn", 1),
-        #       "ignore_list":("Words that can be ignored for the answer", ['!.', '?.', "'", ',', ';']),
-        #       "censored":   ("Don't learn the sentence if one of those words is found", []),
-        #       "num_aliases":("Total of aliases known", 0),
-        #       "aliases":    ("A list of similars words", {}),
-        #       "no_save" :("If True, Pyborg don't saves the dictionary and configuration on disk", "False")
-        #     } )
-        self.settings = self.load_settings()
 
+        self.settings = self.load_settings()
         self.answers = FakeAns()
         self.unfilterd = {}
         mk_folder()
+
         # Read the dictionary
         print("Reading dictionary...")
         if brain is None:
