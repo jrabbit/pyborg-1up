@@ -27,7 +27,7 @@ def release(c, clean=True, docker=False):
 
     with c.cd("pyborg"):
         if clean:
-            c.run("rm -rf build")
+            c.run("pipenv run python setup.py clean")
         c.run("pipenv run python --version", echo=True)
         c.run("pipenv run python setup.py bdist_wheel sdist")
         print("now run `gpg -ba` on the files in dist/ and upload with `twine`")

@@ -1,0 +1,14 @@
+[tumblr]
+ignore = []
+last_look = 2017-01-23T06:30:39.666497+00:00
+tags = [ "your tag",]
+blog = "your-blog.tumblr.com"
+cooldown = 20
+learning = false
+[pyborg]
+multiplex = false
+[auth]
+consumer_secret = "from tumblr"
+oauth_token = "from tumblr"
+consumer_key = "from tumblr"
+oauth_secret = "from tumblr"

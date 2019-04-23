@@ -51,6 +51,7 @@ setup(
           [console_scripts]
           pyborg=pyborg_entrypoint:cli_base
       """,
+    package_data={'':"example.*.toml"},
     url="https://github.com/jrabbit/pyborg-1up/",
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
