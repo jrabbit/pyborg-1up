@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import sys
+import glob
 from os import path
 
 from setuptools import setup
@@ -47,11 +48,11 @@ setup(
     long_description_content_type='text/markdown',
     license="GPL v3 or later",
     install_requires=requires,
+    data_files=[('share/pyborg/example_conf', glob.glob("example.*.toml"))],
     entry_points="""
           [console_scripts]
           pyborg=pyborg_entrypoint:cli_base
       """,
-    package_data={'':"example.*.toml"},
     url="https://github.com/jrabbit/pyborg-1up/",
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
