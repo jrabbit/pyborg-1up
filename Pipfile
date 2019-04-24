@@ -19,6 +19,7 @@ invoke = "*"
 fabric2 = {version = "*",markers = "python_version >= '3.0'"}
 ipython = {version = "*",markers = "python_version >= '3.0'"}
 asynctest = {version = "*",markers = "python_version >= '3.0'"}
+twine = "*"
 
 [packages]
 aeidon = {version = "*",markers = "python_version >= '3.0'"}
@@ -29,8 +30,10 @@ async_timeout = {version = "*",markers = "python_version >= '3.0'"}
 yarl = {version = "*",markers = "python_version >= '3.0'"}
 arrow = ">=0.10.0"
 "backports.functools_lru_cache" = {version = "*",markers = "python_version <= '3.0'"}
-"ipaddress" = {version = "*",markers = "python_version <= '3.0'"}
-"enum34" = {version = "*",markers = "python_version <= '3.0'"}
+ipaddress = {version = "*",markers = "python_version <= '3.0'"}
+enum34 = {version = "*",markers = "python_version <= '3.0'"}
+idna-ssl = {version = ">1.0", markers = "python_version >='3.0' <= '3.7'"}
+typing-extensions = {version = "*", markers = "python_version >='3.0' <= '3.7'"}
 more-itertools = "<6"
 tornado = "<6"
 attrs = "*"

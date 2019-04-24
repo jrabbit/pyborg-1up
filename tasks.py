@@ -31,7 +31,7 @@ def release(c, clean=True, docker=False):
             c.run("rm -rf build pyborg.egg-info")
         c.run("pipenv run python --version", echo=True)
         c.run("pipenv run python setup.py bdist_wheel sdist")
-        print("now run `gpg -ba` on the files in dist/ and upload with `twine`")
+        print("now run `gpg -ba` on the files in pyborg/dist/ and upload with `twine`")
     if docker:
         # Build and push jrabbit/pyborg[:3], needs working d-c and docker
         c.run("docker-compose build")
