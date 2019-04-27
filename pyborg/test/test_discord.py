@@ -81,6 +81,30 @@ if sys.version_info >= (3,):
             patched_learn.assert_called_once_with(patched_normalize.return_value)
             patched_reply.assert_called_once_with(patched_normalize.return_value)
 
+
+    @mock.patch("pyborg.mod.mod_discord.normalize_awoos")
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord._plaintext_name")
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+    class TestPlaintexPing(unittest.TestCase):
+        def setUp(self):
+            self.loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self.loop)
+            self.pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
+
+        def tearDown(self):
+            self.loop.close()
+
+        def test_nick_substitution(self, patched_reply, patched_learn, patched_user, patched_plaintext, patched_normalize):
+            msg = asynctest.MagicMock()
+            msg.channel.send = asynctest.CoroutineMock()
+            patched_user.mentioned_in.return_value = False
+            patched_plaintext.return_value = True  # implict
+            self.loop.run_until_complete(self.pybd.on_message(msg))
+            patched_learn.assert_called_once_with(patched_normalize.return_value)
+            patched_reply.assert_called_once_with(patched_normalize.return_value)
+
     @unittest.skip
     class TestCustomEmojis(unittest.TestCase):
         def setUp(self):
