@@ -1,6 +1,7 @@
 [discord]
 learning = true
 token = "FAKETOKEN"
+plaintext_ping = false
 [pyborg]
 multiplex = true
 multiplex_server = "localhost"
