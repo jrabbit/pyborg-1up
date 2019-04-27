@@ -294,7 +294,7 @@ class pyborg(object):
         mk_folder()
 
         # Read the dictionary
-        print("Reading dictionary...")
+        logger.info("Reading dictionary...")
         if brain is None:
             self.brain_path = 'archive.zip'
         else:
