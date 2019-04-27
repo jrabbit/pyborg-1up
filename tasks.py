@@ -1,3 +1,6 @@
+from pprint import pprint
+
+import attr
 from invoke import task
 from fabric2 import Connection
 
@@ -53,6 +56,36 @@ def test(c):
     "this runs tox, just use tox :)"
     c.run("tox")
 
+
+@task
+def docker_gauntlet(c):
+    "there's so many ways to fuck this up on install let's try them all!"
+    versions_list = ["2", "3.6", "3.7", "3"]
+    for py_version in versions_list:
+        c.run("docker pull python:{}".format(py_version))
+    @attr.s
+    class Strat():
+        name = attr.ib()
+        cmd = attr.ib()
+        wheel = attr.ib(default=None)
+    import pyborg
+    whl_version = pyborg.__version__
+    strats = [Strat(name="pip_wheel", cmd="pip install /srv/src/pyborg_1up/pyborg/dist/{wheel} && pyborg version", wheel="pyborg-{}-py2.py3-none-any.whl".format(whl_version)),
+              Strat(name="pip_install_src", cmd="pip install /srv/src/pyborg1_up/pyborg && pyborg version"),
+              Strat(name="pipenv", cmd="pip install pipenv && cd /srv/src/pyborg1_up/ && pipenv sync && pipenv run pyborg version")
+             ]
+    results = {}
+    for py_version in versions_list:
+        # docker scripting to install via pip, pipenv and setuptools (the first two work normally, but test build arefacts)
+        for strat in strats:
+            print(py_version, strat.name)
+            if strat.wheel:
+                lcmd = strat.cmd.format(wheel=strat.wheel)
+            else:
+                lcmd = strat.cmd
+            ret = c.run("docker run -v $PWD:/srv/src/pyborg1_up -v $PWD/misc/docker_caches:/root/.cache --rm -it python:{} bash -c '{cmd}'".format(py_version, cmd=lcmd), pty=True, warn=True)
+            results["{}_{}".format(py_version, strat.name)] = ret.ok
+    pprint(results)
 
 @task
 def outdated(c):
