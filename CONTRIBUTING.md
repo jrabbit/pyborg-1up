@@ -5,6 +5,8 @@ Development workflow
 
 Use [pipenv](https://docs.pipenv.org/index.html) and the pipfile[.lock]. It's really good.
 
+for dev-deps use `pipenv sync -d`
+
 
 Tips
 ====

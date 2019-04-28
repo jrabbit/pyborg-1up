@@ -47,9 +47,13 @@ def bandit(c):
     c.run("pipenv run bandit --exclude=build,test -s B311 -r pyborg", pty=True)
 
 @task
-def docs(c):
+def docs(c, lan=False):
     "run autobuilder for local docs generation"
-    c.run("pipenv run sphinx-autobuild docs/source docs/build", pty=True)
+    if lan:
+        opt = "-H 0.0.0.0 -p 3030"
+    else:
+        opt = ""
+    c.run("pipenv run sphinx-autobuild docs/source docs/build {}".format(opt), pty=True)
 
 @task
 def test(c):

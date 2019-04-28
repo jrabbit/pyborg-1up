@@ -14,6 +14,7 @@ Contents:
    deploy
    enduser
    changes
+   module_dev
 
 
 
