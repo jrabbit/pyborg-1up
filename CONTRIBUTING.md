@@ -5,7 +5,7 @@ Development workflow
 
 Use [pipenv](https://docs.pipenv.org/index.html) and the pipfile[.lock]. It's really good.
 
-for dev-deps use `pipenv sync -d`
+for dev-deps use `pipenv sync -d` (dev env targets py3 and py2 support is best effort.)
 
 
 Tips
