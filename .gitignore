@@ -68,3 +68,4 @@ pyborg/pyborg-irc.cfg
 archive.zip
 .env
 .envrc
+misc/docker_caches
