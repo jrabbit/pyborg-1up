@@ -480,7 +480,7 @@ def keybase(conf_file, multiplex):
         mod = PyborgKeybase(conf_file)
         mod.start()
     except Exception:
-        mod.teardown()
+        mod.save()
         raise
 
 

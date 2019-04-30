@@ -4,6 +4,7 @@ import subprocess
 import time
 
 import attr
+from box import Box
 
 from pyborg.mod.base import PyborgModBase
 
@@ -38,13 +39,25 @@ class KeybaseCommander(object):
 
 @attr.s
 class PyborgKeybase(PyborgModBase):
+    target_channel = attr.ib(default="jackolas,jackolas")
+
+    def send(self, body):
+        result = Box(self.cmdr.send(self.target_channel, body)).result
+        logger.info(result)
 
     def process_messages(self):
-        logger.info("process_messages %s", self.cmdr.read("jackolas,jackolas"))
+        result = Box(self.cmdr.read("jackolas,jackolas")["result"])
+        for msg in result.messages:
+            body = msg.msg.content.text.body
+            logger.info("process_messages: %s", body)
+            self.learn(body)
+            reply_message = self.reply(body)
+            if reply_message:
+                self.send(reply_message)
 
     def start(self):
         self.cmdr = KeybaseCommander()
-        logger.info(self.cmdr.list())
+        # logger.info(self.cmdr.list())
         # scheduled run loop
         while True:
             self.process_messages()

@@ -1,4 +1,5 @@
 import logging
+import sys
 
 import attr
 import requests
@@ -35,6 +36,17 @@ class PyborgModBase(object):
         if not self.multiplexing:
             import pyborg.pyborg
             self.pyborg = pyborg.pyborg.pyborg()
+        else:
+            self._check_http()
+
+    def _check_http(self):
+        try:
+            ret = requests.get("http://{}:{}".format(self.multi_server, self.multi_port))
+        except requests.exceptions.ConnectionError:
+            logger.error("connection to pyborg server failed!")
+            sys.exit(2001)
+        ret.raise_for_status()
+
 
     def learn(self, body):
         """multiplex mode-enabled learn wrapper"""
