@@ -22,6 +22,7 @@ from pyborg.mod.mod_http import bottle
 from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_linein import ModLineIn
 from pyborg.mod.mod_reddit import PyborgReddit
+from pyborg.mod.mod_keybase import PyborgKeybase
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.util_cli import mk_folder
 
@@ -72,6 +73,7 @@ def cli_base(ctx, verbose, debug, my_version):
     elif ctx.invoked_subcommand is None:
         # still do normal things via the named help even
         ctx.invoke(help)
+
 
 @cli_base.command()
 @click.pass_context
@@ -468,6 +470,18 @@ def linein(multiplex):
         pass
     if not multiplex:
         mod.save()
+
+
+@cli_base.command()
+@click.option("--multiplex", default=True, type=click.BOOL)
+@click.option("--conf-file", default=os.path.join(folder, "keybase.toml"))
+def keybase(conf_file, multiplex):
+    try:
+        mod = PyborgKeybase(conf_file)
+        mod.start()
+    except Exception:
+        mod.teardown()
+        raise
 
 
 @cli_base.command()

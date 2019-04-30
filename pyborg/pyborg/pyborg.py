@@ -50,7 +50,7 @@ import toml
 
 from pyborg.util.util_cli import mk_folder
 from pyborg.util.censored_defaults import CENSORED_REASONABLE_DEFAULTS
-
+from pyborg import __version__
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +149,7 @@ class FakeAns(object):
 
 class pyborg(object):
 
-    ver_string = "I am a version 1.4.0 PyBorg"
+    ver_string = "I am a version {} PyBorg".format(__version__)
     saves_version = "1.4.0"
 
     # Main command list

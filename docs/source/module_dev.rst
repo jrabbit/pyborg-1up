@@ -39,7 +39,7 @@ Add it to the entrypoint
    @click.option("--conf-file", default=os.path.join(folder, "keybase.toml"))
    def keybase(conf_file, multiplex):
          try:
-             mod = PyborgKeybase()
+             mod = PyborgKeybase(conf_file)
              mod.start()
          except Exception:
              mod.teardown()

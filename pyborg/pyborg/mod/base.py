@@ -6,6 +6,7 @@ import toml
 
 logger = logging.getLogger(__name__)
 
+
 @attr.s
 class PyborgModBase(object):
     """Do all the weird stuff for you. This class sets up a toml-backed settings file,
@@ -17,18 +18,19 @@ class PyborgModBase(object):
     conf_file = attr.ib()  # path-like
     settings = attr.ib(default=None, type=dict)
     multiplexing = attr.ib(type=bool, default=True)
-    multi_port = attr.ib(type=int,default=2001)
-    multi_server= attr.ib(type=str, default="localhost")
+    multi_port = attr.ib(type=int, default=2001)
+    multi_server = attr.ib(type=str, default="localhost")
     pyborg = attr.ib(default=None)
 
     def __attrs_post_init__(self):
-        self.settings = toml.load(self.conf_file)
         try:
+            self.settings = toml.load(self.conf_file)
             self.multiplexing = self.settings['pyborg']['multiplex']
             self.multi_server = self.settings['pyborg']['multiplex_server']
             self.multi_port = self.settings['pyborg']['multiplex_port']
-        except KeyError:
-            logger.info("Missing config key, you get defaults.")
+        except (KeyError, OSError):
+            logger.info("Missing config [keys], you get defaults.")
+            logger.debug("Config error we got", exc_info=True)
 
         if not self.multiplexing:
             import pyborg.pyborg
