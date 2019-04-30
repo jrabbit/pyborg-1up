@@ -35,6 +35,7 @@ requires = [
     "prompt_toolkit",
     "discord.py;python_version>='3'",
     "aeidon;python_version>='3'",
+    "python-box",
 ]
 setup(
     name="pyborg",
