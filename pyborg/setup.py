@@ -33,7 +33,7 @@ requires = [
     "attrs",
     "statsd",
     "prompt_toolkit",
-    "discord.py;python_version>='3'",
+    "discord.py>=1;python_version>='3'",
     "aeidon;python_version>='3'",
     "python-box",
 ]
