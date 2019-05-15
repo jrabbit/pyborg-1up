@@ -3,12 +3,17 @@ import sys
 import logging
 import xml.etree.ElementTree as ET
 
+import attr
 import requests
 
 logger = logging.getLogger(__name__)
 
+@attr.s
+class MyLittleResult():
+    final_url = attr.ib()
+    session_id = attr.ib()
 
-def mk_audio(content, delete=False, download=False):
+async def mk_audio(content, delete=False, download=False):
     "send a string to voiceforge to make a mp3 (I think ogg is broken on their end)"
     sess = requests.Session()
     # pretend we're a real ~~boy~~ browser
@@ -25,10 +30,10 @@ def mk_audio(content, delete=False, download=False):
         # an amazing api call.
         sess.post("https://www.voiceforge.com/demos/deleteAudio.php").raise_for_status()
     else:
-        return final_url
+        return MyLittleResult(final_url, sess.cookies["PHPSESSID"])
 
 
-def post_hoc_delete(phpsess):
+async def post_hoc_delete(phpsess):
     "wipeout files even after you closed the session"
     requests.post("https://www.voiceforge.com/demos/deleteAudio.php", cookies={"PHPSESSID": phpsess}).raise_for_status()
 

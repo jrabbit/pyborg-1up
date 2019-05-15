@@ -1,5 +1,9 @@
+import tempfile
 import logging
 from functools import partial
+from operator import itemgetter
+from typing import Dict, Union, List, Callable, Optional, IO
+from types import ModuleType
 
 import discord
 import pyborg.commands
@@ -9,10 +13,8 @@ import venusian
 import attr
 
 from pyborg.util.awoo import normalize_awoos
-from typing import Dict, Union, List, Callable
-from types import ModuleType
+from pyborg.util import voicesynth
 
-# https://github.com/Rapptz/discord.py/blob/master/discord/ext/commands/bot.py#L146
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +29,16 @@ class PyborgDiscord(discord.Client):
     multi_server: str = attr.ib(default="localhost")
     registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
 
+    voice_enabled: bool = attr.ib(default=False)
+    speak_mode: bool = attr.ib(init=False)
+
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
         try:
             self.multiplexing = self.settings['pyborg']['multiplex']
             self.multi_server = self.settings['pyborg']['multiplex_server']
             self.multi_port = self.settings['pyborg']['multiplex_port']
+            self.voice_enabled = self.settings['discord']['voice']
         except KeyError:
             logger.info("Missing config key, you get defaults.")
         if not self.multiplexing:
@@ -43,8 +49,10 @@ class PyborgDiscord(discord.Client):
             self.pyborg = None
         super().__init__()
 
-    def our_start(self) -> None:
+    def our_start(self, opus_lib="libopus.so.0") -> None:
         self.scan()
+        if self.voice_enabled:
+            discord.opus.load_opus(opus_lib)
         if 'token' in self.settings['discord']:
             self.run(self.settings['discord']['token'])
         else:
@@ -58,6 +66,39 @@ class PyborgDiscord(discord.Client):
 
     def clean_msg(self, message: discord.Message) -> str:
         return ' '.join(message.content.split())
+
+    def _vc_with_people(self, guild: discord.Guild) -> discord.VoiceChannel:
+        "returns the most populated channel"
+        table: List[Dict[str, Union[int, discord.VoiceChannel]]] = []
+        for chan in guild.voice_channels:
+            pop = len(chan.members)
+            if guild.voice_client:
+                if chan == guild.voice_client.channel:
+                    pop - 1
+            table.append({"population": pop, "channel": chan})
+        logging.info(table)
+        sorted_table = sorted(table, key=itemgetter("channe"))
+        logging.info(sorted_table)
+        return sorted_table[0]["channel"]
+
+    async def _temp_dl(self, url: str) -> IO:
+        "write out url into tmp file and returns it"
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        ret = requests.get(url, stream=True)
+        for chunk in ret.iter_content(1024):
+            tmp.write(chunk)
+        return tmp
+
+    async def _shove_message_into_voice(self, body: str, guild: discord.Guild, finalizer: Optional[Callable] = None) -> None:
+        logger.info("entered _shove_message_into_voice")
+        # get the audio data from voiceforge
+        result = await voicesynth.mk_audio(body)
+        tmp = await self._temp_dl(result.final_url)
+        voice_channel = self._vc_with_people(guild)
+        voice_client = await voice_channel.connect()
+        aud = discord.FFmpegPCMAudio(tmp.name)
+        voice_client.play(aud, after=finalizer)
+        await voicesynth.post_hoc_delete(result.session_id)
 
     def _extract_emoji(self, msg: str, server_emojis: List[str]) -> str:
         """extract an emoji, returns a str ready to be munged"""
@@ -88,6 +129,14 @@ class PyborgDiscord(discord.Client):
                 for k, v in self.registry.registered.items():
                     help_text += " !{}".format(k)
                 await message.channel.send(help_text)
+            elif command_name in ['leave', 'part']:
+                if message.guild.voice_client:
+                    await message.guild.voice_client.disconnect()
+            elif command_name in ["garf", "garfmode"] and self.voice_enabled:
+                logger.info("garfmode enabled: %s", message.guild)
+                self.loop.create_task(self._shove_message_into_voice("garf mode enabled", message.guild))
+                return
+
             else:
                 if command_name in self.registry.registered:
                     command = self.registry.registered[command_name]

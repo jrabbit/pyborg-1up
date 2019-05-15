@@ -1,5 +1,6 @@
 [discord]
 learning = true
 plaintext_ping = true
+enable_voice = true
 [pyborg]
 multiplex = true
