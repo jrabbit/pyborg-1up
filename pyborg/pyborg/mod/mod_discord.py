@@ -4,6 +4,7 @@ from functools import partial
 from operator import itemgetter
 from typing import Dict, Union, List, Callable, Optional, IO
 from types import ModuleType
+from contextlib import suppress
 
 import discord
 import pyborg.commands
@@ -34,13 +35,11 @@ class PyborgDiscord(discord.Client):
 
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
-        try:
+        with suppress(KeyError):
             self.multiplexing = self.settings['pyborg']['multiplex']
             self.multi_server = self.settings['pyborg']['multiplex_server']
             self.multi_port = self.settings['pyborg']['multiplex_port']
             self.voice_enabled = self.settings['discord']['voice']
-        except KeyError:
-            logger.info("Missing config key, you get defaults.")
         if not self.multiplexing:
             # self.pyborg = pyborg.pyborg.pyborg()
             # pyb config parsing isn't ready for python 3.
@@ -77,7 +76,7 @@ class PyborgDiscord(discord.Client):
                     pop - 1
             table.append({"population": pop, "channel": chan})
         logging.info(table)
-        sorted_table = sorted(table, key=itemgetter("channe"))
+        sorted_table = sorted(table, key=itemgetter("channel"))
         logging.info(sorted_table)
         return sorted_table[0]["channel"]
 
@@ -89,13 +88,21 @@ class PyborgDiscord(discord.Client):
             tmp.write(chunk)
         return tmp
 
-    async def _shove_message_into_voice(self, body: str, guild: discord.Guild, finalizer: Optional[Callable] = None) -> None:
+    async def _shove_message_into_voice(self, body: str, guild: discord.Guild, target_vchannel: Optional[discord.VoiceChannel] = None, finalizer: Optional[Callable] = None) -> None:
         logger.info("entered _shove_message_into_voice")
         # get the audio data from voiceforge
         result = await voicesynth.mk_audio(body)
         tmp = await self._temp_dl(result.final_url)
-        voice_channel = self._vc_with_people(guild)
-        voice_client = await voice_channel.connect()
+        if target_vchannel:
+            voice_channel = target_vchannel
+        else:
+            voice_channel = self._vc_with_people(guild)
+        possible_channel = discord.utils.get(self.voice_clients, channel=voice_channel)
+        if possible_channel:
+            # we don't need to connect in this case.
+            voice_client = possible_channel
+        else:
+            voice_client = await voice_channel.connect()
         aud = discord.FFmpegPCMAudio(tmp.name)
         voice_client.play(aud, after=finalizer)
         await voicesynth.post_hoc_delete(result.session_id)
@@ -131,10 +138,12 @@ class PyborgDiscord(discord.Client):
                 await message.channel.send(help_text)
             elif command_name in ['leave', 'part']:
                 if message.guild.voice_client:
-                    await message.guild.voice_client.disconnect()
-            elif command_name in ["garf", "garfmode"] and self.voice_enabled:
+                    self.loop.create_task(message.guild.voice_client.disconnect())
+                    return
+            elif command_name in ["garf", "garfmode"]:
                 logger.info("garfmode enabled: %s", message.guild)
-                self.loop.create_task(self._shove_message_into_voice("garf mode enabled", message.guild))
+                target = message.author.voice.channel
+                self.loop.create_task(self._shove_message_into_voice(" ".join(message.content.split()[1:]), message.guild, target))
                 return
 
             else:
@@ -146,6 +155,7 @@ class PyborgDiscord(discord.Client):
                         await message.channel.send(command(msg=message.content))
                     else:
                         await message.channel.send(command())
+                return
         if message.author == self.user:
             logger.info("Not learning/responding to self")
             return
