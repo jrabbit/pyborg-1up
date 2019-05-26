@@ -1,3 +1,4 @@
+import re
 import logging
 from functools import partial
 
@@ -123,8 +124,8 @@ class PyborgDiscord(discord.Client):
         line = " ".join(line_list)
         try:
             if self.settings["discord"]["plaintext_ping"]:
-                line = line.replace(message.guild.me.display_name, "#nick")
-                line = line.replace(message.guild.me.display_name.lower(), "#nick")
+                exp = re.compile(message.guild.me.display_name, re.IGNORECASE)
+                line = exp.sub(line, "#nick")
         except KeyError:
             pass
 
