@@ -19,8 +19,8 @@ def deploy(c, restart=False, sync=False):
         if sync:
             conn.run("~/.local/bin/pipenv sync")  # they all use the same pipenv managed virtualenv
         if restart:
-            for unit in ["pyborg_discord", "pyborg_http", "pyborg_twitter", "pyborg_mastodon"]:
-                conn.sudo("systemctl restart {}".format(unit), pty=True)
+            units = ["pyborg_discord", "pyborg_http", "pyborg_twitter", "pyborg_mastodon"].join(" ")
+            conn.run("sudo systemctl restart {}".format(units), pty=True)
         print("Deploy Completed.")
 
 
