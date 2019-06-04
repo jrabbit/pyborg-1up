@@ -960,13 +960,22 @@ class pyborg(object):
             except KeyError:
                 ret = 1
             return ret
+        def _mappable_nick_clean(pair):
+            "mappable weight apply but with shortcut for #nick"
+            word, pos = pair
+            if word == "#nick":
+                comp_weight = 2
+            else:
+                comp_weight = weight(pos)
+            return (word, comp_weight)
+
         if nltk:
             # uses punkt
             tokenized = nltk.word_tokenize(body)
             # uses averaged_perceptron_tagger
             tagged = nltk.pos_tag(tokenized)
             logging.info(tagged)
-            weighted_choices = [(word, weight(pos)) for word, pos in tagged]
+            weighted_choices = list(map(_mappable_nick_clean, tagged))
             population = [val for val, cnt in weighted_choices for i in xrange(cnt)]
             word = random.choice(population)
             # make sure the word is known
