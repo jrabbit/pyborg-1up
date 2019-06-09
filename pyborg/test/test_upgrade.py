@@ -11,7 +11,6 @@ from pyborg_entrypoint import upgrade_to_json
 
 logger = logging.getLogger(__name__)
 
-
 class TestUpgrade1_4(unittest.TestCase):
     "test upgrade from 1.2 to 1.4"
 
@@ -19,9 +18,10 @@ class TestUpgrade1_4(unittest.TestCase):
     def setUpClass(cls):
         cls.click_runner = CliRunner()
 
+    @mock.patch("builtins.open")
     @mock.patch("json.dump")
     @mock.patch("pyborg.pyborg.pyborg.load_brain_2")
-    def test_upgrade_to_json(self, patched_load, patched_dump):
+    def test_upgrade_to_json(self, patched_load, patched_dump, patched_open):
         "test the cli command to upgrade to 1.4"
         patched_load.return_value = [{}, {}]
         result = self.click_runner.invoke(upgrade_to_json, ["/bozo_path.json"], catch_exceptions=False)

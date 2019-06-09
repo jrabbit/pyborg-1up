@@ -1,5 +1,6 @@
 import logging
 import unittest
+import os
 
 import pyborg.pyborg
 from pyborg.mod.mod_http import DumbyIOMod
@@ -21,9 +22,10 @@ class TestPyborgInit(unittest.TestCase):
     old_style_brain = "pyborg/test/fixtures/old.brain.pyborg.archive.zip"
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
 
+    @mock.patch("builtins.open")
     @mock.patch("pyborg.pyborg.pyborg.__init__")  # skip loading brain
     @mock.patch("toml.load")
-    def test_load_settings(self, patched_toml, patched_init):
+    def test_load_settings(self, patched_toml, patched_init, patched_open):
         patched_init.return_value = None
         our_pyb = pyborg.pyborg.pyborg()
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
@@ -94,9 +96,9 @@ class TestPyborgClobbersave(unittest.TestCase):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
         patched_load_brain.side_effect = IOError
         our_pyb = pyborg.pyborg.pyborg()
-
-        with open("archive.zip") as archive:
-            self.assertEqual(archive.read(), "")
+        if os.path.exists("archive.zip"):
+            with open("archive.zip") as archive:
+                self.assertEqual(archive.read(), "")
         self.assertNotEqual(our_pyb.brain_path, "archive.zip")
 
 
@@ -131,9 +133,12 @@ class TestPyborgSave(unittest.TestCase):
              'the': [{'hashval': 3025701897, 'index': 1}],
              'you': [{'hashval': 3710277035, 'index': 1}]}
 
+
+    @mock.patch("os.rename")
+    @mock.patch("builtins.open")
     @mock.patch("json.loads")
     @mock.patch("toml.load")
-    def test_save_db(self, patched_toml, patched_json):
+    def test_save_db(self, patched_toml, patched_json, patched_open, patched_rename):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
         patched_json.return_value = {
             'version': u"1.4.0", 'words': self.words, 'lines': self.lines}
@@ -142,15 +147,17 @@ class TestPyborgSave(unittest.TestCase):
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
         # our_pyb.brain_path = ""
         our_pyb.save_brain()
-
         # print(m.mock_calls)
 
 
 class TestPyborgLearning(unittest.TestCase):
     "Test learning"
+
+    @mock.patch("pyborg.pyborg.pyborg.load_brain_json")
     @mock.patch("toml.load")
-    def test_functional_learn(self, patched_toml):
+    def test_functional_learn(self, patched_toml, patched_load):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        patched_load.return_value = (dict(), dict())
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
         our_pyb.learn("Read a book, any book - Trotskist Proverb")
         our_pyb.learn("You should play dota 2 it's fun")
