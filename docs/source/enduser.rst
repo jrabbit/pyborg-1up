@@ -10,6 +10,18 @@ Some commands your local pyborg might have in your chat room:
  * !info
  * !help
 
+Garfield Mode
+=============
+
+Garfield mode is a wonderful new feature in the discord module. 
+
+Notably it adds the commands:
+
+ * !leave / !part
+ * !garf / !garfmode
+
+Who knows what that does though!
+
 
 Best Of
 =======
