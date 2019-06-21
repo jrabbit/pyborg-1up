@@ -69,20 +69,23 @@ class PyborgDiscord(discord.Client):
     def _vc_with_people(self, guild: discord.Guild) -> discord.VoiceChannel:
         "returns the most populated channel"
         table: List[Dict[str, Union[int, discord.VoiceChannel]]] = []
+        logging.info("vc channels: %s", guild.voice_channels)
         for chan in guild.voice_channels:
             pop = len(chan.members)
             if guild.voice_client:
                 if chan == guild.voice_client.channel:
                     pop - 1
+            logging.info("vc_w_ppl chan: %s", chan)
             table.append({"population": pop, "channel": chan})
-        logging.info(table)
+        logging.info("vc_with_people: %s", table)
         sorted_table = sorted(table, key=itemgetter("channel"))
-        logging.info(sorted_table)
+        logging.info("vc_with_people sorted: %s", sorted_table)
         return sorted_table[0]["channel"]
 
     async def _temp_dl(self, url: str) -> IO:
         "write out url into tmp file and returns it"
         tmp = tempfile.NamedTemporaryFile(delete=False)
+        # tmp = open("keep.mp3", "wb")
         ret = requests.get(url, stream=True)
         for chunk in ret.iter_content(1024):
             tmp.write(chunk)
@@ -142,7 +145,11 @@ class PyborgDiscord(discord.Client):
                     return
             elif command_name in ["garf", "garfmode"]:
                 logger.info("garfmode enabled: %s", message.guild)
-                target = message.author.voice.channel
+                try:
+                    target = message.author.voice.channel
+                except AttributeError:
+                    await message.channel.send("behavior undefined currently")
+                    target = None
                 self.loop.create_task(self._shove_message_into_voice(" ".join(message.content.split()[1:]), message.guild, target))
                 return
 
