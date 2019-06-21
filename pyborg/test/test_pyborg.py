@@ -22,10 +22,10 @@ class TestPyborgInit(unittest.TestCase):
     old_style_brain = "pyborg/test/fixtures/old.brain.pyborg.archive.zip"
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
 
-    @mock.patch("builtins.open")
+    @mock.patch("pyborg.pyborg.open", mock.mock_open())
     @mock.patch("pyborg.pyborg.pyborg.__init__")  # skip loading brain
     @mock.patch("toml.load")
-    def test_load_settings(self, patched_toml, patched_init, patched_open):
+    def test_load_settings(self, patched_toml, patched_init):
         patched_init.return_value = None
         our_pyb = pyborg.pyborg.pyborg()
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
@@ -133,17 +133,13 @@ class TestPyborgSave(unittest.TestCase):
              'the': [{'hashval': 3025701897, 'index': 1}],
              'you': [{'hashval': 3710277035, 'index': 1}]}
 
-
     @mock.patch("os.rename")
-    @mock.patch("builtins.open")
+    @mock.patch("pyborg.pyborg.open", mock.mock_open())
     @mock.patch("json.loads")
     @mock.patch("toml.load")
-    def test_save_db(self, patched_toml, patched_json, patched_open, patched_rename):
+    def test_save_db(self, patched_toml, patched_json, patched_rename):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
-        patched_json.return_value = {
-            'version': u"1.4.0", 'words': self.words, 'lines': self.lines}
-        # m = mock.mock_open()
-        # with mock.patch('pyborg.pyborg.open', m):
+        patched_json.return_value = {'version': u"1.4.0", 'words': self.words, 'lines': self.lines}
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
         # our_pyb.brain_path = ""
         our_pyb.save_brain()
