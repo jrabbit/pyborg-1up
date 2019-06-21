@@ -953,18 +953,19 @@ class pyborg(object):
 
         # Begin experimental NLP code
         def weight(pos):
-            "Takes a POS tag and assigns a weight"
-            lookup = {"NN": 4, "NNP": 5, "RB": 2, "NNS": 3, "NNPS": 5}
+            """Takes a POS tag and assigns a weight
+            New: doubled the weights in 1.4"""
+            lookup = {"NN": 8, "NNP": 10, "RB": 4, "NNS": 6, "NNPS": 10}
             try:
                 ret = lookup[pos]
             except KeyError:
-                ret = 1
+                ret = 2
             return ret
         def _mappable_nick_clean(pair):
             "mappable weight apply but with shortcut for #nick"
             word, pos = pair
             if word == "#nick":
-                comp_weight = 2
+                comp_weight = 1
             else:
                 comp_weight = weight(pos)
             return (word, comp_weight)
