@@ -125,7 +125,7 @@ class PyborgDiscord(discord.Client):
         try:
             if self.settings["discord"]["plaintext_ping"]:
                 exp = re.compile(message.guild.me.display_name, re.IGNORECASE)
-                line = exp.sub(line, "#nick")
+                line = exp.sub("#nick", line)
         except KeyError:
             pass
 
