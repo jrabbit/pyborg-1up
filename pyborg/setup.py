@@ -20,7 +20,7 @@ requires = [
     "irc>=15.1.1<17",  # 17 is py3 only
     "toml",
     "arrow>=0.10.0",
-    "PyTumblr==0.0.6",
+    "PyTumblr",
     "requests",
     "bottle",
     "venusian",
