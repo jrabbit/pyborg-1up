@@ -23,6 +23,7 @@ async def mk_audio(content, delete=False, download=False):
     ret = sess.get("https://www.voiceforge.com/demos/createAudio.php", params={"voice": "Wiseguy", "createTime": unixtime, "voiceText": content})
     logger.debug("http request on their end took: %s", ret.elapsed)
     ret.raise_for_status()
+    logger.debug(ret.text)
     mp3 = ET.fromstring(ret.text)[1].attrib['src']
     final_url = "https://www.voiceforge.com" + mp3
     logger.info(final_url)

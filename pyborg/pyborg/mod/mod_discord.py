@@ -29,7 +29,7 @@ class PyborgDiscord(discord.Client):
     multiplexing: bool = attr.ib(default=True)
     multi_server: str = attr.ib(default="localhost")
     registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
-
+    garf_map = attr.ib(default={})
     voice_enabled: bool = attr.ib(default=False)
     speak_mode: bool = attr.ib(init=False)
 
@@ -78,7 +78,7 @@ class PyborgDiscord(discord.Client):
             logging.info("vc_w_ppl chan: %s", chan)
             table.append({"population": pop, "channel": chan})
         logging.info("vc_with_people: %s", table)
-        sorted_table = sorted(table, key=itemgetter("channel"))
+        sorted_table = sorted(table, key=itemgetter("population"))
         logging.info("vc_with_people sorted: %s", sorted_table)
         return sorted_table[0]["channel"]
 
@@ -145,6 +145,7 @@ class PyborgDiscord(discord.Client):
                     return
             elif command_name in ["garf", "garfmode"]:
                 logger.info("garfmode enabled: %s", message.guild)
+                self.garf_map[message.guild] = True
                 try:
                     target = message.author.voice.channel
                 except AttributeError:
@@ -216,6 +217,8 @@ class PyborgDiscord(discord.Client):
                     msg = msg.replace("#nick", str(message.author.mention))
                     msg = msg.replace("@everyone", "`@everyone`")
                     msg = msg.replace("@here", "`@here`")
+                    if self.garf_map[message.guild]:
+                        self.loop.create_task(self._shove_message_into_voice(msg, message.guild))
                     await message.channel.send(msg)
 
     def _plaintext_name(self, message: discord.Message) -> bool:
