@@ -32,8 +32,8 @@ arrow = ">=0.10.0"
 "backports.functools_lru_cache" = {version = "*",markers = "python_version <= '3.0'"}
 ipaddress = {version = "*",markers = "python_version <= '3.0'"}
 enum34 = {version = "*",markers = "python_version <= '3.0'"}
-idna-ssl = {version = ">1.0", markers = "python_version >='3.0' <= '3.7'"}
-typing-extensions = {version = "*", markers = "python_version >='3.0' <= '3.7'"}
+idna-ssl = {version = ">1.0",markers = "python_version >='3.0' <= '3.7'"}
+typing-extensions = {version = "*",markers = "python_version >='3.0' <= '3.7'"}
 more-itertools = "<6"
 tornado = "<6"
 attrs = "*"
@@ -59,3 +59,4 @@ lxml = "*"
 4392609 = {path = "pyborg",editable = true}
 prompt_toolkit = "*"
 tweepy = "*"
+meinheld = "*"
