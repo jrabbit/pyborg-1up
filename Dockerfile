@@ -4,12 +4,12 @@ LABEL maintainer "jackjrabbit@gmail.com"
 
 RUN mkdir -p /usr/src/pyborg
 
-COPY Pipfile Pipfile.lock /usr/src/
+COPY pyproject.toml poetry.lock /usr/src/
 
 COPY pyborg /usr/src/pyborg
 
 WORKDIR /usr/src/
 
-RUN pip install pipenv && pipenv install
+RUN pip install poetry && poetry install -v
 
-CMD ["pipenv", "run", "pyborg", "linein", "--multiplex", "false"]
+CMD ["poetry", "run", "pyborg", "linein", "--multiplex", "false"]

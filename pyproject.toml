@@ -1,11 +1,32 @@
 [tool.poetry]
 name = "pyborg"
-version = "1.4.0"
+version = "1.4.1b"
 description = "a chatbot suite for modern services"
+license = "GPL-3.0+"
+readme = "pyborg/README.md"
+repository = "https://github.com/jrabbit/pyborg-1up"
+documentation = "https://pyborg.readthedocs.io/en/latest/"
 authors = ["Jack Laxson <jackjrabbit@gmail.com>"]
+include = ["example.*.toml"]
+packages = [
+    { include = "pyborg", from = "pyborg" },
+    { include = "pyborg_entrypoint.py", from = "pyborg" },
+
+]
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Topic :: Communications :: Chat :: Internet Relay Chat",
+    "Topic :: Games/Entertainment",
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+]
+[tool.poetry.scripts]
+pyborg = 'pyborg_entrypoint:cli_base'
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "*"
 toml = "^0.10.0"
 arrow = "^0.14.2"
 PyTumblr = "^0.0.8"
@@ -21,8 +42,9 @@ lxml = "^4.3"
 attrs = "^19.1"
 statsd = "^3.3"
 prompt_toolkit = "^2.0"
-"discord.py" = "^1.2"
-aeidon = "^1.2"
+"discord.py" = {version = "^1.2", python =">= 3.6"}
+"aeidon" = {version = "^1.2.1", python =">= 3.6"}
+irc = "<17"
 
 [tool.poetry.dev-dependencies]
 green = "^2.16"
@@ -32,16 +54,18 @@ sphinx-click = "^2.2"
 click = "^7.0"
 sphinx-autobuild = "^0.7.1"
 funcsigs = "^1.0"
-mypy = "^0.711.0"
+mypy = {version = "^0.711.0", python = ">= 3.7"}
 flake8 = "^3.7"
 invoke = "^1.2"
 fabric2 = "^2.4"
-asynctest = "^0.13.0"
-ipython = "^7.6"
+asynctest = {version = "^0.13.0", python = ">= 3.6"}
+ipython = {version = "^7.6", python = ">= 3.6"}
+tox = "^3.13"
+
+[tool.black]
+line-length = 140
 
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
 
-[tool.black]
-line-length = 140

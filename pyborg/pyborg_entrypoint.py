@@ -334,7 +334,7 @@ def http(reloader, port, host, brain):
     "Run a server for mutliheaded (multiplex) pyborg"
     brain_path = resolve_brain(brain)
     bottle.install(BottledPyborg(brain_path=brain_path))
-    bottle.run(host=host, port=port, reloader=reloader)
+    bottle.run(server="gunicorn", host=host, port=port, reloader=reloader)
     bottle.default_app().close()
 
 
