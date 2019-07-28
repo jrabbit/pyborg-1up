@@ -7,6 +7,10 @@ python:
 
 install: pip install tox-travis
 script:  tox
+addons:
+  apt:
+    packages:
+      - libenchant-dev
 cache:
   directories:
     - $HOME/.cache/pipenv
