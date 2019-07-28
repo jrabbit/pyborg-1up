@@ -13,6 +13,6 @@ addons:
       - libenchant-dev
 cache:
   directories:
-    - $HOME/.cache/pipenv
+    - $HOME/.cache/pypoetry/cache
 after_success:
   - bash <(curl -s https://codecov.io/bash)
