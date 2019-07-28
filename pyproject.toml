@@ -26,7 +26,7 @@ classifiers = [
 pyborg = 'pyborg_entrypoint:cli_base'
 
 [tool.poetry.dependencies]
-python = "*"
+python = ">=3.6"
 toml = "^0.10.0"
 arrow = "^0.14.2"
 PyTumblr = "^0.0.8"
@@ -48,11 +48,11 @@ irc = "<17"
 
 [tool.poetry.dev-dependencies]
 green = "^2.16"
-coverage = "^4.5"
+coverage = "*"
 mock = "^3.0"
 sphinx-click = "^2.2"
 click = "^7.0"
-sphinx-autobuild = "^0.7.1"
+sphinx-autobuild = {version = "^0.7.1", python = ">= 3.6"}
 funcsigs = "^1.0"
 mypy = {version = "^0.711.0", python = ">= 3.7"}
 flake8 = "^3.7"
@@ -61,6 +61,7 @@ fabric2 = "^2.4"
 asynctest = {version = "^0.13.0", python = ">= 3.6"}
 ipython = {version = "^7.6", python = ">= 3.6"}
 tox = "^3.13"
+docutils = "=0.15"
 
 [tool.black]
 line-length = 140
