@@ -4,3 +4,4 @@ pyborg/dist
 pyborg/build
 docs/
 misc/
+.mypy_cache/
