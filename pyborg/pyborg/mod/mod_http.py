@@ -46,6 +46,9 @@ def save(pyborg):
 def info(pyborg):
     return pyborg.ver_string, pyborg.brain_path
 
+@bottle.route("/info.json")
+def info2(pyborg):
+    return {"version_string": pyborg.ver_string, "brain": pyborg.brain_path}
 
 @bottle.route("/stats", method="POST")
 def stats(pyborg):
