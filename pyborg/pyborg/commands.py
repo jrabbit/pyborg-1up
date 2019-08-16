@@ -47,4 +47,4 @@ def known(multiplex, multi_server, msg=None):
 
 @command()
 def blap():
-    return "https://mutualism.net/blap/its_good_to_be_sad.gif"
+    return "https://sexyferret.science/blap/its_good_to_be_sad.gif"
