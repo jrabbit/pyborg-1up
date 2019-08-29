@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyborg"
-version = "1.4.1b"
+version = "2.0a1"
 description = "a chatbot suite for modern services"
 license = "GPL-3.0+"
 readme = "pyborg/README.md"
@@ -17,7 +17,6 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Topic :: Communications :: Chat :: Internet Relay Chat",
     "Topic :: Games/Entertainment",
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
@@ -26,11 +25,11 @@ classifiers = [
 pyborg = 'pyborg_entrypoint:cli_base'
 
 [tool.poetry.dependencies]
-python = ">=3.6"
+python = "^3.7"
 toml = "^0.10.0"
 arrow = "^0.14.2"
 PyTumblr = "^0.0.8"
-requests = "^2.22"
+requests = "*"
 bottle = "^0.12.17"
 venusian = "^1.2"
 click = "^7.0"
@@ -44,28 +43,27 @@ statsd = "^3.3"
 prompt_toolkit = "^2.0"
 "discord.py" = {version = "^1.2", python =">= 3.6"}
 "aeidon" = {version = "^1.2.1", python =">= 3.6"}
-irc = "<17"
+irc = "^17"
+aiohttp = "^3.5.4"
+tox = "^3.13.2"
+aiodns = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 green = "^2.16"
 coverage = "*"
-mock = "^3.0"
 sphinx-click = "^2.2"
 click = "^7.0"
 sphinx-autobuild = {version = "^0.7.1", python = ">= 3.6"}
-funcsigs = "^1.0"
 mypy = {version = "^0.711.0", python = ">= 3.7"}
 flake8 = "^3.7"
 invoke = "^1.2"
 fabric2 = "^2.4"
 asynctest = {version = "^0.13.0", python = ">= 3.6"}
 ipython = {version = "^7.6", python = ">= 3.6"}
-tox = "^3.13"
 docutils = "^0.15"
 
 [tool.black]
 line-length = 140
-
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
