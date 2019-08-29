@@ -4,7 +4,6 @@ from functools import partial
 
 import discord
 import pyborg.commands
-import requests
 import aiohttp
 import toml
 import venusian
