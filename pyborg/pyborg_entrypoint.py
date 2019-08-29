@@ -23,7 +23,7 @@ from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_linein import ModLineIn
 from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.util.bottle_plugin import BottledPyborg
-from pyborg.util.util_cli import mk_folder
+from pyborg.util.util_cli import mk_folder, init_systemd
 
 if sys.version_info <= (3,):
     from pyborg.mod.mod_tumblr import PyborgTumblr
@@ -86,6 +86,17 @@ def folder_info():
     print(folder)
     logger.debug("folder: this uses https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir and should work most of the time")
 
+@cli_base.group()
+def utils():
+    "extra pyborg helper scripts"
+    pass
+
+@utils.command("systemd")
+def yeet_systemd():
+    "Set up systemd unit files for `pyborg http` and friends"
+    print("generating systemd files seems weird.")
+    init_systemd()
+    
 
 @cli_base.group()
 def brain():
