@@ -5,6 +5,7 @@ from functools import partial
 import discord
 import pyborg.commands
 import requests
+import aiohttp
 import toml
 import venusian
 import attr
@@ -13,7 +14,6 @@ from pyborg.util.awoo import normalize_awoos
 from typing import Dict, Union, List, Callable
 from types import ModuleType
 
-# https://github.com/Rapptz/discord.py/blob/master/discord/ext/commands/bot.py#L146
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,8 @@ class PyborgDiscord(discord.Client):
     multiplexing: bool = attr.ib(default=True)
     multi_server: str = attr.ib(default="localhost")
     registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
-
+    aio_session: aiohttp.ClientSession = attr.ib(default=aiohttp.ClientSession())
+ 
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
         try:
@@ -110,7 +111,6 @@ class PyborgDiscord(discord.Client):
             server_emojis = [x.name for x in e]
             logger.debug("got server emojis as: %s", str(server_emojis))
             incoming_message = self._extract_emoji(message.content, server_emojis)
-
         else:
             incoming_message = message.content
 
@@ -133,16 +133,17 @@ class PyborgDiscord(discord.Client):
         line = normalize_awoos(line)
 
         if self.settings['discord']['learning']:
-            self.learn(line)
+            await self.learn(line)
 
         if self.user.mentioned_in(message) or self._plaintext_name(message):
             async with message.channel.typing():
-                msg = self.reply(line)
+                msg = await self.reply(line)
                 logger.debug("on message: %s" % msg)
                 if msg:
                     logger.debug("Sending message...")
                     # if custom emoji: replace to <:weedminion:392111795642433556>
                     # message.server map to full custom emoji
+                    # TODO: measure time spent here?
                     emoji_map = {x.name: x for x in message.guild.emojis}
                     for word in msg.split():
                         if word in emoji_map:
@@ -163,33 +164,28 @@ class PyborgDiscord(discord.Client):
         except KeyError:
             return False
 
-    def learn(self, body: str) -> None:
+    async def learn(self, body: str) -> None:
         """thin wrapper for learn to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
-            ret = requests.post("http://{}:{}/learn".format(self.multi_server, self.multi_port), data={"body": body})
-            if ret.status_code > 499:
-                logger.error("Internal Server Error in pyborg_http. see logs.")
-            else:
-                ret.raise_for_status()
+            async with self.aio_session.post(f"http://{self.multi_server}:{self.multi_port}/learn", data={"body": body}) as ret:
+                if ret.status > 499:
+                    logger.error("Internal Server Error in pyborg_http. see logs.")
+                else:
+                    await ret.raise_for_status()
 
-    def reply(self, body: str) -> Union[str, None]:
-        """thin wrapper for reply to switch to multiplex mode"""
+    async def reply(self, body: str) -> Union[str, None]:
+        """thin wrapper for reply to switch to multiplex mode: now coroutine"""
         if self.settings['pyborg']['multiplex']:
-            ret = requests.post("http://{}:{}/reply".format(self.multi_server, self.multi_port), data={"body": body})
-            if ret.status_code == requests.codes.ok:
-                reply = ret.text
+            url = f"http://{self.multi_server}:{self.multi_port}/reply"
+            async with session.post(url, data={"body": body}, raise_for_status=True) as ret:
+                reply = await ret.text()
                 logger.debug("got reply: %s", reply)
-            elif ret.status_code > 499:
-                logger.error("Internal Server Error in pyborg_http. see logs.")
-                return None
-            else:
-                ret.raise_for_status()
             return reply
         else:
             raise NotImplementedError
 
-    def teardown(self) -> None:
-        pass
+    async def teardown(self) -> None:
+        await self.aio_session.close()
 
     def scan(self, module: ModuleType = pyborg.commands) -> None:
         self.scanner = venusian.Scanner(registry=self.registry)
