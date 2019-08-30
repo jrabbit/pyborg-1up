@@ -3,8 +3,14 @@ Changes
 
 Changelog summaries; for past changes check `the github releases <https://github.com/jrabbit/pyborg-1up/releases>`_
 
+2.0
+---
 
-Next (1.4.0)
+- Dropped python 2 support
+- async http client use in discord module
+
+
+1.4.0
 ------------
 
 - Added nickname plaintext pings in discord module.
