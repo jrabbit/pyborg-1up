@@ -48,10 +48,3 @@ Suggested NLTK data
 -------------------
 
 Pyborg can use nltk tagging and tokenizing when installed and configured. Tagging requires `averaged_perceptron_tagger` and tokenization requires `punkt`.
-
-
-Todo:
------
-
-* spelling or better heuristics
-* graphing and visualization of the database
