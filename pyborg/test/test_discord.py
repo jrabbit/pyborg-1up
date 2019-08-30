@@ -24,8 +24,8 @@ if sys.version_info >= (3,):
             self.loop.close()
 
         @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
-        @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
-        @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+        @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+        @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
         def test_no_reply(self, patched_reply, patched_learn, patched_user):
             msg = mock.Mock()
             msg.content = "Yolo!"
@@ -38,8 +38,8 @@ if sys.version_info >= (3,):
 
         @mock.patch("pyborg.mod.mod_discord.normalize_awoos")
         @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
-        @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
-        @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+        @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+        @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
         def test_reply(self, patched_reply, patched_learn, patched_user, patched_normalize):
             msg = asynctest.MagicMock()
             msg.content.return_value = "<@221134985560588289> you should play dota!"
@@ -58,8 +58,8 @@ if sys.version_info >= (3,):
 
         @mock.patch("pyborg.mod.mod_discord.normalize_awoos")
         @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
-        @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
-        @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+        @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+        @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
         def test_nick_replace(self, patched_reply, patched_learn, patched_user, patched_normalize):
             msg = asynctest.MagicMock()
             msg.content.return_value = "<@221134985560588289> you should play dota!"
@@ -85,8 +85,8 @@ if sys.version_info >= (3,):
     @mock.patch("pyborg.mod.mod_discord.normalize_awoos")
     @mock.patch("pyborg.mod.mod_discord.PyborgDiscord._plaintext_name")
     @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
-    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
-    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+    @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+    @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
     class TestPlaintexPing(unittest.TestCase):
         def setUp(self):
             self.loop = asyncio.new_event_loop()
