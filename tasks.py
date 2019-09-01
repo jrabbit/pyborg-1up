@@ -61,7 +61,7 @@ def test(c):
 @task
 def docker_gauntlet(c):
     "there's so many ways to fuck this up on install let's try them all!"
-    versions_list = ["2", "3.6", "3.7", "3"]
+    versions_list = ["3.6", "3.7", "3"]
     for py_version in versions_list:
         c.run("docker pull python:{}".format(py_version))
     @attr.s
