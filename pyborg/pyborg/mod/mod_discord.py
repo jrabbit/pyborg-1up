@@ -176,7 +176,7 @@ class PyborgDiscord(discord.Client):
         """thin wrapper for reply to switch to multiplex mode: now coroutine"""
         if self.settings['pyborg']['multiplex']:
             url = f"http://{self.multi_server}:{self.multi_port}/reply"
-            async with session.post(url, data={"body": body}, raise_for_status=True) as ret:
+            async with self.aio_session.post(url, data={"body": body}, raise_for_status=True) as ret:
                 reply = await ret.text()
                 logger.debug("got reply: %s", reply)
             return reply

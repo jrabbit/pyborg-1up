@@ -23,7 +23,7 @@
 #
 # Tom Morton <tom@moretom.net>
 # Seb Dailly <seb.dailly@gmail.com>
-#
+# Jack Laxson <jackjrabbit+pyborg@gmail.com>
 
 from __future__ import absolute_import
 
@@ -41,6 +41,8 @@ import uuid
 import zipfile
 from random import randint
 from zlib import crc32
+from pathlib import Path
+from typing import Dict, List, Any
 
 import attr
 import click
@@ -50,7 +52,7 @@ import toml
 
 from pyborg.util.util_cli import mk_folder
 from pyborg.util.censored_defaults import CENSORED_REASONABLE_DEFAULTS
-
+from . import __version__
 
 logger = logging.getLogger(__name__)
 
@@ -147,9 +149,110 @@ class FakeAns(object):
         self.sentences = {}
 
 
+@attr.s
+class InternalCommand():
+    name: str = attr.ib()
+    function = attr.ib()
+    help: str = attr.ib()
+
+
+def _internal_commands_generate() -> Dict:
+    return {"checkdict": InternalCommand(name="checkdict", function=lambda x: x, help="check the brain for broken links (legacy)")}
+
+
+def _create_new_database():
+    mk_folder()
+    folder = click.get_app_dir("Pyborg")
+    name = datetime.datetime.now().strftime("%m-%d-%y-auto-{}.pyborg.json").format(str(uuid.uuid4())[:4])
+    brain_path = os.path.join(folder, "brains", name)
+    logger.info("Error reading saves. New database created.")
+    return brain_path
+
+
+class PyborgBridge():
+    "cheat and make an api mapping to the old one"
+    def __init__(self, brain: Any):
+        mk_folder()
+        logger.info("Reading dictionary...")
+        try:
+            their_pyb = PyborgExperimental.from_brain(brain)
+        except (EOFError, IOError) as e:
+            # Create mew database
+            self.words = {}
+            self.lines = {}
+            logger.error(e)
+            folder = click.get_app_dir("Pyborg")
+            name = datetime.datetime.now().strftime("%m-%d-%y-auto-{}.pyborg.json").format(str(uuid.uuid4())[:4])
+            self.brain_path = os.path.join(folder, "brains", name)
+            logger.info("Error reading saves. New database created.")
+            their_pyb = PyborgExperimental(brain=self.brain_path, words={}, lines={})
+        return their_pyb
+
+
+@attr.s
+class PyborgExperimental():
+    brain: Path = attr.ib()
+    words: Dict = attr.ib()
+    lines: Dict = attr.ib()
+    settings_file: Path = attr.ib(default=os.path.join(click.get_app_dir("Pyborg"), "pyborg.toml"))
+    settings: FakeCfg2 = attr.ib(default=FakeCfg2())
+    internal_commands: Dict = attr.ib(default=_internal_commands_generate())
+    ver_string: str = attr.ib(default=f"I am a version {__version__} Pyborg")
+    saves_version: str = attr.ib(default="1.4.0")
+    has_nltk: bool = attr.ib(init=False)
+
+    def __attrs_post_init__(self):
+        if nltk is None:
+            self.has_nltk = False
+        else:
+            self.has_nltk = True
+
+    def __repr__(self):
+        return "{} with {} words and {} lines. With a settings of: {}".format(self.ver_string, len(self.words), len(self.lines), self.settings)
+
+    @classmethod
+    def from_brain(cls, brain: Path):
+        lines, words = pyborg.load_brain_json(brain)
+        cls(brain=brain, lines=lines, words=words)
+        return cls
+
+    def make_reply(self, body: str) -> str:
+        pass
+
+    def learn(self, body: str) -> None:
+        pass
+
+    def save(self) -> None:
+        """
+        Save brain as 1.4.0 JSON-Unsigned format
+        """
+        logger.info("Writing dictionary...")
+
+        folder = click.get_app_dir("Pyborg")
+        logger.info("Saving pyborg brain to %s", self.brain)
+        cnt = collections.Counter()
+        for key, value in self.words.items():
+            cnt[type(key)] += 1
+            # cnt[type(value)] += 1
+            for i in value:
+                cnt[type(i)] += 1
+        logger.debug("Types: %s", cnt)
+        logger.debug("Words: %s", self.words)
+        logger.debug("Lines: %s", self.lines)
+
+        brain = {'version': self.saves_version, 'words': self.words, 'lines': self.lines}
+        tmp_file = os.path.join(folder, "tmp", "current.pyborg.json")
+        with open(tmp_file, 'w') as f:
+            # this can fail half way...
+            json.dump(brain, f)
+        # if we didn't crash
+        os.rename(tmp_file, self.brain)
+        logger.debug("Successful writing of brain & renaming. Quitting.")
+
+
 class pyborg(object):
 
-    ver_string = "I am a version 1.4.0 PyBorg"
+    ver_string = "I am a version 2.0.0 Pyborg"
     saves_version = "1.4.0"
 
     # Main command list
@@ -961,6 +1064,7 @@ class pyborg(object):
             except KeyError:
                 ret = 2
             return ret
+
         def _mappable_nick_clean(pair):
             "mappable weight apply but with shortcut for #nick"
             word, pos = pair
