@@ -21,7 +21,6 @@ if sys.version_info >= (3,):
             # self.loop.set_debug(True)
 
         async def tearDown(self):
-            self.loop.close()
             await self.our_pybd.teardown()
 
         @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
