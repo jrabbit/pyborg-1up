@@ -26,7 +26,7 @@ class PyborgDiscord(discord.Client):
     multiplexing: bool = attr.ib(default=True)
     multi_server: str = attr.ib(default="localhost")
     registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
-    aio_session: aiohttp.ClientSession = attr.ib(default=aiohttp.ClientSession())
+    aio_session: aiohttp.ClientSession = attr.ib(init=False)
  
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
@@ -42,6 +42,7 @@ class PyborgDiscord(discord.Client):
             raise NotImplementedError
         else:
             self.pyborg = None
+        self.aio_session = aiohttp.ClientSession()
         super().__init__()
 
     def our_start(self) -> None:
