@@ -1,10 +1,7 @@
 import logging
 import unittest
 
-try:
-    from unittest import mock
-except ImportError:
-    import mock
+from unittest import mock
 from click.testing import CliRunner
 
 from pyborg_entrypoint import upgrade_to_json

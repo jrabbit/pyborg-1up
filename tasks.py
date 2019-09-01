@@ -45,12 +45,12 @@ def release(c, clean=True, docker=False):
 @task
 def bandit(c):
     "security audit tool"
-    c.run("pipenv run bandit --exclude=build,test -s B311 -r pyborg", pty=True)
+    c.run("poetry run bandit --exclude=build,test -s B311 -r pyborg", pty=True)
 
 @task
 def docs(c):
     "run autobuilder for local docs generation"
-    c.run("pipenv run sphinx-autobuild docs/source docs/build", pty=True)
+    c.run("poetry run sphinx-autobuild docs/source docs/build", pty=True)
 
 @task
 def test(c):

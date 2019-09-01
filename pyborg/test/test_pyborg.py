@@ -4,10 +4,7 @@ import unittest
 import pyborg.pyborg
 from pyborg.mod.mod_http import DumbyIOMod
 
-try:
-    from unittest import mock
-except ImportError:
-    import mock
+from unittest import mock
 
 logger = logging.getLogger(__name__)
 
