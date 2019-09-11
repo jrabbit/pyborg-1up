@@ -6,20 +6,22 @@ from fabric2 import Connection
 
 
 @task
-def deploy(c, restart=False, sync=False):
+def deploy(c, restart=False, sync=False, target_machine="trotsky"):
     "push code to a server (configure your own here)"
 
+    # desired_services = ["pyborg_discord", "pyborg_http", "pyborg_twitter", "pyborg_mastodon"]
+    desired_services = ["pyborg_discord", "pyborg_http"]
     c.run("git push --all")
-    conn = Connection("trotsky")
+    conn = Connection(target_machine)
     with conn.cd("src/pyborg-1up"):
         conn.run("git fetch")
         conn.run("git stash")
         conn.run("git pull")
         conn.run("git stash pop")
         if sync:
-            conn.run("~/.local/bin/pipenv sync")  # they all use the same pipenv managed virtualenv
+            conn.run("~/.poetry/bin/poetry install -v")  # poetry manages this application
         if restart:
-            units = " ".join(["pyborg_discord", "pyborg_http", "pyborg_twitter", "pyborg_mastodon"])
+            units = " ".join(desired_services)
             conn.run("sudo systemctl restart {}".format(units), pty=True)
             print("Restarted services.")
         print("Deploy Completed.")
@@ -31,11 +33,10 @@ def release(c, clean=True, docker=False):
 
     with c.cd("pyborg"):
         if clean:
-            c.run("pipenv run python setup.py clean")
-            c.run("rm -rf build pyborg.egg-info")
-        c.run("pipenv run python --version", echo=True)
-        c.run("pipenv run python setup.py bdist_wheel sdist")
-        print("now run `gpg -ba` on the files in pyborg/dist/ and upload with `twine`")
+            pass
+        c.run("poetry run python --version", echo=True)
+        c.run("poetry build")
+
     if docker:
         # Build and push jrabbit/pyborg[:3], needs working d-c and docker
         c.run("docker-compose build")
@@ -91,12 +92,12 @@ def docker_gauntlet(c):
 @task
 def outdated(c):
     "outdated packages"
-    c.run("pipenv run pip list -o --format=columns")
+    c.run("poetry show -o")
 
 
 @task
 def lint(c, mypy=True):
     "style & type checks"
     if mypy:
-        c.run("pipenv run mypy pyborg/pyborg", warn=True)
-    c.run("flake8 --config=tox.ini --count pyborg", warn=True)
+        c.run("poetry run  mypy pyborg/pyborg", warn=True)
+    c.run("poetry run flake8 --config=tox.ini --count pyborg", warn=True)
