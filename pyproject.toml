@@ -28,7 +28,7 @@ pyborg = 'pyborg_entrypoint:cli_base'
 python = "^3.6"
 toml = "^0.10.0"
 arrow = "^0.14.2"
-PyTumblr = "^0.0.8"
+PyTumblr = "^0.1.0"
 requests = "*"
 bottle = "^0.12.17"
 venusian = "^1.2"
@@ -49,12 +49,12 @@ tox = "^3.13.2"
 aiodns = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
-green = "^2.16"
+green = "*"
 coverage = "*"
 sphinx-click = "^2.2"
 click = "^7.0"
 sphinx-autobuild = {version = "^0.7.1", python = ">= 3.6"}
-mypy = {version = "^0.711.0", python = ">= 3.7"}
+mypy = {version = "*", python = ">= 3.7"}
 flake8 = "^3.7"
 invoke = "^1.2"
 fabric2 = "^2.4"
