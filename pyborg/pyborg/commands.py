@@ -2,9 +2,10 @@ import logging
 
 import requests
 
+import pyborg
+
 from .util.irc import command
 
-import pyborg
 
 logger = logging.getLogger(__name__)
 
@@ -21,14 +22,14 @@ def words(multiplex, multi_server):
     if multiplex:
         ret = requests.get(multi_server + "words.json")
         ret.raise_for_status()
-        words = ret.json()
+        payload = ret.json()
         try:
-            contexts_per_word = float(words["contexts"]) / float(words["words"])
+            contexts_per_word = float(payload["contexts"]) / float(payload["words"])
 
         except ZeroDivisionError:
             contexts_per_word = 0
 
-        msg = "I know %d words (%d contexts, %.2f per word), %d lines." % (words["words"], words["contexts"], contexts_per_word, words["lines"])
+        msg = "I know %d words (%d contexts, %.2f per word), %d lines." % (payload["words"], payload["contexts"], contexts_per_word, payload["lines"])
         return msg
 
     else:
@@ -36,7 +37,7 @@ def words(multiplex, multi_server):
 
 
 @command(internals=True, pass_msg=True)
-def known(multiplex, multi_server, msg=None):
+def known(multiplex, multi_server, msg=None): # pylint:disable=unused-argument
     message = msg.split()[1:]
     logger.info(message)
     ret = requests.get(multi_server + "known?word={}".format(message[0]))
