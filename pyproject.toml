@@ -44,7 +44,7 @@ prompt_toolkit = "^2.0"
 "discord.py" = {version = "^1.2", python =">= 3.6"}
 "aeidon" = {version = "^1.2.1", python =">= 3.6"}
 irc = "^17"
-aiohttp = "^3.5.4"
+aiohttp = "*"
 tox = "^3.13.2"
 aiodns = "^2.0.0"
 

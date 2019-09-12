@@ -24,14 +24,10 @@ from pyborg.mod.mod_linein import ModLineIn
 from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.util_cli import mk_folder, init_systemd
-
-if sys.version_info <= (3,):
-    from pyborg.mod.mod_tumblr import PyborgTumblr
-
-if sys.version_info >= (3,):
-    from pyborg.mod.mod_mastodon import PyborgMastodon
-    from pyborg.mod.mod_subtitle import PyborgSubtitles
-    from pyborg.mod.mod_discord import PyborgDiscord
+from pyborg.mod.mod_tumblr import PyborgTumblr
+from pyborg.mod.mod_mastodon import PyborgMastodon
+from pyborg.mod.mod_subtitle import PyborgSubtitles
+from pyborg.mod.mod_discord import PyborgDiscord
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +92,32 @@ def yeet_systemd():
     "Set up systemd unit files for `pyborg http` and friends"
     print("generating systemd files seems weird.")
     init_systemd()
+
+# Discord utils
     
+@utils.group("manage-discord")
+def discord_mgr():
+    "run administrative tasks on the bot"
+    pass
+
+@discord_mgr.command("ls")
+def list_discord_servers():
+    "list servers pyborg is on w/ an addressable hash or ID"
+    pass
+
+@discord_mgr.command("rm")
+@click.arguement("server_id_partial", help="unique portion of the hash/ID")
+def leave_discord_server(server_id_partial):
+    "leave the specified server"
+    pass
+
+@discord_mgr.command("info")
+@click.arguement("server_id_partial")
+def info_discord_server(server_id_partial):
+    "basic stats, # of users, current nickname, public stuff."
+    pass
+
+# Brains!
 
 @cli_base.group()
 def brain():
