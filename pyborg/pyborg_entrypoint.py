@@ -106,13 +106,13 @@ def list_discord_servers():
     pass
 
 @discord_mgr.command("rm")
-@click.arguement("server_id_partial", help="unique portion of the hash/ID")
+@click.argument("server_id_partial", help="unique portion of the hash/ID")
 def leave_discord_server(server_id_partial):
     "leave the specified server"
     pass
 
 @discord_mgr.command("info")
-@click.arguement("server_id_partial")
+@click.argument("server_id_partial")
 def info_discord_server(server_id_partial):
     "basic stats, # of users, current nickname, public stuff."
     pass
