@@ -84,7 +84,7 @@ description = "Better dates & times for Python"
 name = "arrow"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "0.14.7"
+version = "0.15.1"
 
 [package.dependencies]
 python-dateutil = "*"
@@ -1458,7 +1458,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "fbe00a819d3c7657bed1037292b9dfde83d42b21c5dde1f2f9aecc0718d03470"
+content-hash = "4c97097807c86f33d1c89bbec5c30d4760d2176ecaa6f8c2cb47704692736bce"
 python-versions = "^3.6"
 
 [metadata.hashes]
@@ -1468,7 +1468,7 @@ aiohttp = ["00d198585474299c9c3b4f1d5de1a576cc230d562abc5e4a0e81d71a20a6ca55", "
 alabaster = ["446438bdcca0e05bd45ea2de1668c1d9b032e1a9154c2c259092d77031ddd359", "a661d72d58e6ea8a57f7a86e37d86716863ee5e92788398526d58b26a4e4dc02"]
 appnope = ["5b26757dc6f79a3b7dc9fab95359328d5747fcb2409d331ea66d0272b90ab2a0", "8b995ffe925347a2138d7ac0fe77155e4311a0ea6d6da4f5128fe4b3cbe5ed71"]
 argh = ["a9b3aaa1904eeb78e32394cd46c6f37ac0fb4af6dc488daa58971bdc7d7fcaf3", "e9535b8c84dc9571a48999094fda7f33e63c3f1b74f3e5f3ac0105a58405bb65"]
-arrow = ["4bfacea734ead51495dc47df00421ecfd4ca1f2c0fbe58b9a26eaeddedc31caf", "67f8be7c0cf420424bc62d8d7dc40b44e4bb2f7b515f9cc2954fb36e35797656"]
+arrow = ["7954440e7621629a3e4c30dfd2038362d153e1e2b50424c7a6f10e1cdf211a7b", "c65ea9214403c77b09bd676cba3dcf1e0a396f5dfb316b811bb7f7e10d99e955"]
 asn1crypto = ["2f1adbb7546ed199e3c90ef23ec95c5cf3585bac7d11fb7eb562a3fe89c64e87", "9d5c20441baf0cb60a4ac34cc447c6c189024b6b4c6cd7877034f4965c464e49"]
 async-timeout = ["0c3c816a028d47f659d6ff5c745cb2acf1f966da1fe5c19c77a70282b25f4c5f", "4291ca197d287d274d0b6cb5d6f8f8f82d434ed288f962539ff18cc9012f9ea3"]
 asynctest = ["5da6118a7e6d6b54d83a8f7197769d046922a44d2a99c21382f0a6e4fadae676", "c27862842d15d83e6a34eb0b2866c323880eb3a75e4485b079ea11748fd77fac"]
