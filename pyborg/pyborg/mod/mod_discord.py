@@ -27,7 +27,7 @@ class PyborgDiscord(discord.Client):
     multi_server: str = attr.ib(default="localhost")
     registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
     aio_session: aiohttp.ClientSession = attr.ib(init=False)
- 
+
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
         try:

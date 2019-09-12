@@ -69,6 +69,7 @@ def cli_base(ctx, verbose, debug, my_version):
         # still do normal things via the named help even
         ctx.invoke(help)
 
+
 @cli_base.command()
 @click.pass_context
 def help(ctx):
@@ -82,10 +83,12 @@ def folder_info():
     print(folder)
     logger.debug("folder: this uses https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir and should work most of the time")
 
+
 @cli_base.group()
 def utils():
     "extra pyborg helper scripts"
     pass
+
 
 @utils.command("systemd")
 def yeet_systemd():
@@ -94,22 +97,26 @@ def yeet_systemd():
     init_systemd()
 
 # Discord utils
-    
+
+
 @utils.group("manage-discord")
 def discord_mgr():
     "run administrative tasks on the bot"
     pass
+
 
 @discord_mgr.command("ls")
 def list_discord_servers():
     "list servers pyborg is on w/ an addressable hash or ID"
     pass
 
+
 @discord_mgr.command("rm")
-@click.argument("server_id_partial", help="unique portion of the hash/ID")
+@click.argument("server_id_partial")
 def leave_discord_server(server_id_partial):
-    "leave the specified server"
+    "leave server matching SERVER_ID_PARTIAL"
     pass
+
 
 @discord_mgr.command("info")
 @click.argument("server_id_partial")
@@ -118,6 +125,7 @@ def info_discord_server(server_id_partial):
     pass
 
 # Brains!
+
 
 @cli_base.group()
 def brain():

@@ -33,12 +33,13 @@ import datetime
 import json
 import logging
 import os
-import random
+import marshal
 import re
 import sys
 import time
 import uuid
 import zipfile
+import random
 from random import randint
 from zlib import crc32
 from pathlib import Path
@@ -46,7 +47,6 @@ from typing import Dict, List, Any
 
 import attr
 import click
-import marshal
 import six
 import toml
 

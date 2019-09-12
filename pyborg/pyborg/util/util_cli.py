@@ -16,20 +16,21 @@ def mk_folder():
     except OSError:
         logger.info("pyborg folder already exists.")
 
-def init_systemd(unit_file="pyborg_out.service", packager="poetry", command="pyborg http"):
+
+def init_systemd(unit_file="pyborg_out.service", packager="poetry", command="pyborg http", wd=None):
     "setup systemd unit files for (new) pyborg prod deploys."
     config = configparser.ConfigParser()
 
     config["Unit"]['Description'] = "Pyborg multiplexing server"
     config["Unit"]['After'] = "network.target"
-
-    config['Service']['WorkingDirectory'] = wd
+    if wd:
+        config['Service']['WorkingDirectory'] = wd
     config['Service']['ExecStart'] = "{} run {}".format(packager, command)
     config['Service']['ExecReload'] = "/bin/kill -HUP $MAINPID"
     config['Service']['KillMode'] = "process"
     config['Service']['Restart'] = "on-failure"
     config['Service']['User'] = "pyborg"
 
-    config["Install"]["WantedBy"] = "multi-user.target"    
+    config["Install"]["WantedBy"] = "multi-user.target"
     with open(unit_file) as fp:
         config.write(fp)

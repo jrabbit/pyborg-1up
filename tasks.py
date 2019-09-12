@@ -99,5 +99,7 @@ def outdated(c):
 def lint(c, mypy=True):
     "style & type checks"
     if mypy:
-        c.run("poetry run  mypy pyborg/pyborg", warn=True)
+        print("mypy")
+        c.run("poetry run mypy pyborg/pyborg", warn=True)
+    print("flake8")
     c.run("poetry run flake8 --config=tox.ini --count pyborg", warn=True)

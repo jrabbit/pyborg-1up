@@ -1,8 +1,8 @@
 import logging
 import os
+from typing import List
 
 import bottle
-import six
 import click
 from bottle import request
 from pyborg.util.bottle_plugin import BottledPyborg
@@ -30,8 +30,6 @@ def learn(pyborg):
 @bottle.route("/reply", method="POST")
 def reply(pyborg):
     body = request.POST.getunicode("body")
-    if six.PY2:
-        body = body.decode("utf-8")
     logger.debug(type(body))
     return pyborg.reply(body)
 
@@ -46,9 +44,11 @@ def save(pyborg):
 def info(pyborg):
     return pyborg.ver_string, pyborg.brain_path
 
+
 @bottle.route("/info.json")
 def info2(pyborg):
     return {"version_string": pyborg.ver_string, "brain": pyborg.brain_path}
+
 
 @bottle.route("/stats", method="POST")
 def stats(pyborg):
@@ -65,7 +65,7 @@ class DumbyIOMod(object):
 
     commandlist = ""
     message = None
-    messages = []  # New for multi-line output
+    messages: List[str] = []  # New for multi-line output
 
     def output(self, message, args):
         self.messages.append(message)
@@ -76,8 +76,6 @@ class DumbyIOMod(object):
 @bottle.route("/process", method="POST")
 def process(pyborg):
     body = request.POST.getunicode("body")
-    if six.PY3:
-        reply_rate = int(request.POST.get("reply_rate"))
     reply_rate = int(request.POST.get("reply_rate"))
     learning = int(request.POST.get("learning"))
     owner = int(request.POST.get("owner"))
