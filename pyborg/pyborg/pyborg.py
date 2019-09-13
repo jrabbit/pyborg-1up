@@ -1265,7 +1265,10 @@ class pyborg(object):
             Learn from a sentence.
             """
             logger.debug("entering learn_line")
-            words = body.split()
+            if nltk:
+                words = nltk.word_tokenize(body)
+            else:
+                words = body.split()
             # Ignore sentences of < 1 words XXX was <3
             if len(words) < 1:
                 return
