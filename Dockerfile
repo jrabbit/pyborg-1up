@@ -4,11 +4,13 @@ LABEL maintainer "jackjrabbit@gmail.com"
 
 RUN mkdir -p /usr/src/pyborg
 
-COPY pyproject.toml poetry.lock /usr/src/
+COPY pyproject.toml poetry.lock /usr/src/app/
 
-COPY pyborg /usr/src/pyborg
+COPY . /usr/src/app
 
-WORKDIR /usr/src/
+WORKDIR /usr/src/app
+
+RUN apt update && apt install -y enchant && rm -rf /var/cache/apt
 
 RUN pip install poetry && poetry install -v
 

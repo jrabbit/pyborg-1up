@@ -41,8 +41,8 @@ lxml = "^4.3"
 attrs = "^19.1"
 statsd = "^3.3"
 prompt_toolkit = "^2.0"
-"discord.py" = {version = "^1.2", python =">= 3.6"}
-"aeidon" = {version = "^1.2.1", python =">= 3.6"}
+"discord.py" = "^1.2"
+"aeidon" = "^1.2.1"
 irc = "^17"
 aiohttp = "*"
 tox = "^3.13.2"
@@ -53,13 +53,13 @@ green = "*"
 coverage = "*"
 sphinx-click = "^2.2"
 click = "^7.0"
-sphinx-autobuild = {version = "^0.7.1", python = ">= 3.6"}
+sphinx-autobuild = "^0.7.1"
 mypy = {version = "*", python = ">= 3.7"}
 flake8 = "^3.7"
 invoke = "^1.2"
 fabric2 = "^2.4"
-asynctest = {version = "^0.13.0", python = ">= 3.6"}
-ipython = {version = "^7.6", python = ">= 3.6"}
+asynctest = "^0.13.0"
+ipython = "^7.6"
 docutils = "^0.15"
 pylint = "^2.3.1"
 
