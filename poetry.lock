@@ -1,7 +1,6 @@
 [[package]]
 category = "main"
 description = "aeidon is a Python package for reading, writing and manipulating text-based subtitle files. It is used by the gaupol package, which provides a subtitle editor with a GTK+ user interface."
-marker = "python_version >= \"3.6\""
 name = "aeidon"
 optional = false
 python-versions = ">=3.5,<4.0"
@@ -63,7 +62,7 @@ version = "0.7.12"
 [[package]]
 category = "dev"
 description = "Disable App Nap on OS X 10.9"
-marker = "python_version >= \"3.6\" and sys_platform == \"darwin\""
+marker = "sys_platform == \"darwin\""
 name = "appnope"
 optional = false
 python-versions = "*"
@@ -72,7 +71,6 @@ version = "0.1.0"
 [[package]]
 category = "dev"
 description = "An unobtrusive argparse wrapper with natural syntax"
-marker = "python_version >= \"3.6\""
 name = "argh"
 optional = false
 python-versions = "*"
@@ -122,7 +120,6 @@ version = "3.0.1"
 [[package]]
 category = "dev"
 description = "Enhance the standard unittest package with features for testing asyncio libraries"
-marker = "python_version >= \"3.6\""
 name = "asynctest"
 optional = false
 python-versions = ">=3.5"
@@ -155,7 +152,6 @@ pytz = ">=2015.7"
 [[package]]
 category = "dev"
 description = "Specifications for callback functions passed in to an API"
-marker = "python_version >= \"3.6\""
 name = "backcall"
 optional = false
 python-versions = "*"
@@ -266,7 +262,6 @@ version = "4.4.0"
 [[package]]
 category = "main"
 description = "A python wrapper for the Discord API"
-marker = "python_version >= \"3.6\""
 name = "discord.py"
 optional = false
 python-versions = ">=3.5.3"
@@ -375,7 +370,7 @@ version = "2.8"
 [[package]]
 category = "main"
 description = "Patch ssl.match_hostname for Unicode(idna) domains support"
-marker = "python_version >= \"3.6\" and python_version < \"3.7\" or python_version < \"3.7\""
+marker = "python_version < \"3.7\""
 name = "idna-ssl"
 optional = false
 python-versions = "*"
@@ -426,7 +421,6 @@ version = "1.3.0"
 [[package]]
 category = "dev"
 description = "IPython: Productive Interactive Computing"
-marker = "python_version >= \"3.6\""
 name = "ipython"
 optional = false
 python-versions = ">=3.5"
@@ -459,7 +453,6 @@ test = ["nose (>=0.10.1)", "requests", "testpath", "pygments", "nbformat", "ipyk
 [[package]]
 category = "dev"
 description = "Vestigial utilities from IPython"
-marker = "python_version >= \"3.6\""
 name = "ipython-genutils"
 optional = false
 python-versions = "*"
@@ -616,7 +609,6 @@ testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs", "pytest-flake8
 [[package]]
 category = "dev"
 description = "An autocompletion tool for Python that can be used for text editors."
-marker = "python_version >= \"3.6\""
 name = "jedi"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
@@ -653,7 +645,6 @@ version = "1.4.2"
 [[package]]
 category = "dev"
 description = "Python LiveReload is an awesome tool for web developers"
-marker = "python_version >= \"3.6\""
 name = "livereload"
 optional = false
 python-versions = "*"
@@ -801,7 +792,6 @@ gssapi = ["pyasn1 (>=0.1.7)", "gssapi (>=1.4.1)", "pywin32 (>=2.1.8)"]
 [[package]]
 category = "dev"
 description = "A Python Parser"
-marker = "python_version >= \"3.6\""
 name = "parso"
 optional = false
 python-versions = "*"
@@ -813,7 +803,6 @@ testing = ["docopt", "pytest (>=3.0.7)"]
 [[package]]
 category = "dev"
 description = "File system general utilities"
-marker = "python_version >= \"3.6\""
 name = "pathtools"
 optional = false
 python-versions = "*"
@@ -830,7 +819,7 @@ version = "5.4.3"
 [[package]]
 category = "dev"
 description = "Pexpect allows easy control of interactive console applications."
-marker = "python_version >= \"3.6\" and sys_platform != \"win32\""
+marker = "sys_platform != \"win32\""
 name = "pexpect"
 optional = false
 python-versions = "*"
@@ -842,7 +831,6 @@ ptyprocess = ">=0.5"
 [[package]]
 category = "dev"
 description = "Tiny 'shelve'-like database with concurrency support"
-marker = "python_version >= \"3.6\""
 name = "pickleshare"
 optional = false
 python-versions = "*"
@@ -867,7 +855,6 @@ dev = ["pre-commit", "tox"]
 [[package]]
 category = "dev"
 description = "Utility that helps with local TCP ports managment. It can find an unused TCP localhost port and remember the association."
-marker = "python_version >= \"3.6\""
 name = "port-for"
 optional = false
 python-versions = "*"
@@ -915,7 +902,7 @@ wcwidth = "*"
 [[package]]
 category = "dev"
 description = "Run a subprocess in a pseudo terminal"
-marker = "python_version >= \"3.6\" and sys_platform != \"win32\""
+marker = "sys_platform != \"win32\""
 name = "ptyprocess"
 optional = false
 python-versions = "*"
@@ -962,7 +949,6 @@ version = "2.19"
 [[package]]
 category = "main"
 description = "Python bindings for the Enchant spellchecking system"
-marker = "python_version >= \"3.6\""
 name = "pyenchant"
 optional = false
 python-versions = "*"
@@ -1072,7 +1058,6 @@ version = "2019.2"
 [[package]]
 category = "dev"
 description = "YAML parser and emitter for Python"
-marker = "python_version >= \"3.6\""
 name = "pyyaml"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
@@ -1161,7 +1146,6 @@ test = ["pytest", "pytest-cov", "html5lib", "flake8 (>=3.5.0)", "flake8-import-o
 [[package]]
 category = "dev"
 description = "Watch a Sphinx directory and rebuild the documentation when a change is detected. Also includes a livereload enabled web server."
-marker = "python_version >= \"3.6\""
 name = "sphinx-autobuild"
 optional = false
 python-versions = "*"
@@ -1290,7 +1274,6 @@ version = "0.10.0"
 [[package]]
 category = "dev"
 description = "Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed."
-marker = "python_version >= \"3.6\""
 name = "tornado"
 optional = false
 python-versions = ">= 3.5"
@@ -1324,7 +1307,6 @@ testing = ["freezegun (>=0.3.11,<1)", "pathlib2 (>=2.3.3,<3)", "pytest (>=4.0.0,
 [[package]]
 category = "dev"
 description = "Traitlets Python config system"
-marker = "python_version >= \"3.6\""
 name = "traitlets"
 optional = false
 python-versions = "*"
@@ -1364,7 +1346,7 @@ version = "1.4.0"
 [[package]]
 category = "main"
 description = "Type Hints for Python"
-marker = "python_version >= \"3.6\" and python_version < \"3.7\" or python_version < \"3.7\" or python_version >= \"3.7\""
+marker = "python_version < \"3.7\" or python_version >= \"3.7\""
 name = "typing"
 optional = false
 python-versions = "*"
@@ -1373,7 +1355,7 @@ version = "3.7.4.1"
 [[package]]
 category = "main"
 description = "Backported and Experimental Type Hints for Python 3.5+"
-marker = "python_version >= \"3.6\" and python_version < \"3.7\" or python_version < \"3.7\" or python_version >= \"3.7\""
+marker = "python_version < \"3.7\" or python_version >= \"3.7\""
 name = "typing-extensions"
 optional = false
 python-versions = "*"
@@ -1441,7 +1423,6 @@ testing = ["pytest (>=4.0.0,<5)", "coverage (>=4.5.0,<5)", "pytest-timeout (>=1.
 [[package]]
 category = "dev"
 description = "Filesystem events monitoring"
-marker = "python_version >= \"3.6\""
 name = "watchdog"
 optional = false
 python-versions = "*"
@@ -1474,7 +1455,6 @@ six = "*"
 [[package]]
 category = "main"
 description = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
-marker = "python_version >= \"3.6\""
 name = "websockets"
 optional = false
 python-versions = ">=3.4"
@@ -1516,7 +1496,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "ba84f9a9b53dc23cebe8a5699dbdf95a09fa18b64a4435ff77dfd8fa6bd8fea5"
+content-hash = "3dd4e149de82cf62f53977b2061209ee38ef14478f8c638aabf7c7ab0dcfeb58"
 python-versions = "^3.6"
 
 [metadata.hashes]
