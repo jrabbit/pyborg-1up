@@ -170,7 +170,7 @@ class TestPyborgParsesQuestions(unittest.TestCase):
         our_pyb.learn("where is the grand nagus?")
         self.assertIn("nagus", our_pyb.words)
         self.assertIn("the", our_pyb.words)
-        self.assertNotIn("nagus?", our_pyb.wordsp)
+        self.assertNotIn("nagus?", our_pyb.words)
 
 @mock.patch("toml.load")
 class TestPyborgUnlearnWord(unittest.TestCase):
