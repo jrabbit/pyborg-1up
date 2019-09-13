@@ -47,7 +47,7 @@ irc = "^17"
 aiohttp = "*"
 tox = "^3.13.2"
 aiodns = "^2.0.0"
-
+nltk = {version = "^3.4.5", extras = ["nlp"]}
 [tool.poetry.dev-dependencies]
 green = "*"
 coverage = "*"

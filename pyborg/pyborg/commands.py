@@ -3,7 +3,6 @@ import logging
 import requests
 
 import pyborg
-
 from .util.irc import command
 
 
