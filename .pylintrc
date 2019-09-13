@@ -258,6 +258,7 @@ good-names=i,
            _,
            e,
            logger,
+           folder,
            ob
 
 # Include a hint for the correct naming format with invalid-name.

@@ -14,7 +14,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-class Registry(object):
+class Registry():
     """Command registry of decorated pyborg commands"""
 
     def __init__(self, mod_irc):

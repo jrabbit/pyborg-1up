@@ -495,15 +495,13 @@ def reddit(conf_file):
 @click.option("--multiplex", default=True, type=click.BOOL)
 def linein(multiplex):
     "This is a commandline repl for interacting with pyborg locally"
-
     my_pyborg = pyborg.pyborg.pyborg
     try:
         mod = ModLineIn(my_pyborg, multiplex)
     except SystemExit:
-        pass
-    if not multiplex:
-        mod.save()
-
+        if not multiplex:
+            mod.save()
+        raise
 
 @cli_base.command()
 def version():

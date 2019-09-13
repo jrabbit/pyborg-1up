@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 @attr.s
-class ModFileIn(object):
+class ModFileIn():
     multiplexing = attr.ib()
     multi_server = attr.ib(default="localhost")
 
