@@ -47,7 +47,6 @@ from typing import Dict, List, Any
 
 import attr
 import click
-import six
 import toml
 
 from pyborg.util.util_cli import mk_folder
@@ -63,8 +62,7 @@ except ImportError:
     nltk = None
     logger.debug("No nltk, won't be using advanced part of speech tagging.")
 
-if six.PY3:
-    xrange = range
+xrange = range
 
 
 def filter_message(message, bot):
@@ -315,10 +313,7 @@ class pyborg(object):
         # folder = click.get_app_dir("Pyborg")
         logger.debug("Trying to open brain %s", brain_path)
         with open(brain_path) as f:
-            if six.PY2:
-                raw_json = f.read().decode('utf-8', 'replace')
-            elif six.PY3:
-                raw_json = f.read()
+            raw_json = f.read()
         logger.debug(raw_json)
         try:
             brain = json.loads(raw_json)
@@ -1256,12 +1251,7 @@ class pyborg(object):
             if self._is_censored(w):
                 logger.debug("word in sentence: %s***%s is censored. escaping.", (w[0], w[-1]))
                 return None
-        if six.PY2:
-            sentence_list = [x.decode('utf-8') for x in sentence]
-            # return as string..
-            final = u"".join(sentence_list)
-        else:
-            final = "".join(sentence)
+        final = "".join(sentence)
         return final
 
     def learn(self, body, num_context=1):
@@ -1325,12 +1315,9 @@ class pyborg(object):
 
             # Hash collisions we don't care about. 2^32 is big :-)
             # Ok so this takes a bytes object... in python3 thats a pain
-            if six.PY3:
-                cleanbody_b = bytes(cleanbody, "utf-8")
-                # ok so crc32 got changed in 3...
-                hashval = crc32(cleanbody_b) & 0xffffffff
-            else:
-                hashval = crc32(cleanbody) & 0xffffffff
+            cleanbody_b = bytes(cleanbody, "utf-8")
+            # ok so crc32 got changed in 3...
+            hashval = crc32(cleanbody_b) & 0xffffffff
 
             logger.debug(hashval)
             # Check context isn't already known
