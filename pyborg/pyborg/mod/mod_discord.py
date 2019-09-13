@@ -10,7 +10,7 @@ import toml
 import venusian
 import attr
 
-import pyborg.commands
+import pyborg.commands as builtin_commands
 from pyborg.util.awoo import normalize_awoos
 
 
@@ -191,7 +191,7 @@ class PyborgDiscord(discord.Client):
         "turn off the bot"
         await self.aio_session.close()
 
-    def scan(self, module: ModuleType = pyborg.commands) -> None:
+    def scan(self, module: ModuleType = builtin_commands) -> None:
         "look for commands to add to registry"
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
