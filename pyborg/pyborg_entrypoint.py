@@ -464,12 +464,7 @@ def filein(multiplex, input_file):
 @cli_base.command()
 @click.option("--conf-file", default=os.path.join(folder, "discord.toml"))
 def discord(conf_file):
-    "Run the discord client (needs python3)"
-    if sys.version_info <= (3,):
-        print(
-            "You are trying to run the discord mod under python 2. \nThis won't work. Please use python 3 (3.6+)."
-        )
-        sys.exit(6)
+    "Run the discord client"
     bot = PyborgDiscord(conf_file)
     try:
         bot.our_start()

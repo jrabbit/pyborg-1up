@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-import sys
 import glob
 from os import path
 
@@ -9,17 +8,14 @@ from pyborg import __version__
 
 
 this_directory = path.abspath(path.dirname(__file__))
-if sys.version_info >= (3,):
-    with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
-        long_description = f.read()
-else:
-    # do python2
-    with open(path.join(this_directory, "README.md")) as f:
-        long_description = f.read()
+
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 requires = [
-    "irc>=15.1.1<17",  # 17 is py3 only
+    "irc",
     "toml",
-    "arrow>=0.10.0",
+    "arrow",
     "PyTumblr",
     "requests",
     "bottle",
@@ -33,8 +29,8 @@ requires = [
     "attrs",
     "statsd",
     "prompt_toolkit",
-    "discord.py;python_version>='3'",
-    "aeidon;python_version>='3'",
+    "discord.py",
+    "aeidon",
 ]
 setup(
     name="pyborg",
@@ -58,7 +54,6 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Topic :: Communications :: Chat :: Internet Relay Chat",
         "Topic :: Games/Entertainment",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
