@@ -5,3 +5,5 @@ pyborg/build
 docs/
 misc/
 .mypy_cache/
+archive.zip
+dist

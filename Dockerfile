@@ -12,6 +12,6 @@ WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 
-RUN pip install poetry && poetry install -v
+RUN pip install poetry && poetry install --no-dev -v
 
 CMD ["poetry", "run", "pyborg", "linein", "--multiplex", "false"]
