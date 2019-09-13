@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import sys
 import unittest
 from unittest import mock
 from functools import partial

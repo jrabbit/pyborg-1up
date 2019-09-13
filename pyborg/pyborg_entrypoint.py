@@ -12,12 +12,13 @@ import os
 
 import click
 import humanize
-import pyborg
-import pyborg.pyborg
 import requests
 import six
 import toml
 from mastodon import Mastodon
+
+import pyborg
+import pyborg.pyborg
 from pyborg.mod.mod_http import bottle
 from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_linein import ModLineIn
@@ -70,9 +71,9 @@ def cli_base(ctx, verbose, debug, my_version):
         ctx.invoke(help)
 
 
-@cli_base.command()
+@cli_base.command("help")
 @click.pass_context
-def help(ctx):
+def local_help(ctx):
     """Show this message and exit."""
     print(ctx.parent.get_help())
 

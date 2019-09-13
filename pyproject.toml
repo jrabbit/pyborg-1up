@@ -62,6 +62,7 @@ asynctest = "^0.13.0"
 ipython = "^7.6"
 docutils = "^0.15"
 pylint = "^2.3.1"
+bandit = "^1.6.2"
 
 [tool.black]
 line-length = 140

@@ -55,8 +55,8 @@ def docs(c):
 
 @task
 def test(c):
-    "this runs tox, just use tox :)"
-    c.run("tox")
+    "this runs tox"
+    c.run("poetry run tox -r")
 
 
 @task

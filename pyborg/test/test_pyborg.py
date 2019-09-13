@@ -1,14 +1,14 @@
 import logging
 import unittest
+from unittest import mock
 
 import pyborg.pyborg
 from pyborg.mod.mod_http import DumbyIOMod
 
-from unittest import mock
 
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 
 class TestPyborgInit(unittest.TestCase):
@@ -158,6 +158,19 @@ class TestPyborgLearning(unittest.TestCase):
         print(our_pyb)
         self.assertNotEqual(len(our_pyb.words), 0)
 
+class TestPyborgParsesQuestions(unittest.TestCase):
+    "check if pyborg keeps punctuation on the word or not"
+
+    @mock.patch("toml.load")
+    def test_parse_question(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path-like")
+        our_pyb.learn("the grand nagus")
+        our_pyb.learn("who is the grand nagus")
+        our_pyb.learn("where is the grand nagus?")
+        self.assertIn("nagus", our_pyb.words)
+        self.assertIn("the", our_pyb.words)
+        self.assertNotIn("nagus?", our_pyb.wordsp)
 
 @mock.patch("toml.load")
 class TestPyborgUnlearnWord(unittest.TestCase):
