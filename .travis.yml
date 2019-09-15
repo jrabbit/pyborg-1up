@@ -8,7 +8,7 @@ python:
 
 install: 
     - pip install tox-travis nltk
-    - python -c "import nltk; map(nltk.download, ['punkt' ,'averaged_perceptron_tagger'])"
+    - python -c "import nltk; any(map(nltk.download, ['punkt' ,'averaged_perceptron_tagger']))"
 
 script: tox
 addons:
