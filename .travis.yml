@@ -18,6 +18,7 @@ addons:
 cache:
   directories:
     - $HOME/.cache/pypoetry/cache
+    - $HOME/nltk_data
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
