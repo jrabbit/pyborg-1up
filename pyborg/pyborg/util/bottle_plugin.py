@@ -5,7 +5,7 @@ from pyborg.pyborg import pyborg
 
 
 @attr.s
-class BottledPyborg(object):
+class BottledPyborg():
     brain_path = attr.ib()
     name = "bottled_pyborg"
     api = 2
