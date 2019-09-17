@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import asyncio
 import collections
 import datetime
 import json
@@ -9,6 +10,8 @@ import shutil
 import struct
 import sys
 import os
+from typing import Callable
+
 
 import click
 import humanize
@@ -68,7 +71,7 @@ def cli_base(ctx, verbose, debug, my_version):
         ctx.exit()
     elif ctx.invoked_subcommand is None:
         # still do normal things via the named help even
-        ctx.invoke(help)
+        ctx.invoke(local_help)
 
 
 @cli_base.command("help")
@@ -105,19 +108,45 @@ def discord_mgr():
     "run administrative tasks on the bot"
     pass
 
+def _eris(f: Callable, debug=False) -> None:
+    "wrangle discord"
+    conf = os.path.join(folder, "discord.toml")
+    loop = asyncio.new_event_loop()
+    # can we get the ctx/debug status?
+    if debug:
+        loop.set_debug(True)
+    asyncio.set_event_loop(loop)
+    our_discord_client = PyborgDiscord(conf, loop=loop)
+    t = asyncio.gather(our_discord_client.fancy_login(), asyncio.ensure_future(f(our_discord_client)),our_discord_client.teardown(), loop=loop)
+    loop.run_until_complete(t)
+    loop.close()
 
 @discord_mgr.command("ls")
 def list_discord_servers():
     "list servers pyborg is on w/ an addressable hash or ID"
-    pass
+
+    async def list_inner(dc):
+        await asyncio.sleep(1)
+        async for guild in dc.fetch_guilds(limit=100):
+            print(guild, guild.id)
+
+    _eris(list_inner)
 
 
 @discord_mgr.command("rm")
 @click.argument("server_id_partial")
 def leave_discord_server(server_id_partial):
     "leave server matching SERVER_ID_PARTIAL"
-    pass
 
+    async def leave_inner(dc):
+        guild_id = server_id_partial
+        await asyncio.sleep(1)
+        g = await dc.fetch_guild(guild_id)
+        if click.confirm(f"do you want to leave {g}?"):
+            # await confirmed_guild.leave()
+            pass
+
+    _eris(leave_inner)
 
 @discord_mgr.command("info")
 @click.argument("server_id_partial")
@@ -138,9 +167,9 @@ def brain():
 def list_brains():
     "print out the pyborg brains (pybrain.json)s info"
     print(os.path.join(folder, "brains") + ":")
-    for x in os.listdir(os.path.join(folder, "brains")):
-        brain_size = os.path.getsize(os.path.join(folder, "brains", x))
-        print("\t {0} {1}".format(x, humanize.naturalsize(brain_size)))
+    for brain_name in os.listdir(os.path.join(folder, "brains")):
+        brain_size = os.path.getsize(os.path.join(folder, "brains", brain_name))
+        print("\t {0} {1}".format(brain_name, humanize.naturalsize(brain_size)))
 
 
 @brain.command()

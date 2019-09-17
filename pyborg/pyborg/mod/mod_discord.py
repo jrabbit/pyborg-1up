@@ -1,5 +1,6 @@
 import re
 import logging
+import collections.abc
 from functools import partial
 from typing import Dict, Union, List, Callable
 from types import ModuleType
@@ -30,6 +31,7 @@ class PyborgDiscord(discord.Client):
     aio_session: aiohttp.ClientSession = attr.ib(init=False)
     pyborg = attr.ib(default=None)
     scanner = attr.ib(default=None)
+    loop = attr.ib(default=None)
     settings: Dict = attr.ib(default=None)
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
@@ -46,7 +48,7 @@ class PyborgDiscord(discord.Client):
         else:
             self.pyborg = None
         self.aio_session = aiohttp.ClientSession()
-        super().__init__()
+        super().__init__(loop=self.loop) # this might create a asyncio.loop!
 
     def our_start(self) -> None:
         self.scan()
@@ -54,7 +56,11 @@ class PyborgDiscord(discord.Client):
             self.run(self.settings['discord']['token'])
         else:
             logger.error("No Token. Set one in your conf file.")
-
+    async def fancy_login(self):
+        if 'token' in self.settings['discord']:
+            await self.login(self.settings['discord']['token'])
+        else:
+            logger.error("No Token. Set one in your conf file.")
     async def on_ready(self) -> None:
         print('Logged in as')
         print(self.user.name)
@@ -79,6 +85,7 @@ class PyborgDiscord(discord.Client):
             logger.info(incoming_message)
             return incoming_message
         else:
+            # this can be a fancy nitro emoji.
             logger.info("_extract_emoji:someone did a fucky wucky")
             logger.debug("_extract_emoji:OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!")
             return msg
@@ -196,6 +203,8 @@ class PyborgDiscord(discord.Client):
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
 
+class CommandInternal(collections.abc.Callable):
+    pass_msg: bool = False
 
 class Registry():
     """Command registry of decorated pyborg commands"""
