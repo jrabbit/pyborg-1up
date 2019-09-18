@@ -1,6 +1,5 @@
 import re
 import logging
-import collections.abc
 from functools import partial
 from typing import Dict, Union, List, Callable
 from types import ModuleType
@@ -33,6 +32,7 @@ class PyborgDiscord(discord.Client):
     scanner = attr.ib(default=None)
     loop = attr.ib(default=None)
     settings: Dict = attr.ib(default=None)
+
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
         try:
@@ -51,16 +51,20 @@ class PyborgDiscord(discord.Client):
         super().__init__(loop=self.loop) # this might create a asyncio.loop!
 
     def our_start(self) -> None:
+        "launch discord.Client main event loop (calls Client.run)"
+
         self.scan()
         if 'token' in self.settings['discord']:
             self.run(self.settings['discord']['token'])
         else:
             logger.error("No Token. Set one in your conf file.")
+
     async def fancy_login(self):
         if 'token' in self.settings['discord']:
             await self.login(self.settings['discord']['token'])
         else:
             logger.error("No Token. Set one in your conf file.")
+
     async def on_ready(self) -> None:
         print('Logged in as')
         print(self.user.name)
@@ -203,8 +207,6 @@ class PyborgDiscord(discord.Client):
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
 
-class CommandInternal(collections.abc.Callable):
-    pass_msg: bool = False
 
 class Registry():
     """Command registry of decorated pyborg commands"""
@@ -214,7 +216,7 @@ class Registry():
 
     def __str__(self):
         return f"{self.mod} command registry with {len(self.registered.keys())}"
-    
+
     def add(self, name: str, ob: Callable, internals: bool, pass_msg: bool) -> None:
         "add command to the registry. takes two config options."
         self.registered[name] = ob
