@@ -435,7 +435,7 @@ class pyborg(object):
                     for z in self.settings.aliases.keys():
                         for alias in self.settings.aliases[z]:
                             pattern = "^%s$" % alias
-                            if self.re.search(pattern, x):
+                            if re.search(pattern, x):
                                 logger.info("replace %s with %s" % (x, z))
                                 self.replace(x, z)
 
