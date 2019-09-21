@@ -129,7 +129,7 @@ def list_discord_servers():
         await asyncio.sleep(1)
         async for guild in dc.fetch_guilds(limit=100):
             print(guild, guild.id)
-green
+
     _eris(list_inner)
 
 

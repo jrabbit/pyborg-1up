@@ -400,7 +400,7 @@ class pyborg(object):
         try:
             self.words, self.lines = self.load_brain_json(self.brain_path)
         except (EOFError, IOError) as e:
-            # Create mew database
+            # Create new database
             self.words = {}
             self.lines = {}
             logger.error(e)
@@ -573,7 +573,7 @@ class pyborg(object):
 
     def do_commands(self, io_module, body, args, owner):
         """
-        Respond to user comands.
+        Respond to user commands.
         """
         msg = ""
         command_list = body.split()
