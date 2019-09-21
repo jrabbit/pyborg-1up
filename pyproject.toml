@@ -47,7 +47,8 @@ irc = "^17"
 aiohttp = "*"
 tox = "^3.13.2"
 aiodns = "^2.0.0"
-nltk = {version = "^3.4.5", extras = ["nlp"]}
+nltk = {version = "^3.4.5", optional = true}
+
 [tool.poetry.dev-dependencies]
 green = "*"
 coverage = "*"
@@ -63,6 +64,9 @@ ipython = "^7.6"
 docutils = "^0.15"
 pylint = "^2.3.1"
 bandit = "^1.6.2"
+
+[tool.poetry.extras]
+nlp = ["nltk"]
 
 [tool.black]
 line-length = 140

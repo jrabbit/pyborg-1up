@@ -5,6 +5,10 @@ from unittest import mock
 import pyborg.pyborg
 from pyborg.mod.mod_http import DumbyIOMod
 
+try:
+    import nltk
+except ImportError:
+    nltk = None
 
 logger = logging.getLogger(__name__)
 
@@ -158,6 +162,7 @@ class TestPyborgLearning(unittest.TestCase):
         print(our_pyb)
         self.assertNotEqual(len(our_pyb.words), 0)
 
+@unittest.skipIf(not nltk, "advanced lexing uses nltk, install the `nlp` extra.")
 class TestPyborgParsesQuestions(unittest.TestCase):
     "check if pyborg keeps punctuation on the word or not"
 
