@@ -1,4 +1,4 @@
-﻿Pyborg is a markov chain bot for irc that generates replies based on messages and it's database.
+﻿Pyborg is a markov chain bot for many protocols (Discord, IRC, Twitter, etc.) that generates replies based on messages and it's database.
 
 
 [![codecov status](https://codecov.io/gh/jrabbit/pyborg-1up/branch/master/graph/badge.svg)](https://codecov.io/gh/jrabbit/pyborg-1up)
@@ -46,10 +46,3 @@ Suggested NLTK data
 -------------------
 
 Pyborg can use nltk tagging and tokenizing when installed and configured. Tagging requires `averaged_perceptron_tagger` and tokenization requires `punkt`.
-
-
-Todo:
------
-
-* spelling or better heuristics
-* graphing and visualization of the database
