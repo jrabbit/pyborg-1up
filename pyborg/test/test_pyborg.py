@@ -153,7 +153,7 @@ class TestPyborgLearning(unittest.TestCase):
     @mock.patch("toml.load")
     def test_functional_learn(self, patched_toml, patched_json):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
-        with open("./fixtures/small.brain.pyborg.json") as f:
+        with open("python/test/fixtures/small.brain.pyborg.json") as f:
             patched_json.return_value = f.read()
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
         our_pyb.learn("Read a book, any book - Trotskist Proverb")
