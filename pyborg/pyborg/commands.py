@@ -48,3 +48,8 @@ def known(multiplex, multi_server, msg=None):
 @command()
 def blap():
     return "https://sexyferret.science/blap/its_good_to_be_sad.gif"
+
+
+@command()
+def spray():
+    return "https://sexyferret.science/blap/spray.gif"
