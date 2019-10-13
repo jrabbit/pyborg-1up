@@ -11,7 +11,7 @@ import struct
 import sys
 import os
 from typing import Callable, List, Union
-from discord import Guild
+from discord import Guild, Client
 
 import click
 import humanize
@@ -123,7 +123,6 @@ def _eris(f: Callable, debug=False) -> None:
     our_discord_client = PyborgDiscord(conf, loop=loop)
     t = asyncio.gather(our_discord_client.fancy_login(), asyncio.ensure_future(f(our_discord_client)),our_discord_client.teardown(), loop=loop)
     loop.run_until_complete(t)
-    loop.close()
 
 @discord_mgr.command("ls")
 def list_discord_servers():
@@ -135,24 +134,26 @@ def list_discord_servers():
             try:
                 print(guild, guild.id)
             except:
-                logger.exception("had discord api issue probably")
+                logger.exception("manage-discord: had discord api issue probably")
     _eris(list_inner)
 
 
-class BadDiscordServerFragement(BaseException):
+class BadDiscordServerFragement(Exception):
     pass
 
 
-async def resolve_guild(guilds: List[Guild], search_term: Union[int, str]) -> Guild:
-    for g in guilds:
+async def resolve_guild(dc: Client, search_term: Union[int, str]) -> Guild:
+    for g in dc.guilds:
+        print(g)
         if search_term.isdigit():
             if g.id == int(search_term):
                 return g
         if g.id.startswith(search_term):
             return g
-        if search_term in g.name:
+        if search_term in str(g):
             return g
-    raise BadDiscordServerFragement(search_term, g)
+    return False
+    # raise BadDiscordServerFragement(search_term)
 
 
 
@@ -163,12 +164,31 @@ def leave_discord_server(server_id_partial):
 
     async def leave_inner(dc):
         await asyncio.sleep(1)
-        guild_id = await resolve_guild(dc.guilds, server_id_partial)
-        g = await dc.fetch_guild(guild_id)
-        if click.confirm(f"do you want to leave {g}?"):
-            await g.leave()
+        guild_id = await resolve_guild(dc, server_id_partial)
+        logger.info("got %s", guild_id)
+        if guild_id:
+            g = await dc.fetch_guild(guild_id)
+            if click.confirm(f"do you want to leave {g}?"):
+                await g.leave()
+        else:
+            logger.error("manage-discord: Don't know what you meant?")
 
     _eris(leave_inner)
+
+@discord_mgr.command("i-rm")
+def interactive_leave_discord_server():
+    "offers to leave servers one-by-one"
+
+    async def leave_interactive_inner(dc):
+        await asyncio.sleep(1)
+        async for guild in dc.fetch_guilds(limit=100):
+            if click.confirm(f"do you want to leave {guild}?"):
+                await guild.leave()
+            else:
+                print("ok, next...")
+
+    _eris(leave_interactive_inner)
+
 
 
 @discord_mgr.command("info")
@@ -178,8 +198,11 @@ def info_discord_server(server_id_partial):
 
     async def info_inner(dc):
         await asyncio.sleep(1)
-        g = await resolve_guild(dc.guilds, server_id_partial)
-        print(g, g.id, g.me.display_name, g.member_count)
+        g = await resolve_guild(dc, server_id_partial)
+        if g:
+            print(g, g.id, g.me.display_name, g.member_count)
+        else:
+            logger.error("manage-discord: Didn't resolve a guild.")
 
     _eris(info_inner)
 
