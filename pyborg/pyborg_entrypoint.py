@@ -132,8 +132,10 @@ def list_discord_servers():
     async def list_inner(dc):
         await asyncio.sleep(1)
         async for guild in dc.fetch_guilds(limit=100):
-            print(guild, guild.id, guild.me.display_name)
-
+            try:
+                print(guild, guild.id, guild.me.display_name)
+            except:
+                logger.exception()
     _eris(list_inner)
 
 
