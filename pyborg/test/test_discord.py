@@ -3,6 +3,7 @@ import logging
 import unittest
 from unittest import mock
 from functools import partial
+from pathlib import Path
 
 import asynctest
 
@@ -28,7 +29,7 @@ class TestOnMessage(asynctest.TestCase):
         msg.content = "Yolo!"
         patched_reply.return_value = ""
         patched_user.mentioned_in.return_value = False
-        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
+        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
 
         self.loop.run_until_complete(self.our_pybd.on_message(msg))
         patched_reply.assert_not_called()
@@ -48,7 +49,7 @@ class TestOnMessage(asynctest.TestCase):
         patched_reply.return_value = "I should play dota!"
         patched_reply.replace.return_value = "I should play dota!"
 
-        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
+        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
         self.loop.run_until_complete(self.our_pybd.on_message(msg))
         patched_learn.assert_called_once_with(patched_normalize.return_value)
         patched_reply.assert_called_once_with(patched_normalize.return_value)
@@ -69,7 +70,7 @@ class TestOnMessage(asynctest.TestCase):
         patched_reply.return_value = "I should play dota! #nick"
         patched_reply.replace.return_value = "I should play dota! <@42303631157544375>"
 
-        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
+        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
         self.our_pybd.send_message = do_nothing
         self.our_pybd.send_typing = partial(do_nothing, "bogus_arg")
 
@@ -88,7 +89,7 @@ class TestPlaintexPing(unittest.TestCase):
     def setUp(self):
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
-        self.pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
+        self.pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
 
     def tearDown(self):
         self.loop.close()
@@ -129,7 +130,7 @@ class TestCustomEmojis(unittest.TestCase):
         # patched_normalize.return_value = 'attempt <:weedminion:392111795642433556> replacement'
         expected = "attempt weedminion replacement"
 
-        our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
+        our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
         our_pybd.send_message = do_nothing
         our_pybd.send_typing = partial(do_nothing, "bogus_arg")
 
@@ -155,7 +156,7 @@ class TestCustomEmojis(unittest.TestCase):
         msg.channel.return_value = "maketotaldestroy"
         expected = "weedminion"
 
-        our_pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
+        our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
         our_pybd.send_message = do_nothing
         our_pybd.send_typing = partial(do_nothing, "bogus_arg")
 
