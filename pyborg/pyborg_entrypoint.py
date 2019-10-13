@@ -135,7 +135,7 @@ def list_discord_servers():
             try:
                 print(guild, guild.id, guild.me.display_name)
             except:
-                logger.exception()
+                logger.exception("had discord api issue probably")
     _eris(list_inner)
 
 
