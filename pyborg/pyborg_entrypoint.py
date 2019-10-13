@@ -10,8 +10,8 @@ import shutil
 import struct
 import sys
 import os
-from typing import Callable
-
+from typing import Callable, List
+from discord import Guild
 
 import click
 import humanize
@@ -28,7 +28,7 @@ from pyborg.mod.mod_linein import ModLineIn
 from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.util_cli import mk_folder, init_systemd
-from pyborg.mod.mod_tumblr import PyborgTumblr
+# from pyborg.mod.mod_tumblr import PyborgTumblr
 from pyborg.mod.mod_mastodon import PyborgMastodon
 from pyborg.mod.mod_subtitle import PyborgSubtitles
 from pyborg.mod.mod_discord import PyborgDiscord
@@ -54,7 +54,7 @@ def resolve_brain(target_brain):
 
 
 @click.group(context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
-@click.option('--version', 'my_version', default=False, is_flag=True, help="this is a bogus arg mapped to version command for maximum nice", hidden=True)
+@click.option('--version', 'my_version', default=False, is_flag=True, help="output a version summary")
 @click.option('--debug', default=False, is_flag=True, help="control log level")
 @click.option('--verbose/--silent', default=True, help="control log level")
 @click.pass_context
@@ -128,9 +128,23 @@ def list_discord_servers():
     async def list_inner(dc):
         await asyncio.sleep(1)
         async for guild in dc.fetch_guilds(limit=100):
-            print(guild, guild.id)
+            print(guild, guild.id, guild.me.display_name)
 
     _eris(list_inner)
+
+
+class BadDiscordServerFragement(BaseException):
+    pass
+
+
+async def resolve_guild(guilds: List[Guild], search_term) -> Guild:
+    for g in guilds:
+        if g.id.startswith(search_term):
+            return g
+        if search_term in g.name:
+            return g
+    raise BadDiscordServerFragement(search_term)
+
 
 
 @discord_mgr.command("rm")
@@ -143,16 +157,22 @@ def leave_discord_server(server_id_partial):
         await asyncio.sleep(1)
         g = await dc.fetch_guild(guild_id)
         if click.confirm(f"do you want to leave {g}?"):
-            # await confirmed_guild.leave()
-            pass
+            await confirmed_guild.leave()
 
     _eris(leave_inner)
+
 
 @discord_mgr.command("info")
 @click.argument("server_id_partial")
 def info_discord_server(server_id_partial):
     "basic stats, # of users, current nickname, public stuff."
-    pass
+
+    async def info_inner(dc):
+        await asyncio.sleep(1)
+        g = await resolve_guild(dc.guilds, server_id_partial)
+        print(g, g.id, g.me.display_name, g.member_count)
+
+    _eris(info_inner)
 
 # Brains!
 
@@ -177,8 +197,7 @@ def list_brains():
 @click.argument('target_brain', default="current")
 def backup(target_brain, output):
     "Backup a specific brain"
-    if target_brain == "current":
-        target = os.path.join(folder, "brains", "archive.zip")
+    target = resolve_brain(target_brain)
     backup_name = datetime.datetime.now().strftime("pyborg-%m-%d-%y-archive")
     if output is None:
         output = os.path.join(folder, "brains", "{}.zip".format(backup_name))

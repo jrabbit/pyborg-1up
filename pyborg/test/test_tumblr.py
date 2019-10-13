@@ -2,6 +2,7 @@ import datetime
 import json
 import unittest
 from unittest import mock
+from pathlib import Path
 
 import pyborg
 
@@ -23,8 +24,8 @@ class TestBot(unittest.TestCase):
             'tags': ['hello bill'],
         },
     }
-    with open("pyborg/test/fixtures/tumblr_posts.json") as fixture_f:
-        posts = json.load(fixture_f)
+    with open(Path(".", "pyborg", "test", "fixtures", "tumblr_posts.json")) as fixture_f:
+        posts = json.load(fixture_f, )
 
     @mock.patch('pyborg.pyborg.pyborg')
     @mock.patch('pyborg.mod.mod_tumblr.logger.info')
