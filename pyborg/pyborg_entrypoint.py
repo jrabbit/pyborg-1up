@@ -133,7 +133,7 @@ def list_discord_servers():
         await asyncio.sleep(1)
         async for guild in dc.fetch_guilds(limit=100):
             try:
-                print(guild, guild.id, guild.me.display_name)
+                print(guild, guild.name, guild.me.display_name)
             except:
                 logger.exception("had discord api issue probably")
     _eris(list_inner)
