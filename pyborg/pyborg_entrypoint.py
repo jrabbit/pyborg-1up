@@ -175,6 +175,7 @@ def leave_discord_server(server_id_partial):
 
     _eris(leave_inner)
 
+
 @discord_mgr.command("i-rm")
 def interactive_leave_discord_server():
     "offers to leave servers one-by-one"

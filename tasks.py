@@ -1,4 +1,5 @@
 from pprint import pprint
+from pathlib import Path
 
 import attr
 from invoke import task
@@ -52,7 +53,9 @@ def bandit(c):
 @task
 def docs(c):
     "run autobuilder for local docs generation"
-    c.run("poetry run sphinx-autobuild docs/source docs/build", pty=True)
+    src = Path("docs", "source")
+    docs = Path("docs", "build")
+    c.run(f"poetry run sphinx-autobuild {src} {docs}", pty=True)
 
 @task
 def test(c):
@@ -65,7 +68,7 @@ def docker_gauntlet(c):
     "there's so many ways to fuck this up on install let's try them all!"
     versions_list = ["3.6", "3.7", "3"]
     for py_version in versions_list:
-        c.run("docker pull python:{}".format(py_version))
+        c.run(f"docker pull python:{py_version}")
     @attr.s
     class Strat():
         name = attr.ib()
@@ -87,7 +90,7 @@ def docker_gauntlet(c):
             else:
                 lcmd = strat.cmd
             ret = c.run("docker run -v $PWD:/srv/src/pyborg1_up -v $PWD/misc/docker_caches:/root/.cache --rm -it python:{} bash -c '{cmd}'".format(py_version, cmd=lcmd), pty=True, warn=True)
-            results["{}_{}".format(py_version, strat.name)] = ret.ok
+            results[f"{py_version}_{strat.name}"] = ret.ok
     pprint(results)
 
 @task
@@ -99,11 +102,12 @@ def outdated(c):
 @task
 def lint(c, mypy=True, pylint=False):
     "style & type checks"
+    pp = Path("pyborg", "pyborg")
     if mypy:
         print("mypy")
-        c.run("poetry run mypy pyborg/pyborg", warn=True)
+        c.run(f"poetry run mypy {pp}", warn=True)
     if pylint:
         print("pylint")
-        c.run("poetry run pylint pyborg/pyborg", warn=True)
+        c.run(f"poetry run pylint {pp}", warn=True)
     print("flake8")
     c.run("poetry run flake8 --config=tox.ini --count pyborg", warn=True)
