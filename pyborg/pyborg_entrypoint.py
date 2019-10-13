@@ -21,6 +21,7 @@ from mastodon import Mastodon
 from pyborg.mod.mod_http import bottle
 from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_linein import ModLineIn
+from pyborg.mod.mod_telegram import ModTelegram
 from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.util_cli import mk_folder
@@ -446,6 +447,21 @@ def discord(conf_file):
 def reddit(conf_file):
     "Runs the reddit module"
     bot = PyborgReddit(conf_file)
+    try:
+        bot.start()
+    except KeyboardInterrupt:
+        bot.teardown()
+        sys.exit()
+    except Exception:
+        bot.teardown()
+        raise
+
+
+@cli_base.command()
+@click.option("--conf-file", default="telegram.toml")
+def telegram(conf_file):
+    "Runs the teelgram module"
+    bot = ModTelegram(conf_file)
     try:
         bot.start()
     except KeyboardInterrupt:

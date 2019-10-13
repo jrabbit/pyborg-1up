@@ -1,0 +1,8 @@
+[telegram]
+token = "FAKETOKEN"
+admins = ["yourpseudo"]
+
+[pyborg]
+multiplex = true
+multiplex_server = "localhost"
+multiplex_port = 2001
