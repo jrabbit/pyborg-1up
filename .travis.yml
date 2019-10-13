@@ -22,3 +22,9 @@ cache:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  script: poetry publish --build -u __token__ -p $pypi_token
+  on:
+    python: "3.7"
+    tags: true

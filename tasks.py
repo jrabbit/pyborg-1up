@@ -6,12 +6,13 @@ from fabric2 import Connection
 
 
 @task
-def deploy(c, restart=False, sync=False, target_machine="trotsky"):
+def deploy(c, git=True, restart=False, sync=False, target_machine="trotsky"):
     "push code to a server (configure your own here)"
 
     # desired_services = ["pyborg_discord", "pyborg_http", "pyborg_twitter", "pyborg_mastodon"]
     desired_services = ["pyborg_discord", "pyborg_http"]
-    c.run("git push --all")
+    if git:
+        c.run("git push --all")
     conn = Connection(target_machine)
     with conn.cd("src/pyborg-1up"):
         conn.run("git fetch")
