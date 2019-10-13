@@ -145,8 +145,9 @@ class BadDiscordServerFragement(BaseException):
 
 async def resolve_guild(guilds: List[Guild], search_term: Union[int, str]) -> Guild:
     for g in guilds:
-        if g.id == search_term:
-            return g
+        if search_term.isdigit():
+            if g.id == int(search_term):
+                return g
         if g.id.startswith(search_term):
             return g
         if search_term in g.name:
