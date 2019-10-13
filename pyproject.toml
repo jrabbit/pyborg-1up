@@ -42,7 +42,7 @@ attrs = "^19.1"
 statsd = "^3.3"
 prompt_toolkit = "^2.0"
 "discord.py" = "^1.2"
-"aeidon" = "^1.2.1"
+"aeidon" = {version= "^1.2.1", optional = true}
 irc = "^17"
 aiohttp = "*"
 tox = "^3.13.2"
@@ -68,6 +68,7 @@ bandit = "^1.6.2"
 
 [tool.poetry.extras]
 nlp = ["nltk"]
+subtitles = ["aeidon"]
 
 [tool.black]
 line-length = 140
