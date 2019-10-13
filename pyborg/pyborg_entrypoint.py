@@ -152,7 +152,7 @@ async def resolve_guild(guilds: List[Guild], search_term: Union[int, str]) -> Gu
             return g
         if search_term in g.name:
             return g
-    raise BadDiscordServerFragement(search_term)
+    raise BadDiscordServerFragement(search_term, g)
 
 
 
