@@ -9,6 +9,9 @@ Changelog summaries; for past changes check `the github releases <https://github
 - Dropped python 2 support
 - async http client use in discord module
 - api rewrite, optional v1 bridge class for old style compat w/ the class formerly known as pyborg's new internals
+- discord server management commands
+- new package depenency extras: :kbd:`nlp`, :kbd:`subtitles`
+- uses poetry for package lifecycle management
 
 
 1.4.0

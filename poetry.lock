@@ -1408,7 +1408,7 @@ nlp = ["nltk"]
 subtitles = ["aeidon"]
 
 [metadata]
-content-hash = "c80e05056dfff3d51f8e83731161570b0a820a094c195a39a2f21ef519ebce85"
+content-hash = "03218978292e980e36e2c73bfaa35e166dc8064b243a0d852bf77c518388b38f"
 python-versions = "^3.6"
 
 [metadata.hashes]

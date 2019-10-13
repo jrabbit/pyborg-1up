@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyborg"
-version = "2.0a2"
+version = "2.0a3"
 description = "Markov chain (chat) bot for a suite for modern services (discord, irc, twitter, mastodon, file, linein)"
 license = "GPL-3.0+"
 readme = "pyborg/README.md"
@@ -41,7 +41,7 @@ lxml = "^4.3"
 attrs = "^19.1"
 statsd = "^3.3"
 prompt_toolkit = "^2.0"
-"discord.py" = "^1.2"
+"discord.py" = "^1.2.3"
 "aeidon" = {version= "^1.2.1", optional = true}
 irc = "^17"
 aiohttp = "*"
@@ -53,9 +53,9 @@ tabulate = "^0.8.5"
 [tool.poetry.dev-dependencies]
 green = "*"
 coverage = "*"
-sphinx-click = "^2.2"
+sphinx-click = "*"
 click = "^7.0"
-sphinx-autobuild = "^0.7.1"
+sphinx-autobuild = "*"
 mypy = {version = "*", python = ">= 3.7"}
 flake8 = "^3.7"
 invoke = "^1.2"
