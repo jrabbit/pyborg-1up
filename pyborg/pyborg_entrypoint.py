@@ -159,11 +159,11 @@ def leave_discord_server(server_id_partial):
     "leave server matching SERVER_ID_PARTIAL"
 
     async def leave_inner(dc):
-        guild_id = server_id_partial
         await asyncio.sleep(1)
+        guild_id = await resolve_guild(dc.guilds, server_id_partial)
         g = await dc.fetch_guild(guild_id)
         if click.confirm(f"do you want to leave {g}?"):
-            await confirmed_guild.leave()
+            await g.leave()
 
     _eris(leave_inner)
 
