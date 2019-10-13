@@ -10,7 +10,7 @@ import shutil
 import struct
 import sys
 import os
-from typing import Callable, List
+from typing import Callable, List, Union
 from discord import Guild
 
 import click
@@ -143,8 +143,10 @@ class BadDiscordServerFragement(BaseException):
     pass
 
 
-async def resolve_guild(guilds: List[Guild], search_term) -> Guild:
+async def resolve_guild(guilds: List[Guild], search_term: Union[int, str]) -> Guild:
     for g in guilds:
+        if g.id == search_term:
+            return g
         if g.id.startswith(search_term):
             return g
         if search_term in g.name:
