@@ -26,9 +26,10 @@ class PyborgDiscord(discord.Client):
     multi_port: int = attr.ib(default=2001)
     multiplexing: bool = attr.ib(default=True)
     multi_server: str = attr.ib(default="localhost")
+    multi_protocol: str = attr.ib(default="http")
     registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
     aio_session: aiohttp.ClientSession = attr.ib(init=False)
-    save_status_count : int = attr.ib(default=0)
+    save_status_count : int = attr.ib(default=0, init=False)
     pyborg = attr.ib(default=None)
     scanner = attr.ib(default=None)
     loop = attr.ib(default=None)
@@ -119,7 +120,7 @@ class PyborgDiscord(discord.Client):
             return
 
         if self.save_status_count % 5:
-            async with self.aio_session.get(f"http://{self.multi_server}:{self.multi_port}/meta/status.json") as ret:
+            async with self.aio_session.get(f"http://{self.multi_server}:{self.multi_port}/meta/status.json", raise_for_status=True) as ret:
                 async with ret.json() as data:
                     if data["status"]:
                         await self.change_presence(activity=discord.Game("Saving brain..."))
