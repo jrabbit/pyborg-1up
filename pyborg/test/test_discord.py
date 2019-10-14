@@ -12,11 +12,14 @@ from pyborg.util.utils_testing import do_nothing
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 class TestOnMessage(asynctest.TestCase):
     def setUp(self):
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
         # self.loop.set_debug(True)
+        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path(Path.cwd(),"pyborg","test","fixtures", "discord.toml"))
+
 
     async def tearDown(self):
         await self.our_pybd.teardown()
@@ -29,7 +32,6 @@ class TestOnMessage(asynctest.TestCase):
         msg.content = "Yolo!"
         patched_reply.return_value = ""
         patched_user.mentioned_in.return_value = False
-        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
 
         self.loop.run_until_complete(self.our_pybd.on_message(msg))
         patched_reply.assert_not_called()
@@ -49,7 +51,6 @@ class TestOnMessage(asynctest.TestCase):
         patched_reply.return_value = "I should play dota!"
         patched_reply.replace.return_value = "I should play dota!"
 
-        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
         self.loop.run_until_complete(self.our_pybd.on_message(msg))
         patched_learn.assert_called_once_with(patched_normalize.return_value)
         patched_reply.assert_called_once_with(patched_normalize.return_value)
@@ -70,7 +71,6 @@ class TestOnMessage(asynctest.TestCase):
         patched_reply.return_value = "I should play dota! #nick"
         patched_reply.replace.return_value = "I should play dota! <@42303631157544375>"
 
-        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
         self.our_pybd.send_message = do_nothing
         self.our_pybd.send_typing = partial(do_nothing, "bogus_arg")
 

@@ -1,8 +1,10 @@
 import inspect
+import logging
 
 import attr
 from pyborg.pyborg import pyborg
 
+logger = logging.getLogger(__name__)
 
 @attr.s
 class BottledPyborg():
@@ -14,11 +16,12 @@ class BottledPyborg():
         self.pyb = pyborg(self.brain_path)
 
     def close(self):
+        logger.debug("bottled pyborg save via close() initiated.")
         self.pyb.save_brain()
 
     def apply(self, callback, route):
         keyword = "pyborg"
-        args = inspect.getargspec(route.callback)[0]
+        args = inspect.signature(route.callback).parameters[0]
         if keyword not in args:
             return callback
 
