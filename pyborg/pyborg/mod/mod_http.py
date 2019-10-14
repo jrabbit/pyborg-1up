@@ -1,6 +1,7 @@
 import logging
 import os
 from typing import List
+from threading import RLock
 
 import bottle
 import click
@@ -9,13 +10,17 @@ from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.stats import send_stats
 
 logger = logging.getLogger(__name__)
+SAVE_LOCK = RLock()
 
 
 @bottle.route("/")
 def index(pyborg):
-    return """<h1>Welcome to PyBorg/http</h1>
-    <h2>{}</h2>
-    <a href="/words.json">Words info (json)</a>""".format(pyborg.ver_string)
+    return f"""<html><h1>Welcome to PyBorg/http</h1>
+    <h2>{pyborg.ver_string}</h2>
+    <a href="/words.json">Words info (json)</a>
+    <h2>Is the db saving?</h2>
+    <p>{bool(SAVE_LOCK)}</p>
+    </html>"""
 
 # Basic API
 
@@ -36,8 +41,10 @@ def reply(pyborg):
 
 @bottle.route("/save", method="POST")
 def save(pyborg):
-    pyborg.save_brain()
-    return "Saved to {}".format(pyborg.brain_path)
+    with SAVE_LOCK:
+        pyborg.save_brain()
+        return f"Saved to {pyborg.brain_path}"
+
 
 
 @bottle.route("/info")
@@ -95,9 +102,7 @@ def known(pyborg):
     "return number of contexts"
     word = request.query.word
     try:
-        c = len(pyborg.words[word])
-        msg = "{} is known ({} contexts)".format(word, c)
-        return msg
+        return f"{word} is known ({pyborg.words[word]} contexts)"
     except KeyError:
         return "word not known"
 
@@ -114,13 +119,17 @@ def commands_json(pyborg):
     return pyborg.commanddict
 
 
-@bottle.route("/logging-level", method="POST")
+@bottle.get("/meta/status.json")
+def save_lock_status():
+    return {"status": bool(SAVE_LOCK)}
+
+
+@bottle.post("/meta/logging-level")
 def set_log_level():
-    # when we drop 2 support this can use strings instead of the enums
-    levels = {"DEBUG": logging.DEBUG, "INFO": logging.INFO,
+    """levels = {"DEBUG": logging.DEBUG, "INFO": logging.INFO,
               "WARNING": logging.WARNING, "ERROR": logging.ERROR, "CRITICAL": logging.CRITICAL}
-    target = levels[request.POST.get("level").upper()]
-    logger.setLevel(target)
+    """
+    logger.setLevel(request.POST.get("level").upper())
 
 
 if __name__ == '__main__':

@@ -28,6 +28,7 @@ class PyborgDiscord(discord.Client):
     multi_server: str = attr.ib(default="localhost")
     registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
     aio_session: aiohttp.ClientSession = attr.ib(init=False)
+    save_status_count : int = attr.ib(default=0)
     pyborg = attr.ib(default=None)
     scanner = attr.ib(default=None)
     loop = attr.ib(default=None)
@@ -116,6 +117,14 @@ class PyborgDiscord(discord.Client):
         if message.author == self.user:
             logger.info("Not learning/responding to self")
             return
+
+        if self.save_status_count % 5:
+            async with self.aio_session.get(f"http://{self.multi_server}:{self.multi_port}/meta/status.json") as ret:
+                async with ret.json() as data:
+                    if data["status"]:
+                        await self.change_presence(activity=discord.Game("Saving brain..."))
+
+        self.save_status_count += 1
 
         # Custom Emoji handling here
         # DEBUG:pyborg.mod.mod_discord:<:weedminion:392111795642433556>
