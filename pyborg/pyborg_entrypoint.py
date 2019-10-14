@@ -97,6 +97,15 @@ def utils():
     "extra pyborg helper scripts"
     pass
 
+@utils.command("http")
+def dump_httpd_info():
+    multi_protocol = "http"
+    multi_server = "localhost"
+    multi_port = 2001
+    r = requests.get(f"{multi_protocol}://{multi_server}:{multi_port}/meta/status.json")
+    r.raise_for_status()
+    logging.debug(r)
+    print(f"server is {'saving' if r.json()['status'] else 'not saving'}")
 
 @utils.command("systemd")
 def yeet_systemd():

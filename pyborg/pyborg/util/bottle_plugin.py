@@ -21,7 +21,7 @@ class BottledPyborg():
 
     def apply(self, callback, route):
         keyword = "pyborg"
-        args = inspect.signature(route.callback).parameters[0]
+        args = inspect.signature(route.callback).parameters
         if keyword not in args:
             return callback
 

@@ -1,23 +1,25 @@
 import logging
 import os
 from typing import List
-from threading import RLock
+from pathlib import Path
 
 import bottle
 import click
 from bottle import request
+from filelock import FileLock
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.stats import send_stats
 
 logger = logging.getLogger(__name__)
-SAVE_LOCK = RLock()
+folder = click.get_app_dir("Pyborg")
+SAVE_LOCK = FileLock(Path(folder, ".pyborg_is_saving.lock"))
 
 
 @bottle.route("/")
 def index(pyborg):
     return f"""<html><h1>Welcome to PyBorg/http</h1>
     <h2>{pyborg.ver_string}</h2>
-    <a href="/words.json">Words info (json)</a>
+    <a href='/words.json'>Words info (json)</a>
     <h2>Is the db saving?</h2>
     <p>{bool(SAVE_LOCK)}</p>
     </html>"""
@@ -46,7 +48,6 @@ def save(pyborg):
         return f"Saved to {pyborg.brain_path}"
 
 
-
 @bottle.route("/info")
 def info(pyborg):
     return pyborg.ver_string, pyborg.brain_path
@@ -66,13 +67,13 @@ def stats(pyborg):
 # Advanced API
 
 
-class DumbyIOMod(object):
-
+class DumbyIOMod:
     """fake IO mod for pyborg interop"""
-
-    commandlist = ""
-    message = None
-    messages: List[str] = []  # New for multi-line output
+    def __init__(self):
+        self.commandlist = ""
+        self.message = None
+        self.messages: List[str] = []  # New for multi-line output
+        self.args = None
 
     def output(self, message, args):
         self.messages.append(message)
@@ -120,8 +121,8 @@ def commands_json(pyborg):
 
 
 @bottle.get("/meta/status.json")
-def save_lock_status():
-    return {"status": bool(SAVE_LOCK)}
+def save_lock_status(pyborg):
+    return {"status": SAVE_LOCK.is_locked}
 
 
 @bottle.post("/meta/logging-level")

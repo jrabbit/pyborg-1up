@@ -120,10 +120,12 @@ class PyborgDiscord(discord.Client):
             return
 
         if self.save_status_count % 5:
-            async with self.aio_session.get(f"http://{self.multi_server}:{self.multi_port}/meta/status.json", raise_for_status=True) as ret:
-                async with ret.json() as data:
-                    if data["status"]:
-                        await self.change_presence(activity=discord.Game("Saving brain..."))
+            async with self.aio_session.get(f"http://{self.multi_server}:{self.multi_port}/meta/status.json", raise_for_status=True) as ret_status:
+                data = await ret_status.json()
+                if data["status"]:
+                    await self.change_presence(activity=discord.Game("Saving brain..."))
+                else:
+                    await self.change_presence(activity=discord.Game("hack the planet"))
 
         self.save_status_count += 1
 
@@ -191,11 +193,7 @@ class PyborgDiscord(discord.Client):
     async def learn(self, body: str) -> None:
         """thin wrapper for learn to switch to multiplex mode"""
         if self.settings['pyborg']['multiplex']:
-            async with self.aio_session.post(f"http://{self.multi_server}:{self.multi_port}/learn", data={"body": body}) as ret:
-                if ret.status > 499:
-                    logger.error("Internal Server Error in pyborg_http. see logs.")
-                else:
-                    await ret.raise_for_status()
+            await self.aio_session.post(f"http://{self.multi_server}:{self.multi_port}/learn", data={"body": body}, raise_for_status=True)
 
     async def reply(self, body: str) -> Union[str, None]:
         """thin wrapper for reply to switch to multiplex mode: now coroutine"""
