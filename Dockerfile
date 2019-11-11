@@ -12,6 +12,8 @@ WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 
-RUN pip install poetry && poetry install --no-dev -v
+RUN pip install --pre poetry && poetry install --no-dev -v -E subtitles -E nlp
+
+EXPOSE 2001
 
 CMD ["poetry", "run", "pyborg", "linein", "--multiplex", "false"]
