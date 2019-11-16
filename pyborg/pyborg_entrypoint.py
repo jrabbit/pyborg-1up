@@ -10,7 +10,7 @@ import shutil
 import struct
 import sys
 import os
-from typing import Callable, List, Union
+from typing import Callable, Union
 from discord import Guild, Client
 
 import click
