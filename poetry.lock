@@ -1474,12 +1474,12 @@ category = "main"
 description = "A library for deferring decorator actions"
 name = "venusian"
 optional = false
-python-versions = "*"
-version = "1.2.0"
+python-versions = ">=3.5"
+version = "3.0.0"
 
 [package.extras]
 docs = ["sphinx", "repoze.sphinx.autointerface"]
-testing = ["pytest", "coverage", "pytest-cov"]
+testing = ["pytest", "pytest-cov", "coverage"]
 
 [[package]]
 category = "main"
@@ -1573,7 +1573,7 @@ nlp = ["nltk"]
 subtitles = ["aeidon"]
 
 [metadata]
-content-hash = "008faed713fb33b45ba8f48682ee1c5e0ffa013a8b3b8421344b5dde1ea81067"
+content-hash = "64d79b134e12e7e861552a088f66760c4d82686a9cfab120d220b7b692eaa9ef"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -2348,8 +2348,8 @@ urllib3 = [
     {file = "urllib3-1.25.7.tar.gz", hash = "sha256:f3c5fd51747d450d4dcf6f923c81f78f811aab8205fda64b0aba34a4e48b0745"},
 ]
 venusian = [
-    {file = "venusian-1.2.0-py2.py3-none-any.whl", hash = "sha256:2f2d077a1eedc3fda40425f65687c8c494da7e83d7c23bc2c4d1a40eb3ca5b6d"},
-    {file = "venusian-1.2.0.tar.gz", hash = "sha256:64ec8285b80b110d0ae5db4280e90e31848a59db98db1aba4d7d46f48ce91e3e"},
+    {file = "venusian-3.0.0-py3-none-any.whl", hash = "sha256:06e7385786ad3a15c70740b2af8d30dfb063a946a851dcb4159f9e2a2302578f"},
+    {file = "venusian-3.0.0.tar.gz", hash = "sha256:f6842b7242b1039c0c28f6feef29016e7e7dd3caaeb476a193acf737db31ee38"},
 ]
 virtualenv = [
     {file = "virtualenv-16.7.7-py2.py3-none-any.whl", hash = "sha256:11cb4608930d5fd3afb545ecf8db83fa50e1f96fc4fca80c94b07d2c83146589"},
