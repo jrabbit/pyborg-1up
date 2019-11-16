@@ -1,21 +1,28 @@
 import logging
 import os
+from typing import List
+from pathlib import Path
 
 import bottle
-import six
 import click
 from bottle import request
+from filelock import FileLock
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.stats import send_stats
 
 logger = logging.getLogger(__name__)
+folder = click.get_app_dir("Pyborg")
+SAVE_LOCK = FileLock(Path(folder, ".pyborg_is_saving.lock"))
 
 
 @bottle.route("/")
 def index(pyborg):
-    return """<h1>Welcome to PyBorg/http</h1>
-    <h2>{}</h2>
-    <a href="/words.json">Words info (json)</a>""".format(pyborg.ver_string)
+    return f"""<html><h1>Welcome to PyBorg/http</h1>
+    <h2>{pyborg.ver_string}</h2>
+    <a href='/words.json'>Words info (json)</a>
+    <h2>Is the db saving?</h2>
+    <p>{bool(SAVE_LOCK)}</p>
+    </html>"""
 
 # Basic API
 
@@ -30,21 +37,25 @@ def learn(pyborg):
 @bottle.route("/reply", method="POST")
 def reply(pyborg):
     body = request.POST.getunicode("body")
-    if six.PY2:
-        body = body.decode("utf-8")
     logger.debug(type(body))
     return pyborg.reply(body)
 
 
 @bottle.route("/save", method="POST")
 def save(pyborg):
-    pyborg.save_brain()
-    return "Saved to {}".format(pyborg.brain_path)
+    with SAVE_LOCK:
+        pyborg.save_brain()
+        return f"Saved to {pyborg.brain_path}"
 
 
 @bottle.route("/info")
 def info(pyborg):
     return pyborg.ver_string, pyborg.brain_path
+
+
+@bottle.route("/info.json")
+def info2(pyborg):
+    return {"version_string": pyborg.ver_string, "brain": pyborg.brain_path}
 
 
 @bottle.route("/stats", method="POST")
@@ -56,13 +67,13 @@ def stats(pyborg):
 # Advanced API
 
 
-class DumbyIOMod(object):
-
+class DumbyIOMod:
     """fake IO mod for pyborg interop"""
-
-    commandlist = ""
-    message = None
-    messages = []  # New for multi-line output
+    def __init__(self):
+        self.commandlist = ""
+        self.message = None
+        self.messages: List[str] = []  # New for multi-line output
+        self.args = None
 
     def output(self, message, args):
         self.messages.append(message)
@@ -73,8 +84,6 @@ class DumbyIOMod(object):
 @bottle.route("/process", method="POST")
 def process(pyborg):
     body = request.POST.getunicode("body")
-    if six.PY3:
-        reply_rate = int(request.POST.get("reply_rate"))
     reply_rate = int(request.POST.get("reply_rate"))
     learning = int(request.POST.get("learning"))
     owner = int(request.POST.get("owner"))
@@ -94,9 +103,7 @@ def known(pyborg):
     "return number of contexts"
     word = request.query.word
     try:
-        c = len(pyborg.words[word])
-        msg = "{} is known ({} contexts)".format(word, c)
-        return msg
+        return f"{word} is known ({pyborg.words[word]} contexts)"
     except KeyError:
         return "word not known"
 
@@ -113,13 +120,17 @@ def commands_json(pyborg):
     return pyborg.commanddict
 
 
-@bottle.route("/logging-level", method="POST")
+@bottle.get("/meta/status.json")
+def save_lock_status(pyborg):
+    return {"status": SAVE_LOCK.is_locked}
+
+
+@bottle.post("/meta/logging-level")
 def set_log_level():
-    # when we drop 2 support this can use strings instead of the enums
-    levels = {"DEBUG": logging.DEBUG, "INFO": logging.INFO,
+    """levels = {"DEBUG": logging.DEBUG, "INFO": logging.INFO,
               "WARNING": logging.WARNING, "ERROR": logging.ERROR, "CRITICAL": logging.CRITICAL}
-    target = levels[request.POST.get("level").upper()]
-    logger.setLevel(target)
+    """
+    logger.setLevel(request.POST.get("level").upper())
 
 
 if __name__ == '__main__':

@@ -1,14 +1,31 @@
 dist: xenial
+
 language: python
+
 python:
-  - "2.7"
   - "3.6"
   - "3.7"
 
-install: pip install tox-travis
-script:  tox
+install: 
+    - pip install tox-travis nltk
+    - python -c "import nltk;[nltk.download(x) for x in ['punkt' ,'averaged_perceptron_tagger']]"
+
+script: tox
+addons:
+  apt:
+    packages:
+      - libenchant-dev
 cache:
   directories:
-    - $HOME/.cache/pipenv
+    - $HOME/.cache/pypoetry/cache
+    - $HOME/nltk_data
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  provider: script
+  script: poetry publish --build -u __token__ -p $pypi_token
+  on:
+    python: "3.7"
+    tags: true

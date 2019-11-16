@@ -31,6 +31,10 @@ We're on the cheeseshop.
 	pip install pyborg
 
 
+optional extras:
+   - nlp (need nltk data deps)
+   - subtitles (need libenchant-dev)
+
 
 Advanced NLTK integration
 -------------------------

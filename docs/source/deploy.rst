@@ -1,6 +1,10 @@
 Deploying pyborg on modern computers
 ====================================
 
+..note:: Hey this isn't up to date 
+         This doesn't work as is for the poetry-managed source in pyborg v2+
+
+
 docker-compose
 --------------
 Checkout the Dockerfile(s) in the source. There's also a :kbd:`docker-compose.yml` file to get you started.
@@ -11,7 +15,7 @@ Systemd Unit files
 
   * Create :program:`pyborg` user (:kbd:`adduser pyborg --no-create-home --shell /bin/false`)
 
-  * Install pyborg into pipenv. Either from source (git) or pypi.
+  * Install pyborg with poetry from source (git) or via pypi (also via :kbd:`pip`).
 
   * Edit the unit files to match your system. (you probably aren't named Jack.)
 

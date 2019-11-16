@@ -3,7 +3,9 @@ Issues, pull requests, feedback all accepted and welcome.
 Development workflow
 ====================
 
-Use [pipenv](https://docs.pipenv.org/index.html) and the pipfile[.lock]. It's really good.
+[poetry](https://poetry.eustace.io/) is used to manage dependencies and building wheels.
+
+NOTE: Pyborg 2.0 will be python 3+ only!
 
 
 Tips

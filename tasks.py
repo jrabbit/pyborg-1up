@@ -1,4 +1,5 @@
 from pprint import pprint
+from pathlib import Path
 
 import attr
 from invoke import task
@@ -6,20 +7,23 @@ from fabric2 import Connection
 
 
 @task
-def deploy(c, restart=False, sync=False):
+def deploy(c, git=True, restart=False, sync=False, target_machine="trotsky"):
     "push code to a server (configure your own here)"
 
-    c.run("git push --all")
-    conn = Connection("trotsky")
+    # desired_services = ["pyborg_discord", "pyborg_http", "pyborg_twitter", "pyborg_mastodon"]
+    desired_services = ["pyborg_discord", "pyborg_http"]
+    if git:
+        c.run("git push --all")
+    conn = Connection(target_machine)
     with conn.cd("src/pyborg-1up"):
         conn.run("git fetch")
         conn.run("git stash")
         conn.run("git pull")
         conn.run("git stash pop")
         if sync:
-            conn.run("~/.local/bin/pipenv sync")  # they all use the same pipenv managed virtualenv
+            conn.run("~/.poetry/bin/poetry install -v")  # poetry manages this application
         if restart:
-            units = " ".join(["pyborg_discord", "pyborg_http", "pyborg_twitter", "pyborg_mastodon"])
+            units = " ".join(desired_services)
             conn.run("sudo systemctl restart {}".format(units), pty=True)
             print("Restarted services.")
         print("Deploy Completed.")
@@ -31,11 +35,10 @@ def release(c, clean=True, docker=False):
 
     with c.cd("pyborg"):
         if clean:
-            c.run("pipenv run python setup.py clean")
-            c.run("rm -rf build pyborg.egg-info")
-        c.run("pipenv run python --version", echo=True)
-        c.run("pipenv run python setup.py bdist_wheel sdist")
-        print("now run `gpg -ba` on the files in pyborg/dist/ and upload with `twine`")
+            pass
+        c.run("poetry run python --version", echo=True)
+        c.run("poetry build")
+
     if docker:
         # Build and push jrabbit/pyborg[:3], needs working d-c and docker
         c.run("docker-compose build")
@@ -45,25 +48,27 @@ def release(c, clean=True, docker=False):
 @task
 def bandit(c):
     "security audit tool"
-    c.run("pipenv run bandit --exclude=build,test -s B311 -r pyborg", pty=True)
+    c.run("poetry run bandit --exclude=build,test -s B311 -r pyborg", pty=True)
 
 @task
 def docs(c):
     "run autobuilder for local docs generation"
-    c.run("pipenv run sphinx-autobuild docs/source docs/build", pty=True)
+    src = Path("docs", "source")
+    docs = Path("docs", "build")
+    c.run(f"poetry run sphinx-autobuild {src} {docs}", pty=True)
 
 @task
 def test(c):
-    "this runs tox, just use tox :)"
-    c.run("tox")
+    "this runs tox"
+    c.run("poetry run tox -r")
 
 
 @task
 def docker_gauntlet(c):
     "there's so many ways to fuck this up on install let's try them all!"
-    versions_list = ["2", "3.6", "3.7", "3"]
+    versions_list = ["3.6", "3.7", "3"]
     for py_version in versions_list:
-        c.run("docker pull python:{}".format(py_version))
+        c.run(f"docker pull python:{py_version}")
     @attr.s
     class Strat():
         name = attr.ib()
@@ -85,18 +90,24 @@ def docker_gauntlet(c):
             else:
                 lcmd = strat.cmd
             ret = c.run("docker run -v $PWD:/srv/src/pyborg1_up -v $PWD/misc/docker_caches:/root/.cache --rm -it python:{} bash -c '{cmd}'".format(py_version, cmd=lcmd), pty=True, warn=True)
-            results["{}_{}".format(py_version, strat.name)] = ret.ok
+            results[f"{py_version}_{strat.name}"] = ret.ok
     pprint(results)
 
 @task
 def outdated(c):
     "outdated packages"
-    c.run("pipenv run pip list -o --format=columns")
+    c.run("poetry show -o")
 
 
 @task
-def lint(c, mypy=True):
+def lint(c, mypy=True, pylint=False):
     "style & type checks"
+    pp = Path("pyborg", "pyborg")
     if mypy:
-        c.run("pipenv run mypy pyborg/pyborg", warn=True)
-    c.run("flake8 --config=tox.ini --count pyborg", warn=True)
+        print("mypy")
+        c.run(f"poetry run mypy {pp}", warn=True)
+    if pylint:
+        print("pylint")
+        c.run(f"poetry run pylint {pp}", warn=True)
+    print("flake8")
+    c.run("poetry run flake8 --config=tox.ini --count pyborg", warn=True)

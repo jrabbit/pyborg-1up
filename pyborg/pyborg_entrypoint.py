@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import asyncio
 import collections
 import datetime
 import json
@@ -9,29 +10,32 @@ import shutil
 import struct
 import sys
 import os
+from typing import Callable, List, Union
+from discord import Guild, Client
 
 import click
 import humanize
-import pyborg
-import pyborg.pyborg
 import requests
 import six
 import toml
 from mastodon import Mastodon
+try:
+    import aeidon
+    from pyborg.mod.mod_subtitle import PyborgSubtitles
+except ImportError:
+    aeidon = False
+
+import pyborg
+import pyborg.pyborg
 from pyborg.mod.mod_http import bottle
 from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_linein import ModLineIn
 from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.util.bottle_plugin import BottledPyborg
-from pyborg.util.util_cli import mk_folder
-
-if sys.version_info <= (3,):
-    from pyborg.mod.mod_tumblr import PyborgTumblr
-
-if sys.version_info >= (3,):
-    from pyborg.mod.mod_mastodon import PyborgMastodon
-    from pyborg.mod.mod_subtitle import PyborgSubtitles
-    from pyborg.mod.mod_discord import PyborgDiscord
+from pyborg.util.util_cli import mk_folder, init_systemd
+from pyborg.mod.mod_tumblr import PyborgTumblr
+from pyborg.mod.mod_mastodon import PyborgMastodon
+from pyborg.mod.mod_discord import PyborgDiscord
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +58,7 @@ def resolve_brain(target_brain):
 
 
 @click.group(context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
-@click.option('--version', 'my_version', default=False, is_flag=True, help="this is a bogus arg mapped to version command for maximum nice", hidden=True)
+@click.option('--version', 'my_version', default=False, is_flag=True, help="output a version summary")
 @click.option('--debug', default=False, is_flag=True, help="control log level")
 @click.option('--verbose/--silent', default=True, help="control log level")
 @click.pass_context
@@ -71,11 +75,12 @@ def cli_base(ctx, verbose, debug, my_version):
         ctx.exit()
     elif ctx.invoked_subcommand is None:
         # still do normal things via the named help even
-        ctx.invoke(help)
+        ctx.invoke(local_help)
 
-@cli_base.command()
+
+@cli_base.command("help")
 @click.pass_context
-def help(ctx):
+def local_help(ctx):
     """Show this message and exit."""
     print(ctx.parent.get_help())
 
@@ -88,6 +93,133 @@ def folder_info():
 
 
 @cli_base.group()
+def utils():
+    "extra pyborg helper scripts"
+    pass
+
+@utils.command("http")
+def dump_httpd_info():
+    multi_protocol = "http"
+    multi_server = "localhost"
+    multi_port = 2001
+    r = requests.get(f"{multi_protocol}://{multi_server}:{multi_port}/meta/status.json")
+    r.raise_for_status()
+    logging.debug(r)
+    print(f"server is {'saving' if r.json()['status'] else 'not saving'}")
+
+@utils.command("systemd")
+def yeet_systemd():
+    "Set up systemd unit files for `pyborg http` and friends"
+    print("generating systemd files seems weird.")
+    init_systemd()
+
+# Discord utils
+
+
+@utils.group("manage-discord")
+def discord_mgr():
+    "run administrative tasks on the bot"
+    pass
+
+def _eris(f: Callable, debug=False) -> None:
+    "wrangle discord"
+    conf = os.path.join(folder, "discord.toml")
+    loop = asyncio.new_event_loop()
+    # can we get the ctx/debug status?
+    if debug:
+        loop.set_debug(True)
+    asyncio.set_event_loop(loop)
+    our_discord_client = PyborgDiscord(conf, loop=loop)
+    t = asyncio.gather(our_discord_client.fancy_login(), asyncio.ensure_future(f(our_discord_client)),our_discord_client.teardown(), loop=loop)
+    loop.run_until_complete(t)
+
+@discord_mgr.command("ls")
+def list_discord_servers():
+    "list servers pyborg is on w/ an addressable hash or ID"
+
+    async def list_inner(dc):
+        await asyncio.sleep(1)
+        async for guild in dc.fetch_guilds(limit=100):
+            try:
+                print(guild, guild.id)
+            except:
+                logger.exception("manage-discord: had discord api issue probably")
+    _eris(list_inner)
+
+
+class BadDiscordServerFragement(Exception):
+    pass
+
+
+async def resolve_guild(dc: Client, search_term: Union[int, str]) -> Guild:
+    for g in dc.guilds:
+        print(g)
+        if search_term.isdigit():
+            if g.id == int(search_term):
+                return g
+        if g.id.startswith(search_term):
+            return g
+        if search_term in str(g):
+            return g
+    return False
+    # raise BadDiscordServerFragement(search_term)
+
+
+
+@discord_mgr.command("rm")
+@click.argument("server_id_partial")
+def leave_discord_server(server_id_partial):
+    "leave server matching SERVER_ID_PARTIAL"
+
+    async def leave_inner(dc):
+        await asyncio.sleep(1)
+        guild_id = await resolve_guild(dc, server_id_partial)
+        logger.info("got %s", guild_id)
+        if guild_id:
+            g = await dc.fetch_guild(guild_id)
+            if click.confirm(f"do you want to leave {g}?"):
+                await g.leave()
+        else:
+            logger.error("manage-discord: Don't know what you meant?")
+
+    _eris(leave_inner)
+
+
+@discord_mgr.command("i-rm")
+def interactive_leave_discord_server():
+    "offers to leave servers one-by-one"
+
+    async def leave_interactive_inner(dc):
+        await asyncio.sleep(1)
+        async for guild in dc.fetch_guilds(limit=100):
+            if click.confirm(f"do you want to leave {guild}?"):
+                await guild.leave()
+            else:
+                print("ok, next...")
+
+    _eris(leave_interactive_inner)
+
+
+
+@discord_mgr.command("info")
+@click.argument("server_id_partial")
+def info_discord_server(server_id_partial):
+    "basic stats, # of users, current nickname, public stuff."
+
+    async def info_inner(dc):
+        await asyncio.sleep(1)
+        g = await resolve_guild(dc, server_id_partial)
+        if g:
+            print(g, g.id, g.me.display_name, g.member_count)
+        else:
+            logger.error("manage-discord: Didn't resolve a guild.")
+
+    _eris(info_inner)
+
+# Brains!
+
+
+@cli_base.group()
 def brain():
     "Pyborg brain (pybrain.json) utils"
     pass
@@ -97,9 +229,9 @@ def brain():
 def list_brains():
     "print out the pyborg brains (pybrain.json)s info"
     print(os.path.join(folder, "brains") + ":")
-    for x in os.listdir(os.path.join(folder, "brains")):
-        brain_size = os.path.getsize(os.path.join(folder, "brains", x))
-        print("\t {0} {1}".format(x, humanize.naturalsize(brain_size)))
+    for brain_name in os.listdir(os.path.join(folder, "brains")):
+        brain_size = os.path.getsize(os.path.join(folder, "brains", brain_name))
+        print("\t {0} {1}".format(brain_name, humanize.naturalsize(brain_size)))
 
 
 @brain.command()
@@ -107,8 +239,7 @@ def list_brains():
 @click.argument('target_brain', default="current")
 def backup(target_brain, output):
     "Backup a specific brain"
-    if target_brain == "current":
-        target = os.path.join(folder, "brains", "archive.zip")
+    target = resolve_brain(target_brain)
     backup_name = datetime.datetime.now().strftime("pyborg-%m-%d-%y-archive")
     if output is None:
         output = os.path.join(folder, "brains", "{}.zip".format(backup_name))
@@ -351,13 +482,14 @@ def set_logging_level(log_level):
     ret.raise_for_status()
 
 
-@cli_base.command()
-@click.argument("subtitle-file")
-@click.option("--conf-file", default=os.path.join(folder, "subtitle.toml"))
-def subtitles(conf_file, subtitle_file):
-    "learn from subtitles! python3 only! thx aeidon"
-    subs = PyborgSubtitles(conf_file=conf_file, subs_file=subtitle_file)
-    subs.start()
+if aeidon:
+    @cli_base.command()
+    @click.argument("subtitle-file")
+    @click.option("--conf-file", default=os.path.join(folder, "subtitle.toml"))
+    def subtitles(conf_file, subtitle_file):
+        "learn from subtitles! python3 only! thx aeidon"
+        subs = PyborgSubtitles(conf_file=conf_file, subs_file=subtitle_file)
+        subs.start()
 
 
 @cli_base.command()
@@ -424,12 +556,7 @@ def filein(multiplex, input_file):
 @cli_base.command()
 @click.option("--conf-file", default=os.path.join(folder, "discord.toml"))
 def discord(conf_file):
-    "Run the discord client (needs python3)"
-    if sys.version_info <= (3,):
-        print(
-            "You are trying to run the discord mod under python 2. \nThis won't work. Please use python 3 (3.6+)."
-        )
-        sys.exit(6)
+    "Run the discord client"
     bot = PyborgDiscord(conf_file)
     try:
         bot.our_start()
@@ -460,15 +587,13 @@ def reddit(conf_file):
 @click.option("--multiplex", default=True, type=click.BOOL)
 def linein(multiplex):
     "This is a commandline repl for interacting with pyborg locally"
-
     my_pyborg = pyborg.pyborg.pyborg
     try:
         mod = ModLineIn(my_pyborg, multiplex)
     except SystemExit:
-        pass
-    if not multiplex:
-        mod.save()
-
+        if not multiplex:
+            mod.save()
+        raise
 
 @cli_base.command()
 def version():

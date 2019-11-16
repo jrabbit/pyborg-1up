@@ -17,7 +17,9 @@ If you want the latest git via pip you'll need some special sauce.
 `pip install -e git+https://github.com/jrabbit/pyborg-1up.git#egg=pyborg\&subdirectory=pyborg`
 
 
-Note that we're using Python 3.6+ (for fancy type declarations) and 2.7 (for now)
+Note that we're using Python 3.6+ (for fancy type declarations).
+
+Python 2 support was [dropped with](https://pythonclock.org/) the release of pyborg 2.0.
 
 
 Basic Usage
