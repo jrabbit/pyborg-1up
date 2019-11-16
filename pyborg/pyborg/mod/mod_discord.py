@@ -1,7 +1,7 @@
 import re
 import logging
 from functools import partial
-from typing import Dict, Union, List, Callable
+from typing import Dict, Union, List, Callable, MutableMapping, Any
 from types import ModuleType
 
 import discord
@@ -12,7 +12,6 @@ import attr
 
 import pyborg.commands as builtin_commands
 from pyborg.util.awoo import normalize_awoos
-
 
 
 logger = logging.getLogger(__name__)
@@ -29,11 +28,11 @@ class PyborgDiscord(discord.Client):
     multi_protocol: str = attr.ib(default="http")
     registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
     aio_session: aiohttp.ClientSession = attr.ib(init=False)
-    save_status_count : int = attr.ib(default=0, init=False)
+    save_status_count: int = attr.ib(default=0, init=False)
     pyborg = attr.ib(default=None)
     scanner = attr.ib(default=None)
     loop = attr.ib(default=None)
-    settings: Dict = attr.ib(default=None)
+    settings: MutableMapping[str, Any] = attr.ib(default=None)
 
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
@@ -50,7 +49,7 @@ class PyborgDiscord(discord.Client):
         else:
             self.pyborg = None
         self.aio_session = aiohttp.ClientSession()
-        super().__init__(loop=self.loop) # this might create a asyncio.loop!
+        super().__init__(loop=self.loop)  # this might create a asyncio.loop!
 
     def our_start(self) -> None:
         "launch discord.Client main event loop (calls Client.run)"

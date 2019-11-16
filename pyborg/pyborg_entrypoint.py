@@ -130,7 +130,7 @@ def _eris(f: Callable, debug=False) -> None:
         loop.set_debug(True)
     asyncio.set_event_loop(loop)
     our_discord_client = PyborgDiscord(conf, loop=loop)
-    t = asyncio.gather(our_discord_client.fancy_login(), asyncio.ensure_future(f(our_discord_client)),our_discord_client.teardown(), loop=loop)
+    t = asyncio.gather(our_discord_client.fancy_login(), asyncio.ensure_future(f(our_discord_client)), our_discord_client.teardown(), loop=loop)
     loop.run_until_complete(t)
 
 @discord_mgr.command("ls")
@@ -594,6 +594,7 @@ def linein(multiplex):
         if not multiplex:
             mod.save()
         raise
+
 
 @cli_base.command()
 def version():
