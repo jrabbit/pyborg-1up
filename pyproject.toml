@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyborg"
-version = "2.0a3"
+version = "2.0.0-alpha.4"
 description = "Markov chain (chat) bot for a suite for modern services (discord, irc, twitter, mastodon, file, linein)"
 license = "GPL-3.0+"
 readme = "pyborg/README.md"
