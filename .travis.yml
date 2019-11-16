@@ -8,7 +8,7 @@ python:
   - "3.8"
 
 install: 
-    - pip install tox-travis nltk coveragepy
+    - pip install tox-travis nltk coverage
     - python -c "import nltk;[nltk.download(x) for x in ['punkt' ,'averaged_perceptron_tagger']]"
 
 script: tox
