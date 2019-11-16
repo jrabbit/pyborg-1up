@@ -116,7 +116,7 @@ class PyborgDiscord(discord.Client):
                     else:
                         await message.channel.send(command())
         if message.author == self.user:
-            logger.info("Not learning/responding to self")
+            logger.debug("Not learning/responding to self")
             return
 
         if self.save_status_count % 5:

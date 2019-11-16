@@ -103,7 +103,7 @@ def known(pyborg):
     "return number of contexts"
     word = request.query.word
     try:
-        return f"{word} is known ({pyborg.words[word]} contexts)"
+        return f"{word} is known ({len(pyborg.words[word])} contexts)"
     except KeyError:
         return "word not known"
 
