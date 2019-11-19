@@ -12,14 +12,19 @@ We're on the cheeseshop! Yay!
 
 `pip install pyborg`
 
-If you want the latest git via pip you'll need some special sauce.
+If you want the latest git via pip you'll need to install it via [poetry.](https://poetry.eustace.io/docs/)
 
-`pip install -e git+https://github.com/jrabbit/pyborg-1up.git#egg=pyborg\&subdirectory=pyborg`
+Testing releases can be found via:
+
+`pip install --pre pyborg`
 
 
 Note that we're using Python 3.6+ (for fancy type declarations).
 
 Python 2 support was [dropped with](https://pythonclock.org/) the release of pyborg 2.0.
+
+
+There are two extras "nlp" and "subtitles". e.g. `pip install pyborg[nlp]`
 
 
 Basic Usage
