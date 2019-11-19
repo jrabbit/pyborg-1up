@@ -1,6 +1,6 @@
 ﻿Pyborg is a markov chain bot for many protocols (Discord, IRC, Twitter, etc.) that generates replies based on messages and it's database.
 
-![PyPI](https://img.shields.io/pypi/v/pyborg?style=for-the-badge)![PyPI](https://img.shields.io/pypi/v/pyborg?style=for-the-badge)
+[![PyPI](https://img.shields.io/pypi/v/pyborg)](https://pypi.org/project/pyborg/)
 [![codecov status](https://codecov.io/gh/jrabbit/pyborg-1up/branch/master/graph/badge.svg)](https://codecov.io/gh/jrabbit/pyborg-1up)
 [![CI status](https://travis-ci.org/jrabbit/pyborg-1up.svg)](https://travis-ci.org/jrabbit/pyborg-1up)
 [![Documentation Status](https://readthedocs.org/projects/pyborg/badge/?version=latest)](https://pyborg.readthedocs.io/en/latest/?badge=latest)
