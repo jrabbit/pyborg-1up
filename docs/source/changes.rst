@@ -12,6 +12,7 @@ Changelog summaries; for past changes check `the github releases <https://github
 - discord server management commands
 - new package depenency extras: :kbd:`nlp`, :kbd:`subtitles`
 - uses poetry for package lifecycle management
+- coverage reporting fixed
 
 
 1.4.0

@@ -271,7 +271,7 @@ description = "A python wrapper for the Discord API"
 name = "discord.py"
 optional = false
 python-versions = ">=3.5.3"
-version = "1.2.4"
+version = "1.2.5"
 
 [package.dependencies]
 aiohttp = ">=3.3.0,<3.6.0"
@@ -1326,7 +1326,7 @@ description = "Pretty-print tabular data"
 name = "tabulate"
 optional = false
 python-versions = "*"
-version = "0.8.5"
+version = "0.8.6"
 
 [package.extras]
 widechars = ["wcwidth"]
@@ -1573,7 +1573,7 @@ nlp = ["nltk"]
 subtitles = ["aeidon"]
 
 [metadata]
-content-hash = "64d79b134e12e7e861552a088f66760c4d82686a9cfab120d220b7b692eaa9ef"
+content-hash = "ace3c03a38c9382a6c100ebffb219ff34e8dc17c1f288008c5d49bfe8e5e1285"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -1790,8 +1790,7 @@ decorator = [
     {file = "decorator-4.4.1.tar.gz", hash = "sha256:54c38050039232e1db4ad7375cfce6748d7b41c29e95a081c8a6d2c30364a2ce"},
 ]
 "discord.py" = [
-    {file = "discord.py-1.2.4-py3-none-any.whl", hash = "sha256:2d5fec14b1c047b561336e969939e7f34564489851ec1a7edb8d303087127256"},
-    {file = "discord.py-1.2.4.tar.gz", hash = "sha256:3e044d84f0bb275d173e2d958cb4a579e525707f90e3e8a15c59901f79e80663"},
+    {file = "discord.py-1.2.5-py3-none-any.whl", hash = "sha256:7c843b523bb011062b453864e75c7b675a03faf573c58d14c9f096e85984329d"},
 ]
 docutils = [
     {file = "docutils-0.15.2-py2-none-any.whl", hash = "sha256:9e4d7ecfc600058e07ba661411a2b7de2fd0fafa17d1a7f7361cd47b1175c827"},
@@ -2276,7 +2275,7 @@ stevedore = [
     {file = "stevedore-1.31.0.tar.gz", hash = "sha256:e0739f9739a681c7a1fda76a102b65295e96a144ccdb552f2ae03c5f0abe8a14"},
 ]
 tabulate = [
-    {file = "tabulate-0.8.5.tar.gz", hash = "sha256:d0097023658d4dea848d6ae73af84532d1e86617ac0925d1adf1dd903985dac3"},
+    {file = "tabulate-0.8.6.tar.gz", hash = "sha256:5470cc6687a091c7042cee89b2946d9235fe9f6d49c193a4ae2ac7bf386737c8"},
 ]
 tempora = [
     {file = "tempora-1.14.1-py2.py3-none-any.whl", hash = "sha256:d28a03d2f64ee81aec6e6bff374127ef306fe00c1b7e27c7ff1618344221a699"},
