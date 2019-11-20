@@ -25,9 +25,6 @@
 # Seb Dailly <seb.dailly@gmail.com>
 # Jack Laxson <jackjrabbit+pyborg@gmail.com>
 
-from __future__ import absolute_import
-
-
 import collections
 import datetime
 import json
@@ -178,7 +175,7 @@ class PyborgBridge():
             # Create mew database
             self.words = {}
             self.lines = {}
-            logger.error(e)
+            logger.debug(e)
             folder = click.get_app_dir("Pyborg")
             name = datetime.datetime.now().strftime("%m-%d-%y-auto-{}.pyborg.json").format(str(uuid.uuid4())[:4])
             self.brain_path = os.path.join(folder, "brains", name)

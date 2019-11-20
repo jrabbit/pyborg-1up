@@ -1,7 +1,8 @@
+import asyncio
 import re
 import logging
 from functools import partial
-from typing import Dict, Union, List, Callable, MutableMapping, Any
+from typing import Dict, Union, List, Optional, Callable, MutableMapping, Any
 from types import ModuleType
 
 import discord
@@ -10,6 +11,7 @@ import toml
 import venusian
 import attr
 
+import pyborg
 import pyborg.commands as builtin_commands
 from pyborg.util.awoo import normalize_awoos
 
@@ -26,12 +28,12 @@ class PyborgDiscord(discord.Client):
     multiplexing: bool = attr.ib(default=True)
     multi_server: str = attr.ib(default="localhost")
     multi_protocol: str = attr.ib(default="http")
-    registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
+    registry: Registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
     aio_session: aiohttp.ClientSession = attr.ib(init=False)
     save_status_count: int = attr.ib(default=0, init=False)
-    pyborg = attr.ib(default=None)
-    scanner = attr.ib(default=None)
-    loop = attr.ib(default=None)
+    pyborg: Optional[pyborg.pyborg.pyborg] = attr.ib(default=None)
+    scanner: venusian.Scanner = attr.ib(default=None)
+    loop: Optional[asyncio.BaseEventLoop] = attr.ib(default=None)
     settings: MutableMapping[str, Any] = attr.ib(default=None)
 
     def __attrs_post_init__(self) -> None:
@@ -60,7 +62,7 @@ class PyborgDiscord(discord.Client):
         else:
             logger.error("No Token. Set one in your conf file.")
 
-    async def fancy_login(self):
+    async def fancy_login(self) -> None:
         if 'token' in self.settings['discord']:
             await self.login(self.settings['discord']['token'])
         else:
@@ -80,14 +82,14 @@ class PyborgDiscord(discord.Client):
         # s[s.find("<:"):s.find(">")+1] the general idea here
         start = msg.find("<:")
         attempted_emoji = msg[start + 2: msg.find(":", start + 2)]
-        logger.info("_extract_emoji:attempting to emoji: %s", attempted_emoji)
+        logger.debug("_extract_emoji:attempting to emoji: %s", attempted_emoji)
         if attempted_emoji in server_emojis:
             # now replace the range from start to end with the extracted emoji
             end = msg.find(">", start) + 1
             before, _, after = msg.partition(msg[start:end])
             logger.debug(_)
             incoming_message = before + attempted_emoji + after
-            logger.info(incoming_message)
+            logger.debug(incoming_message)
             return incoming_message
         else:
             # this can be a fancy nitro emoji.
@@ -214,6 +216,9 @@ class PyborgDiscord(discord.Client):
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
 
+
+#class FancyCallable(Callable):
+#    pass_msg: bool
 
 class Registry():
     """Command registry of decorated pyborg commands"""
