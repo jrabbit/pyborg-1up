@@ -1,9 +1,9 @@
 import logging
 import time
-from typing import Union
+from typing import MutableMapping, Union
+from pathlib import Path
 
-
-import aeidon  # https://github.com/otsaloma/gaupol/tree/master/aeidon
+import aeidon
 import attr
 import requests
 import toml
@@ -12,13 +12,17 @@ logger = logging.getLogger(__name__)
 
 
 @attr.s
-class PyborgSubtitles(object):
-    conf_file = attr.ib()
-    subs_file = attr.ib()
+class PyborgSubtitles():
+    conf_file: Path = attr.ib()
+    subs_file: Path = attr.ib()
     paused = attr.ib(default=False)
     riffs = attr.ib(default=dict(), type=dict)
     pre_processed = attr.ib(default=False)
-
+    multiplexing: bool = attr.ib(init=False)
+    multi_server: str = attr.ib(init=False)
+    project: aeidon.Project = attr.ib(init=False)
+    subtitles = attr.ib(init=False)
+    settings: MutableMapping = attr.ib(init=False)
     # def __attrs_post_init__(self):
     #    pass
 
@@ -81,8 +85,3 @@ class PyborgSubtitles(object):
 
     def teardown(self) -> None:
         pass
-
-
-if __name__ == '__main__':
-    subs = PyborgSubtitles(conf_file="subtitles.toml", subs_file="/home/jack/subs.ssa")
-    subs.start()

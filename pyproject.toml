@@ -70,6 +70,10 @@ bandit = "^1.6.2"
 nlp = ["nltk"]
 subtitles = ["aeidon"]
 
+[tool.isort]
+known_third_party = ["aeidon"]
+line_length = 140
+
 [tool.black]
 line-length = 140
 [build-system]
