@@ -1,20 +1,19 @@
 import asyncio
-import re
 import logging
+import re
 from functools import partial
-from typing import Dict, Union, List, Optional, Callable, MutableMapping, Any
 from types import ModuleType
+from typing import Any, Callable, Dict, List, MutableMapping, Optional, Union
 
-import discord
 import aiohttp
+import attr
+import discord
 import toml
 import venusian
-import attr
 
-import pyborg
+import pyborg as pyb_core
 import pyborg.commands as builtin_commands
 from pyborg.util.awoo import normalize_awoos
-
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +30,7 @@ class PyborgDiscord(discord.Client):
     registry: Registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
     aio_session: aiohttp.ClientSession = attr.ib(init=False)
     save_status_count: int = attr.ib(default=0, init=False)
-    pyborg: Optional[pyborg.pyborg.pyborg] = attr.ib(default=None)
+    pyborg: Optional[pyb_core.pyborg.pyborg] = attr.ib(default=None)
     scanner: venusian.Scanner = attr.ib(default=None)
     loop: Optional[asyncio.BaseEventLoop] = attr.ib(default=None)
     settings: MutableMapping[str, Any] = attr.ib(default=None)
@@ -215,10 +214,10 @@ class PyborgDiscord(discord.Client):
         "look for commands to add to registry"
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
-
-
+#
 #class FancyCallable(Callable):
 #    pass_msg: bool
+
 
 class Registry():
     """Command registry of decorated pyborg commands"""

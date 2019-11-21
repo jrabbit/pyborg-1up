@@ -3,8 +3,8 @@ import logging
 import requests
 
 import pyborg
-from .util.irc import command
 
+from .util.irc import command
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ def words(multiplex: bool, multi_server: str) -> str:
 
 
 @command(internals=True, pass_msg=True)
-def known(multiplex: bool, multi_server:str, msg:str="") -> str: # pylint:disable=unused-argument
+def known(multiplex: bool, multi_server: str, msg: str = "") -> str:  # pylint:disable=unused-argument
     message = msg.split()[1:]
     logger.info(message)
     ret = requests.get(multi_server + "known?word={}".format(message[0]))

@@ -1,9 +1,9 @@
-from pprint import pprint
 from pathlib import Path
+from pprint import pprint
 
 import attr
-from invoke import task
 from fabric2 import Connection
+from invoke import task
 
 
 @task

@@ -1,8 +1,8 @@
 import logging
-import time
-import sys
 import os.path
-from typing import List, Dict, Optional
+import sys
+import time
+from typing import Dict, List, Optional
 
 import arrow
 import lxml.html

@@ -1,9 +1,9 @@
 import asyncio
 import logging
 import unittest
-from unittest import mock
 from functools import partial
 from pathlib import Path
+from unittest import mock
 
 import asynctest
 

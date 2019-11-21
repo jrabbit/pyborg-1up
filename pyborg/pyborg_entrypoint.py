@@ -5,37 +5,39 @@ import collections
 import datetime
 import json
 import logging
+import os
 import platform
 import shutil
 import struct
 import sys
-import os
 from typing import Callable, Union
-from discord import Guild, Client
 
 import click
 import humanize
 import requests
 import six
 import toml
+from discord import Client, Guild
 from mastodon import Mastodon
+
+import pyborg
+import pyborg.pyborg
+from pyborg.mod.mod_discord import PyborgDiscord
+from pyborg.mod.mod_http import bottle
+from pyborg.mod.mod_irc import ModIRC
+from pyborg.mod.mod_linein import ModLineIn
+from pyborg.mod.mod_mastodon import PyborgMastodon
+from pyborg.mod.mod_reddit import PyborgReddit
+from pyborg.mod.mod_tumblr import PyborgTumblr
+from pyborg.util.bottle_plugin import BottledPyborg
+from pyborg.util.util_cli import init_systemd, mk_folder
+
 try:
     import aeidon
     from pyborg.mod.mod_subtitle import PyborgSubtitles
 except ImportError:
     aeidon = False
 
-import pyborg
-import pyborg.pyborg
-from pyborg.mod.mod_http import bottle
-from pyborg.mod.mod_irc import ModIRC
-from pyborg.mod.mod_linein import ModLineIn
-from pyborg.mod.mod_reddit import PyborgReddit
-from pyborg.util.bottle_plugin import BottledPyborg
-from pyborg.util.util_cli import mk_folder, init_systemd
-from pyborg.mod.mod_tumblr import PyborgTumblr
-from pyborg.mod.mod_mastodon import PyborgMastodon
-from pyborg.mod.mod_discord import PyborgDiscord
 
 logger = logging.getLogger(__name__)
 

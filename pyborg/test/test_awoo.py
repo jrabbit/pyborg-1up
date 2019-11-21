@@ -2,6 +2,7 @@ import unittest
 
 from pyborg.util.awoo import normalize_awoos
 
+
 class TestAwooNormalize(unittest.TestCase):
 
     def test_1_awoo(self):

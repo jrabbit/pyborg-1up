@@ -1,12 +1,17 @@
+"""
+pyborg http server for multiplexing backend/brain access
+"""
+
 import logging
 import os
-from typing import List
 from pathlib import Path
+from typing import List
 
 import bottle
 import click
 from bottle import request
 from filelock import FileLock
+
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.stats import send_stats
 
@@ -91,10 +96,10 @@ def process(pyborg):
     # logger.debug("process:body type: %s", type(body))
     # logger.debug("process:body: %s" ,body)
 
-    io = DumbyIOMod()
-    pyborg.process_msg(io, body, reply_rate, learning, None, owner)
-    if io.message:
-        return io.message
+    fake_io = DumbyIOMod()
+    pyborg.process_msg(fake_io, body, reply_rate, learning, None, owner)
+    if fake_io.message:
+        return fake_io.message
     return ""
 
 
@@ -136,6 +141,5 @@ def set_log_level():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     folder = click.get_app_dir("Pyborg")
-    brain_path = os.path.join(folder, "brains", "current.pyborg.json")
-    bottle.install(BottledPyborg(brain_path=brain_path))
+    bottle.install(BottledPyborg(brain_path=os.path.join(folder, "brains", "current.pyborg.json")))
     bottle.run(host="localhost", port=2001, reloader=True)

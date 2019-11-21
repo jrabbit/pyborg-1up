@@ -1,6 +1,6 @@
-import os
-import logging
 import configparser
+import logging
+import os
 
 import click
 

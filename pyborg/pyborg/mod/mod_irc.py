@@ -6,10 +6,11 @@ from functools import partial
 import irc
 import irc.bot
 import irc.strings
-import pyborg.pyborg
-import pyborg.commands
-import venusian
 import requests
+import venusian
+
+import pyborg.commands
+import pyborg.pyborg
 
 logger = logging.getLogger(__name__)
 

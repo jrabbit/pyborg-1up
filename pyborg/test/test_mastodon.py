@@ -1,10 +1,9 @@
-import unittest
 import json
 import logging
 import sys
-
-
+import unittest
 from unittest import mock
+
 from pyborg.mod.mod_mastodon import PyborgMastodon
 
 logging.basicConfig(level=logging.DEBUG)

@@ -29,25 +29,26 @@ import collections
 import datetime
 import json
 import logging
-import os
 import marshal
+import os
+import random
 import re
 import sys
 import time
 import uuid
 import zipfile
-import random
-from random import randint
-from zlib import crc32
 from pathlib import Path
-from typing import Dict, List, Any
+from random import randint
+from typing import Any, Dict, List
+from zlib import crc32
 
 import attr
 import click
 import toml
 
-from pyborg.util.util_cli import mk_folder
 from pyborg.util.censored_defaults import CENSORED_REASONABLE_DEFAULTS
+from pyborg.util.util_cli import mk_folder
+
 from . import __version__
 
 logger = logging.getLogger(__name__)
