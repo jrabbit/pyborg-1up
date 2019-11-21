@@ -1,6 +1,5 @@
 import json
 import logging
-import sys
 import unittest
 from unittest import mock
 

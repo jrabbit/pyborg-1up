@@ -27,6 +27,7 @@ import praw
 import requests
 import six
 import toml
+from typing import MutableMapping
 
 from pyborg import pyborg
 from pyborg.util.hate_filter import SUBREDDIT_HATE_LIST

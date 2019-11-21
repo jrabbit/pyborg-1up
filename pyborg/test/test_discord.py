@@ -18,8 +18,7 @@ class TestOnMessage(asynctest.TestCase):
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
         # self.loop.set_debug(True)
-        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path(Path.cwd(),"pyborg","test","fixtures", "discord.toml"))
-
+        self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path(Path.cwd(), "pyborg", "test", "fixtures", "discord.toml"))
 
     async def tearDown(self):
         await self.our_pybd.teardown()
@@ -89,7 +88,7 @@ class TestPlaintexPing(unittest.TestCase):
     def setUp(self):
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
-        self.pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
+        self.pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg", "test", "fixtures", "discord.toml"))
 
     def tearDown(self):
         self.loop.close()
@@ -102,6 +101,7 @@ class TestPlaintexPing(unittest.TestCase):
         self.loop.run_until_complete(self.pybd.on_message(msg))
         patched_learn.assert_called_once_with(patched_normalize.return_value)
         patched_reply.assert_called_once_with(patched_normalize.return_value)
+
 
 @unittest.skip
 class TestCustomEmojis(unittest.TestCase):
@@ -130,7 +130,7 @@ class TestCustomEmojis(unittest.TestCase):
         # patched_normalize.return_value = 'attempt <:weedminion:392111795642433556> replacement'
         expected = "attempt weedminion replacement"
 
-        our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
+        our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg", "test", "fixtures", "discord.toml"))
         our_pybd.send_message = do_nothing
         our_pybd.send_typing = partial(do_nothing, "bogus_arg")
 
@@ -156,7 +156,7 @@ class TestCustomEmojis(unittest.TestCase):
         msg.channel.return_value = "maketotaldestroy"
         expected = "weedminion"
 
-        our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg","test","fixtures", "discord.toml"))
+        our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg", "test", "fixtures", "discord.toml"))
         our_pybd.send_message = do_nothing
         our_pybd.send_typing = partial(do_nothing, "bogus_arg")
 

@@ -39,7 +39,7 @@ import uuid
 import zipfile
 from pathlib import Path
 from random import randint
-from typing import Any, Dict, List
+from typing import Any, Dict
 from zlib import crc32
 
 import attr
@@ -174,12 +174,12 @@ class PyborgBridge():
             their_pyb = PyborgExperimental.from_brain(brain)
         except (EOFError, IOError) as e:
             # Create mew database
-            self.words = {}
-            self.lines = {}
+            self.words: Dict = {}
+            self.lines: Dict = {}
             logger.debug(e)
             folder = click.get_app_dir("Pyborg")
             name = datetime.datetime.now().strftime("%m-%d-%y-auto-{}.pyborg.json").format(str(uuid.uuid4())[:4])
-            self.brain_path = os.path.join(folder, "brains", name)
+            self.brain_path = Path(folder, "brains", name)
             logger.info("Error reading saves. New database created.")
             their_pyb = PyborgExperimental(brain=self.brain_path, words={}, lines={})
         return their_pyb
@@ -190,7 +190,7 @@ class PyborgExperimental():
     brain: Path = attr.ib()
     words: Dict = attr.ib()
     lines: Dict = attr.ib()
-    settings_file: Path = attr.ib(default=os.path.join(click.get_app_dir("Pyborg"), "pyborg.toml"))
+    settings_file: Path = attr.ib(default=Path(click.get_app_dir("Pyborg"), "pyborg.toml"))
     settings: FakeCfg2 = attr.ib(default=FakeCfg2())
     internal_commands: Dict = attr.ib(default=_internal_commands_generate())
     ver_string: str = attr.ib(default=f"I am a version {__version__} Pyborg")

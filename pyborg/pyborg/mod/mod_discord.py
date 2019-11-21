@@ -14,7 +14,7 @@ import discord
 import toml
 import venusian
 
-import pyborg as pyb_core
+from .. import pyborg as pyb_core
 import pyborg.commands as builtin_commands
 from pyborg.util.awoo import normalize_awoos
 
@@ -30,10 +30,10 @@ class PyborgDiscord(discord.Client):
     multiplexing: bool = attr.ib(default=True)
     multi_server: str = attr.ib(default="localhost")
     multi_protocol: str = attr.ib(default="http")
-    registry: Registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
+    registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
     aio_session: aiohttp.ClientSession = attr.ib(init=False)
     save_status_count: int = attr.ib(default=0, init=False)
-    pyborg: Optional[pyb_core.pyborg.pyborg] = attr.ib(default=None)
+    pyborg: Optional[pyb_core.pyborg] = attr.ib(default=None)
     scanner: venusian.Scanner = attr.ib(default=None)
     loop: Optional[asyncio.BaseEventLoop] = attr.ib(default=None)
     settings: MutableMapping[str, Any] = attr.ib(default=None)
