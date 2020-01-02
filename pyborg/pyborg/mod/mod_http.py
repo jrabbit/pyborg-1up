@@ -26,7 +26,7 @@ def index(pyborg):
     <h2>{pyborg.ver_string}</h2>
     <a href='/words.json'>Words info (json)</a>
     <h2>Is the db saving?</h2>
-    <p>{bool(SAVE_LOCK)}</p>
+    <p>{SAVE_LOCK.is_locked}</p>
     </html>"""
 
 # Basic API
