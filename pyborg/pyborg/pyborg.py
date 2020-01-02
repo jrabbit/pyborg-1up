@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 #
 # PyBorg: The python AI bot.
 #
@@ -1069,7 +1069,7 @@ class pyborg(object):
 
         if nltk:
             # uses punkt
-            tokenized = nltk.word_tokenize(body.replace("#nick", r"\#nick"))
+            tokenized = nltk.tokenize.casual.casual_tokenize(body)
             # uses averaged_perceptron_tagger
             tagged = nltk.pos_tag(tokenized)
             logging.info(tagged)
