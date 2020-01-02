@@ -13,6 +13,7 @@ Changelog summaries; for past changes check `the github releases <https://github
 - new package depenency extras: :kbd:`nlp`, :kbd:`subtitles`
 - uses poetry for package lifecycle management
 - coverage reporting fixed
+- `stronger tokenizer <https://www.nltk.org/api/nltk.tokenize.html#module-nltk.tokenize.casual>`_ more tuned for internet text
 
 
 1.4.0
