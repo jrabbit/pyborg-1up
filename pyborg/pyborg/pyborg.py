@@ -1069,7 +1069,7 @@ class pyborg(object):
 
         if nltk:
             # uses punkt
-            tokenized = nltk.word_tokenize(body)
+            tokenized = nltk.word_tokenize(body.replace("#nick", r"\#nick"))
             # uses averaged_perceptron_tagger
             tagged = nltk.pos_tag(tokenized)
             logging.info(tagged)
