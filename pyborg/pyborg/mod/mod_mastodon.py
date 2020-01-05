@@ -15,6 +15,11 @@ from mastodon import Mastodon
 
 logger = logging.getLogger(__name__)
 
+# https://mastodonpy.readthedocs.io/en/stable/#notification-dicts
+NotificationDict = Dict[str, Union[str, Dict[str, Any]]]
+# https://mastodonpy.readthedocs.io/en/stable/#toot-dicts
+TootDict = Dict[str, Any]
+ManyToot = List[Union[NotificationDict, TootDict]]
 
 @attr.s
 class PyborgMastodon():
@@ -137,9 +142,3 @@ class PyborgMastodon():
             self.last_look = arrow.utcnow()
             logger.debug("Sleeping for {} seconds".format(self.settings['mastodon']['cooldown']))
             time.sleep(self.settings['mastodon']['cooldown'])
-
-# https://mastodonpy.readthedocs.io/en/stable/#notification-dicts
-NotificationDict = Dict[str, Union[str, Dict[str, Any]]]
-# https://mastodonpy.readthedocs.io/en/stable/#toot-dicts
-TootDict = Dict[str, Any]
-ManyToot = List[Union[NotificationDict, TootDict]]
