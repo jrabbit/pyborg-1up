@@ -61,3 +61,4 @@ archive.zip
 .envrc
 misc/
 /@*_tmp*
+.coverage*
