@@ -12,7 +12,7 @@ WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 
-RUN pip install --pre poetry && poetry install --no-dev -v -E subtitles -E nlp
+RUN pip install poetry && poetry install --no-dev -v -E subtitles -E nlp
 
 EXPOSE 2001
 
