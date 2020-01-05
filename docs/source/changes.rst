@@ -14,7 +14,7 @@ Changelog summaries; for past changes check `the github releases <https://github
 - uses poetry for package lifecycle management
 - coverage reporting fixed
 - `stronger tokenizer <https://www.nltk.org/api/nltk.tokenize.html#module-nltk.tokenize.casual>`_ more tuned for internet text
-
+- mastodon toml config fields normalized to :kbd:`[pyborg][multiplex_server]`, :kbd:`[pyborg][multiplex_port]`
 
 1.4.0
 ------------

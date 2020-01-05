@@ -338,8 +338,8 @@ def doctor(target_brain, one_two):
         sys.exit(8)
 
     # Type check the brain
-    assert isinstance(words, dict)
-    assert isinstance(lines, dict)
+    assert isinstance(words, dict) # nosec
+    assert isinstance(lines, dict) # nosec
     for key, value in words.items():
         cnt[type(key)] += 1
         for i in value:
