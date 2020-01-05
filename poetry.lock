@@ -67,7 +67,7 @@ description = "Better dates & times for Python"
 name = "arrow"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-version = "0.15.4"
+version = "0.15.5"
 
 [package.dependencies]
 python-dateutil = "*"
@@ -374,7 +374,7 @@ description = "Green is a clean, colorful, fast python test runner."
 name = "green"
 optional = false
 python-versions = "*"
-version = "3.0.0"
+version = "3.1.0"
 
 [package.dependencies]
 colorama = "*"
@@ -421,6 +421,7 @@ version = "1.2.0"
 [[package]]
 category = "main"
 description = "Read metadata from Python packages"
+marker = "python_version < \"3.8\""
 name = "importlib-metadata"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
@@ -443,29 +444,12 @@ python-versions = ">=2.7,!=3.0,!=3.1,!=3.2,!=3.3"
 version = "1.0.2"
 
 [[package]]
-category = "main"
-description = "Correctly generate plurals, singular nouns, ordinals, indefinite articles; convert numbers to words"
-name = "inflect"
-optional = false
-python-versions = ">=3.6"
-version = "4.0.0"
-
-[package.dependencies]
-[package.dependencies.importlib-metadata]
-python = "<3.8"
-version = "*"
-
-[package.extras]
-docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
-testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-black-multipy", "pytest-cov", "nose", "pygments"]
-
-[[package]]
 category = "dev"
 description = "Pythonic task execution"
 name = "invoke"
 optional = false
 python-versions = "*"
-version = "1.3.0"
+version = "1.4.0"
 
 [[package]]
 category = "dev"
@@ -512,14 +496,12 @@ category = "main"
 description = "IRC (Internet Relay Chat) protocol library for Python"
 name = "irc"
 optional = false
-python-versions = ">=3.4"
-version = "17.1"
+python-versions = ">=3.6"
+version = "18.0.0"
 
 [package.dependencies]
-importlib-metadata = "*"
 "jaraco.collections" = "*"
 "jaraco.functools" = ">=1.20"
-"jaraco.itertools" = ">=1.8"
 "jaraco.logging" = "*"
 "jaraco.stream" = "*"
 "jaraco.text" = "*"
@@ -527,9 +509,13 @@ more-itertools = "*"
 pytz = "*"
 tempora = ">=1.6"
 
+[package.dependencies.importlib-metadata]
+python = "<3.8"
+version = "*"
+
 [package.extras]
 docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
-testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs", "pytest-flake8", "backports.unittest-mock", "pygments"]
+testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-black-multipy", "pytest-cov", "backports.unittest-mock"]
 
 [[package]]
 category = "dev"
@@ -591,22 +577,6 @@ more-itertools = "*"
 [package.extras]
 docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-black-multipy", "pytest-cov", "six", "backports.unittest-mock", "jaraco.classes"]
-
-[[package]]
-category = "main"
-description = "jaraco.itertools"
-name = "jaraco.itertools"
-optional = false
-python-versions = ">=3.6"
-version = "5.0.0"
-
-[package.dependencies]
-inflect = "*"
-more-itertools = ">=4.0.0"
-
-[package.extras]
-docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
-testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-black-multipy", "pytest-cov"]
 
 [[package]]
 category = "main"
@@ -964,11 +934,10 @@ category = "main"
 description = "Library for building powerful interactive command lines in Python"
 name = "prompt-toolkit"
 optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-version = "2.0.10"
+python-versions = ">=3.6"
+version = "3.0.2"
 
 [package.dependencies]
-six = ">=1.9.0"
 wcwidth = "*"
 
 [[package]]
@@ -1560,6 +1529,7 @@ multidict = ">=4.0"
 [[package]]
 category = "main"
 description = "Backport of pathlib-compatible object wrapper for zip files"
+marker = "python_version < \"3.8\""
 name = "zipp"
 optional = false
 python-versions = ">=2.7"
@@ -1577,7 +1547,7 @@ nlp = ["nltk"]
 subtitles = ["aeidon"]
 
 [metadata]
-content-hash = "64d79b134e12e7e861552a088f66760c4d82686a9cfab120d220b7b692eaa9ef"
+content-hash = "aabb888ff269880e21860ea9e76120f1c51dbccfa34d68b3b259517292c9e5bc"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -1622,8 +1592,8 @@ argh = [
     {file = "argh-0.26.2.tar.gz", hash = "sha256:e9535b8c84dc9571a48999094fda7f33e63c3f1b74f3e5f3ac0105a58405bb65"},
 ]
 arrow = [
-    {file = "arrow-0.15.4-py2.py3-none-any.whl", hash = "sha256:01a16d8a93eddf86a29237f32ae36b29c27f047e79312eb4df5d55fd5a2b3183"},
-    {file = "arrow-0.15.4.tar.gz", hash = "sha256:e1a318a4c0b787833ae46302c02488b6eeef413c6a13324b3261ad320f21ec1e"},
+    {file = "arrow-0.15.5-py2.py3-none-any.whl", hash = "sha256:70729bcc831da496ca3cb4b7e89472c8e2d27d398908155e0796179f6d2d41ee"},
+    {file = "arrow-0.15.5.tar.gz", hash = "sha256:5390e464e2c5f76971b60ffa7ee29c598c7501a294bc9f5e6dadcb251a5d027b"},
 ]
 astroid = [
     {file = "astroid-2.3.3-py3-none-any.whl", hash = "sha256:840947ebfa8b58f318d42301cf8c0a20fd794a33b61cc4638e28e9e61ba32f42"},
@@ -1828,7 +1798,7 @@ gitpython = [
     {file = "GitPython-3.0.5.tar.gz", hash = "sha256:9c2398ffc3dcb3c40b27324b316f08a4f93ad646d5a6328cafbb871aa79f5e42"},
 ]
 green = [
-    {file = "green-3.0.0.tar.gz", hash = "sha256:9b9588f7a5a79302dc00f5a6a62554d44d8363c72cb2adb364e50aa0017e8e9d"},
+    {file = "green-3.1.0.tar.gz", hash = "sha256:c7297578d801200a93e4306c746962731131bb828a2041f74575deec7dbffd74"},
 ]
 humanize = [
     {file = "humanize-0.5.1.tar.gz", hash = "sha256:a43f57115831ac7c70de098e6ac46ac13be00d69abbf60bdcac251344785bb19"},
@@ -1852,14 +1822,10 @@ importlib-resources = [
     {file = "importlib_resources-1.0.2-py2.py3-none-any.whl", hash = "sha256:6e2783b2538bd5a14678284a3962b0660c715e5a0f10243fd5e00a4b5974f50b"},
     {file = "importlib_resources-1.0.2.tar.gz", hash = "sha256:d3279fd0f6f847cced9f7acc19bd3e5df54d34f93a2e7bb5f238f81545787078"},
 ]
-inflect = [
-    {file = "inflect-4.0.0-py2.py3-none-any.whl", hash = "sha256:b7043603072911713f0c82ca0942078d5d53d8ac249ca2e1c25586d9cfb866d4"},
-    {file = "inflect-4.0.0.tar.gz", hash = "sha256:4bafdc6bcfd83ee1e5874607577f7388cd3492cbdb06fc875979c6398ad41ab0"},
-]
 invoke = [
-    {file = "invoke-1.3.0-py2-none-any.whl", hash = "sha256:fc803a5c9052f15e63310aa81a43498d7c55542beb18564db88a9d75a176fa44"},
-    {file = "invoke-1.3.0-py3-none-any.whl", hash = "sha256:f4ec8a134c0122ea042c8912529f87652445d9f4de590b353d23f95bfa1f0efd"},
-    {file = "invoke-1.3.0.tar.gz", hash = "sha256:c52274d2e8a6d64ef0d61093e1983268ea1fc0cd13facb9448c4ef0c9a7ac7da"},
+    {file = "invoke-1.4.0-py2-none-any.whl", hash = "sha256:4668a4a594a47f2da2f0672ec2f7b1566f809cebf10bcd95ce2de9ecf39b95d1"},
+    {file = "invoke-1.4.0-py3-none-any.whl", hash = "sha256:e04faba8ea7cdf6f5c912be42dcafd5c1074b7f2f306998992c4bfb40a9a690b"},
+    {file = "invoke-1.4.0.tar.gz", hash = "sha256:ae7b4513638bde9afcda0825e9535599637a3f65bd819a27098356027bb17c8a"},
 ]
 ipython = [
     {file = "ipython-7.11.1-py3-none-any.whl", hash = "sha256:387686dd7fc9caf29d2fddcf3116c4b07a11d9025701d220c589a430b0171d8a"},
@@ -1870,8 +1836,8 @@ ipython-genutils = [
     {file = "ipython_genutils-0.2.0.tar.gz", hash = "sha256:eb2e116e75ecef9d4d228fdc66af54269afa26ab4463042e33785b887c628ba8"},
 ]
 irc = [
-    {file = "irc-17.1-py2.py3-none-any.whl", hash = "sha256:51dcb5aad4d4abf497e3149e2c2f4c40192a6f9951061475391c8fce9d69d618"},
-    {file = "irc-17.1.tar.gz", hash = "sha256:0c19aeee800dbad792179d70dff1281c06fec220323f8ec34150cd94357f383b"},
+    {file = "irc-18.0.0-py2.py3-none-any.whl", hash = "sha256:7cbdd492edf93a0f4c1c390a44fd1bdaea4d3401864666b1e43f0c5d693dd1ad"},
+    {file = "irc-18.0.0.tar.gz", hash = "sha256:989b438363c41b371356be6f68f8cdbb7c7748234ae9494e9d16ee5f4d4ae5e1"},
 ]
 isort = [
     {file = "isort-4.3.21-py2.py3-none-any.whl", hash = "sha256:6e811fcb295968434526407adb8796944f1988c5b65e8139058f2014cbe100fd"},
@@ -1888,10 +1854,6 @@ isort = [
 "jaraco.functools" = [
     {file = "jaraco.functools-3.0.0-py2.py3-none-any.whl", hash = "sha256:1db5ed25d8bb6cafc48b1c575743e1b4847a5ca7fca72497e89723832aa52529"},
     {file = "jaraco.functools-3.0.0.tar.gz", hash = "sha256:5cb0eea0f254584241c519641328a4d4ec2001a86c3cd6d17a8fd228493f6d97"},
-]
-"jaraco.itertools" = [
-    {file = "jaraco.itertools-5.0.0-py2.py3-none-any.whl", hash = "sha256:a9c91fe1a1026904e86e4ff8f7c1a65c851983afe273d0e6263f38408d6b9f37"},
-    {file = "jaraco.itertools-5.0.0.tar.gz", hash = "sha256:6447d567f57efe5efea386265c7864652e9530830a1b80f43e60b4f222b9ab84"},
 ]
 "jaraco.logging" = [
     {file = "jaraco.logging-3.0.0-py2.py3-none-any.whl", hash = "sha256:b05ed07101883997a30e05c2472798d86129803d9961a0d1081a3236ad37c52a"},
@@ -2100,9 +2062,8 @@ prawcore = [
     {file = "prawcore-1.0.1.tar.gz", hash = "sha256:ab5558efb438aa73fc66c4178bfc809194dea3ce2addf4dec873de7e2fd2824e"},
 ]
 prompt-toolkit = [
-    {file = "prompt_toolkit-2.0.10-py2-none-any.whl", hash = "sha256:e7f8af9e3d70f514373bf41aa51bc33af12a6db3f71461ea47fea985defb2c31"},
-    {file = "prompt_toolkit-2.0.10-py3-none-any.whl", hash = "sha256:46642344ce457641f28fc9d1c9ca939b63dadf8df128b86f1b9860e59c73a5e4"},
-    {file = "prompt_toolkit-2.0.10.tar.gz", hash = "sha256:f15af68f66e664eaa559d4ac8a928111eebd5feda0c11738b5998045224829db"},
+    {file = "prompt_toolkit-3.0.2-py3-none-any.whl", hash = "sha256:0278d2f51b5ceba6ea8da39f76d15684e84c996b325475f6e5720edc584326a7"},
+    {file = "prompt_toolkit-3.0.2.tar.gz", hash = "sha256:63daee79aa8366c8f1c637f1a4876b890da5fc92a19ebd2f7080ebacb901e990"},
 ]
 ptyprocess = [
     {file = "ptyprocess-0.6.0-py2.py3-none-any.whl", hash = "sha256:d7cc528d76e76342423ca640335bd3633420dc1366f258cb31d05e865ef5ca1f"},
