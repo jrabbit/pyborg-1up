@@ -260,7 +260,8 @@ good-names=i,
            e,
            logger,
            folder,
-           ob
+           ob,
+           tl
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no

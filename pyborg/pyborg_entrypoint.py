@@ -350,13 +350,24 @@ def doctor(target_brain, one_two):
     print(cnt)
 
 
-def check_server(server):
-    response = requests.get("http://{}:2001/".format(server))
-    response.raise_for_status()
-
+def check_server(server, port=2001):
+    try:
+        response = requests.get(f"http://{server}:{port}/")
+        response.raise_for_status()
+    except requests.exceptions.ConnectionError:
+        logger.error("pyborg http server uncontactable! exiting")
+        sys.exit(8080)
 
 def run_mastodon(conf_file, secret_folder):
-    bot = PyborgMastodon(conf_file)
+    with open(conf_file) as f:
+        settings = toml.load(f)
+    try:
+        check_server(settings["pyborg"]["multiplexing_server"])
+    except KeyError:
+        logger.error("toml file missing [pyborg][multiplexing_server] entry! exiting")
+        sys.exit(78)
+
+    bot = PyborgMastodon(toml_file=conf_file)
     try:
         bot.start(folder=secret_folder)
     except KeyboardInterrupt:
@@ -369,7 +380,7 @@ def run_mastodon(conf_file, secret_folder):
 
 @cli_base.group(invoke_without_command=True)
 @click.pass_context
-@click.option("--base-url", default='https://mastodon.social')
+@click.option("--base-url", default="https://botsin.space/")
 @click.option("--conf-file", default=os.path.join(folder, "mastodon.toml"))
 @click.option("--secret-folder", default=folder)
 def mastodon(ctx, base_url, conf_file, secret_folder):

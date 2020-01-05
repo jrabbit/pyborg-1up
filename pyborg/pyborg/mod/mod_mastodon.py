@@ -1,8 +1,11 @@
+import contextlib
 import logging
 import os.path
 import sys
 import time
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, MutableMapping, Any, Union
+
+import attr
 
 import arrow
 import lxml.html
@@ -13,16 +16,24 @@ from mastodon import Mastodon
 logger = logging.getLogger(__name__)
 
 
+@attr.s
 class PyborgMastodon():
     """it does toots"""
+    toml_file: str = attr.ib()
+    settings: MutableMapping[str, Any] = attr.ib(default=None)
+    last_look: arrow.Arrow = attr.ib(default=None)
+    multiplexing: bool = attr.ib(default=True)
+    multi_server: str = attr.ib(default="localhost")
+    multi_port: int = attr.ib(default=2001)
+    mastodon: Mastodon = attr.ib(init=False)
+    my_id = attr.ib(init=False)
 
-    # todo: attrs
-    def __init__(self, conf_file):
-        self.toml_file = conf_file
-        self.settings = toml.load(conf_file)
-        self.last_look = arrow.get(self.settings['mastodon']['last_look'])
-        self.multiplexing = True
-        self.multi_server = self.settings['pyborg']['multi_server']
+    def __attrs_post_init__(self) -> None:
+        self.settings = toml.load(self.toml_file)
+        with contextlib.suppress(KeyError):
+            self.last_look = arrow.get(self.settings['mastodon']['last_look'])
+            self.multi_server = self.settings['pyborg']['multiplex_server']
+            self.multi_port = self.settings['pyborg']['multiplex_port']
 
     def teardown(self) -> None:
         self.settings['mastodon']['last_look'] = self.last_look.datetime
@@ -33,7 +44,7 @@ class PyborgMastodon():
             raise NotImplementedError("Use multiplexing.")
             # self.pyborg.save_all()
 
-    def learn(self, body) -> None:
+    def learn(self, body: str) -> None:
         if self.multiplexing:
             try:
                 ret = requests.post("http://{}:2001/learn".format(self.multi_server), data={"body": body})
@@ -49,7 +60,7 @@ class PyborgMastodon():
             raise NotImplementedError("Use multiplexing.")
             # self.pyborg.learn(body)
 
-    def reply(self, body) -> Optional[str]:
+    def reply(self, body: str) -> Optional[str]:
         if self.multiplexing:
             try:
                 ret = requests.post("http://{}:2001/reply".format(self.multi_server), data={"body": body})
@@ -70,7 +81,7 @@ class PyborgMastodon():
             raise NotImplementedError("use multiplexing.")
             # return self.pyborg.reply(body)
 
-    def should_reply_direct(self, usern) -> bool:
+    def should_reply_direct(self, usern: str) -> bool:
         should_reply = []
         should_reply.extend([a['acct'] for a in self.mastodon.account_followers(self.my_id)])  # is this cached?
         return usern in should_reply
@@ -78,21 +89,14 @@ class PyborgMastodon():
     def is_reply_to_me(self, item: Dict) -> bool:
         logger.debug(item)
         try:
-            if item["in_reply_to_account_id"] == self.my_id:
-                return True
-            else:
-                return False
+            return item["in_reply_to_account_id"] == self.my_id
         except KeyError:
             if item["type"] == "mention":
-                if any([True for mention in item["mentions"] if mention['id'] == self.my_id]):
-                    return True
-                else:
-                    # Is this actually possible?
-                    return False
+                return any([True for mention in item["mentions"] if mention['id'] == self.my_id])
             else:
                 return False
 
-    def handle_toots(self, toots: List[Dict]) -> None:
+    def handle_toots(self, toots: ManyToot) -> None:
         for item in toots:
             # logger.debug(arrow.get(item["created_at"]) > self.last_look)
             logger.debug(item['content'])
@@ -102,7 +106,7 @@ class PyborgMastodon():
                 fromacct = item['account']['acct']  # to check if we've banned them?
                 parsed_html = lxml.html.fromstring(item['content'])
                 body = parsed_html.text_content()
-                if self.settings['pyborg']['learning']:
+                if self.settings['pyborg'].get('learning', True):
                     self.learn(body)
                 reply = self.reply(body)
                 if reply:
@@ -114,7 +118,7 @@ class PyborgMastodon():
                 else:
                     logger.info("Couldn't toot.")
 
-    def start(self, folder=".") -> None:
+    def start(self, folder: str= ".") -> None:
         "This actually runs the bot"
         self.mastodon = Mastodon(
             client_id=os.path.join(folder, 'pyborg_mastodon_clientcred.secret'),
@@ -125,7 +129,7 @@ class PyborgMastodon():
 
         while True:
             tl = self.mastodon.timeline()
-            toots: List[Dict] = []
+            toots: ManyToot = list()
             mentions = [notif['status'] for notif in self.mastodon.notifications() if notif['type'] == "mention"]
             toots.extend(tl)
             toots.extend(mentions)
@@ -133,3 +137,9 @@ class PyborgMastodon():
             self.last_look = arrow.utcnow()
             logger.debug("Sleeping for {} seconds".format(self.settings['mastodon']['cooldown']))
             time.sleep(self.settings['mastodon']['cooldown'])
+
+# https://mastodonpy.readthedocs.io/en/stable/#notification-dicts
+NotificationDict = Dict[str, Union[str, Dict[str, Any]]]
+# https://mastodonpy.readthedocs.io/en/stable/#toot-dicts
+TootDict = Dict[str, Any]
+ManyToot = List[Union[NotificationDict, TootDict]]
