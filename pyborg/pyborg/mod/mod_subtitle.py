@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 @attr.s
 class PyborgSubtitles():
-    conf_file: Path = attr.ib()
-    subs_file: Path = attr.ib()
+    conf_file: Union[Path, str] = attr.ib()
+    subs_file: Union[Path, str] = attr.ib()
     paused = attr.ib(default=False)
     riffs = attr.ib(default=dict(), type=dict)
     pre_processed = attr.ib(default=False)

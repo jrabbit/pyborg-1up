@@ -1,6 +1,7 @@
 import configparser
 import logging
 import os
+from typing import Optional
 
 import click
 
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 folder = click.get_app_dir("Pyborg")
 
 
-def mk_folder():
+def mk_folder() -> None:
     try:
         os.makedirs(os.path.join(folder, "brains"))
         os.makedirs(os.path.join(folder, "tmp"))
@@ -17,7 +18,7 @@ def mk_folder():
         logger.info("pyborg folder already exists.")
 
 
-def init_systemd(unit_file="pyborg_out.service", packager="poetry", command="pyborg http", wd=None):
+def init_systemd(unit_file: str="pyborg_out.service", packager: str="poetry", command: str="pyborg http", wd: Optional[str]=None) -> None:
     "setup systemd unit files for (new) pyborg prod deploys."
     config = configparser.ConfigParser()
 

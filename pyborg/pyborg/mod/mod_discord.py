@@ -112,8 +112,8 @@ class PyborgDiscord(discord.Client):
             else:
                 if command_name in self.registry.registered:
                     command = self.registry.registered[command_name]
-                    logger.info("Running command %s", command)
-                    logger.info("pass message?: %s", command.pass_msg)
+                    logger.debug("cmd: Running command %s", command)
+                    logger.debug("cmd: pass message?: %s", command.pass_msg)
                     if command.pass_msg:
                         await message.channel.send(command(msg=message.content))
                     else:

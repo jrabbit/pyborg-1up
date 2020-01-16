@@ -1,4 +1,3 @@
-## -*- coding: utf-8 -*-
 #
 # PyBorg: The python AI bot.
 #

@@ -5,7 +5,7 @@ pyborg http server for multiplexing backend/brain access
 import logging
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 import bottle
 import click
@@ -21,7 +21,7 @@ SAVE_LOCK = FileLock(Path(folder, ".pyborg_is_saving.lock"))
 
 
 @bottle.route("/")
-def index(pyborg):
+def index(pyborg) -> str:
     return f"""<html><h1>Welcome to PyBorg/http</h1>
     <h2>{pyborg.ver_string}</h2>
     <a href='/words.json'>Words info (json)</a>
@@ -33,38 +33,38 @@ def index(pyborg):
 
 
 @bottle.route("/learn", method="POST")
-def learn(pyborg):
+def learn(pyborg) -> str:
     body = request.POST.getunicode("body")
     pyborg.learn(body)
     return "OK"
 
 
 @bottle.route("/reply", method="POST")
-def reply(pyborg):
+def reply(pyborg) -> str:
     body = request.POST.getunicode("body")
     logger.debug(type(body))
     return pyborg.reply(body)
 
 
 @bottle.route("/save", method="POST")
-def save(pyborg):
+def save(pyborg) -> str:
     with SAVE_LOCK:
         pyborg.save_brain()
         return f"Saved to {pyborg.brain_path}"
 
 
 @bottle.route("/info")
-def info(pyborg):
+def info(pyborg) -> tuple:
     return pyborg.ver_string, pyborg.brain_path
 
 
 @bottle.route("/info.json")
-def info2(pyborg):
+def info2(pyborg) -> Dict:
     return {"version_string": pyborg.ver_string, "brain": pyborg.brain_path}
 
 
 @bottle.route("/stats", method="POST")
-def stats(pyborg):
+def stats(pyborg) -> str:
     "record stats to statsd"
     send_stats(pyborg)
     return "OK"
@@ -74,20 +74,20 @@ def stats(pyborg):
 
 class DumbyIOMod:
     """fake IO mod for pyborg interop"""
-    def __init__(self):
+    def __init__(self) -> None:
         self.commandlist = ""
         self.message = None
         self.messages: List[str] = []  # New for multi-line output
         self.args = None
 
-    def output(self, message, args):
+    def output(self, message, args) -> None:
         self.messages.append(message)
         self.message = message
         self.args = args
 
 
 @bottle.route("/process", method="POST")
-def process(pyborg):
+def process(pyborg) -> str:
     body = request.POST.getunicode("body")
     reply_rate = int(request.POST.get("reply_rate"))
     learning = int(request.POST.get("learning"))
@@ -104,7 +104,7 @@ def process(pyborg):
 
 
 @bottle.route("/known")
-def known(pyborg):
+def known(pyborg) -> str:
     "return number of contexts"
     word = request.query.word
     try:
@@ -114,24 +114,24 @@ def known(pyborg):
 
 
 @bottle.route("/words.json")
-def words_json(pyborg):
+def words_json(pyborg) -> Dict:
     return {"words": pyborg.settings.num_words,
             "contexts": pyborg.settings.num_contexts,
             "lines": len(pyborg.lines)}
 
 
 @bottle.route("/commands.json")
-def commands_json(pyborg):
+def commands_json(pyborg) -> Dict:
     return pyborg.commanddict
 
 
 @bottle.get("/meta/status.json")
-def save_lock_status(pyborg):
+def save_lock_status(pyborg) -> Dict:
     return {"status": SAVE_LOCK.is_locked}
 
 
 @bottle.post("/meta/logging-level")
-def set_log_level():
+def set_log_level() -> None:
     """levels = {"DEBUG": logging.DEBUG, "INFO": logging.INFO,
               "WARNING": logging.WARNING, "ERROR": logging.ERROR, "CRITICAL": logging.CRITICAL}
     """

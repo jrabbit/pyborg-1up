@@ -17,18 +17,21 @@ import humanize
 import requests
 import six
 import toml
+import tweepy
 from discord import Client, Guild
 from mastodon import Mastodon
 
 import pyborg
 import pyborg.pyborg
 from pyborg.mod.mod_discord import PyborgDiscord
+from pyborg.mod.mod_filein import ModFileIn
 from pyborg.mod.mod_http import bottle
 from pyborg.mod.mod_irc import ModIRC
 from pyborg.mod.mod_linein import ModLineIn
 from pyborg.mod.mod_mastodon import PyborgMastodon
 from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.mod.mod_tumblr import PyborgTumblr
+from pyborg.mod.mod_twitter import PyborgTwitter
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.util_cli import init_systemd, mk_folder
 
@@ -46,7 +49,8 @@ folder = click.get_app_dir("Pyborg")
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
-def resolve_brain(target_brain):
+def resolve_brain(target_brain: str) -> str:
+    "utility function to get the brain path"
     if target_brain == "current":
         brain_path = os.path.join(folder, "brains", "current.pyborg.json")
 
@@ -64,7 +68,10 @@ def resolve_brain(target_brain):
 @click.option('--debug', default=False, is_flag=True, help="control log level")
 @click.option('--verbose/--silent', default=True, help="control log level")
 @click.pass_context
-def cli_base(ctx, verbose, debug, my_version):
+def cli_base(ctx: click.Context, verbose: bool, debug: bool, my_version: bool) -> None:
+    """Pyborg is a markov chain bot for IRC
+    (and other services [even at the same time with the same database])
+    that generates replies based on messages and it’s database"""
     mk_folder()
     # only the first basicConfig() is respected.
     if debug:
@@ -82,25 +89,27 @@ def cli_base(ctx, verbose, debug, my_version):
 
 @cli_base.command("help")
 @click.pass_context
-def local_help(ctx):
+def local_help(ctx: click.Context) -> None:
     """Show this message and exit."""
     print(ctx.parent.get_help())
 
 
 @cli_base.command("folder")
-def folder_info():
+def folder_info() -> None:
     "where pyborg will look for brains and toml confs"
     print(folder)
     logger.debug("folder: this uses https://click.palletsprojects.com/en/7.x/api/#click.get_app_dir and should work most of the time")
 
 
 @cli_base.group()
-def utils():
+def utils() -> None:
     "extra pyborg helper scripts"
-    pass
+    pass  # pylint: disable=W0107
+
 
 @utils.command("http")
-def dump_httpd_info():
+def dump_httpd_info() -> None:
+    "http helper script"
     multi_protocol = "http"
     multi_server = "localhost"
     multi_port = 2001
@@ -109,8 +118,9 @@ def dump_httpd_info():
     logging.debug(r)
     print(f"server is {'saving' if r.json()['status'] else 'not saving'}")
 
+
 @utils.command("systemd")
-def yeet_systemd():
+def yeet_systemd() -> None:
     "Set up systemd unit files for `pyborg http` and friends"
     print("generating systemd files seems weird.")
     init_systemd()
@@ -119,11 +129,12 @@ def yeet_systemd():
 
 
 @utils.group("manage-discord")
-def discord_mgr():
+def discord_mgr() -> None:
     "run administrative tasks on the bot"
-    pass
+    pass  # pylint: disable=W0107
 
-def _eris(f: Callable, debug=False) -> None:
+
+def _eris(f: Callable, debug: bool =False) -> None:
     "wrangle discord"
     conf = os.path.join(folder, "discord.toml")
     loop = asyncio.new_event_loop()
@@ -132,14 +143,16 @@ def _eris(f: Callable, debug=False) -> None:
         loop.set_debug(True)
     asyncio.set_event_loop(loop)
     our_discord_client = PyborgDiscord(conf, loop=loop)
-    t = asyncio.gather(our_discord_client.fancy_login(), asyncio.ensure_future(f(our_discord_client)), our_discord_client.teardown(), loop=loop)
+    tasks = (our_discord_client.fancy_login(), asyncio.ensure_future(f(our_discord_client)), our_discord_client.teardown())
+    t = asyncio.gather(*tasks, loop=loop)
     loop.run_until_complete(t)
 
+
 @discord_mgr.command("ls")
-def list_discord_servers():
+def list_discord_servers() -> None:
     "list servers pyborg is on w/ an addressable hash or ID"
 
-    async def list_inner(dc):
+    async def list_inner(dc: Client) -> None:
         await asyncio.sleep(1)
         async for guild in dc.fetch_guilds(limit=100):
             try:
@@ -149,11 +162,8 @@ def list_discord_servers():
     _eris(list_inner)
 
 
-class BadDiscordServerFragement(Exception):
-    pass
-
-
-async def resolve_guild(dc: Client, search_term: Union[int, str]) -> Guild:
+async def _resolve_guild(dc: Client, search_term: Union[int, str]) -> Guild:
+    "internal utility method to get the guild by partial name or short id"
     for g in dc.guilds:
         print(g)
         if search_term.isdigit():
@@ -167,15 +177,14 @@ async def resolve_guild(dc: Client, search_term: Union[int, str]) -> Guild:
     # raise BadDiscordServerFragement(search_term)
 
 
-
 @discord_mgr.command("rm")
 @click.argument("server_id_partial")
-def leave_discord_server(server_id_partial):
+def leave_discord_server(server_id_partial: str) -> None:
     "leave server matching SERVER_ID_PARTIAL"
 
-    async def leave_inner(dc):
+    async def leave_inner(dc: Client) -> None:
         await asyncio.sleep(1)
-        guild_id = await resolve_guild(dc, server_id_partial)
+        guild_id = await _resolve_guild(dc, server_id_partial)
         logger.info("got %s", guild_id)
         if guild_id:
             g = await dc.fetch_guild(guild_id)
@@ -188,10 +197,10 @@ def leave_discord_server(server_id_partial):
 
 
 @discord_mgr.command("i-rm")
-def interactive_leave_discord_server():
+def interactive_leave_discord_server() -> None:
     "offers to leave servers one-by-one"
 
-    async def leave_interactive_inner(dc):
+    async def leave_interactive_inner(dc: Client) -> None:
         await asyncio.sleep(1)
         async for guild in dc.fetch_guilds(limit=100):
             if click.confirm(f"do you want to leave {guild}?"):
@@ -202,15 +211,14 @@ def interactive_leave_discord_server():
     _eris(leave_interactive_inner)
 
 
-
 @discord_mgr.command("info")
 @click.argument("server_id_partial")
-def info_discord_server(server_id_partial):
+def info_discord_server(server_id_partial: str) -> None:
     "basic stats, # of users, current nickname, public stuff."
 
-    async def info_inner(dc):
+    async def info_inner(dc: Client) -> None:
         await asyncio.sleep(1)
-        g = await resolve_guild(dc, server_id_partial)
+        g = await _resolve_guild(dc, server_id_partial)
         if g:
             print(g, g.id, g.me.display_name, g.member_count)
         else:
@@ -222,13 +230,13 @@ def info_discord_server(server_id_partial):
 
 
 @cli_base.group()
-def brain():
+def brain() -> None:
     "Pyborg brain (pybrain.json) utils"
-    pass
+    pass  # pylint: disable=W0107
 
 
 @brain.command("list")
-def list_brains():
+def list_brains() -> None:
     "print out the pyborg brains (pybrain.json)s info"
     print(os.path.join(folder, "brains") + ":")
     for brain_name in os.listdir(os.path.join(folder, "brains")):
@@ -239,7 +247,7 @@ def list_brains():
 @brain.command()
 @click.option('--output', type=click.Path())
 @click.argument('target_brain', default="current")
-def backup(target_brain, output):
+def backup(target_brain: str, output: str) -> None:
     "Backup a specific brain"
     target = resolve_brain(target_brain)
     backup_name = datetime.datetime.now().strftime("pyborg-%m-%d-%y-archive")
@@ -250,7 +258,7 @@ def backup(target_brain, output):
 
 @brain.command()
 @click.argument('target_brain', default="current")
-def stats(target_brain):
+def stats(target_brain: str) -> None:
     "Get stats about a brain"
     brain_path = resolve_brain(target_brain)
     pyb = pyborg.pyborg.pyborg(brain=brain_path)
@@ -268,7 +276,7 @@ def stats(target_brain):
 @brain.command("import")
 @click.argument('target_brain', type=click.Path(exists=True), default="archive.zip")
 @click.option('--tag')
-def convert(target_brain, tag):
+def convert(target_brain: str, tag: str) -> None:
     "move your brain to the new central location"
     mk_folder()
     if tag is None:
@@ -282,7 +290,7 @@ def convert(target_brain, tag):
 
 @brain.command("upgrade")
 @click.argument('target_brain', default="current")
-def upgrade_to_json(target_brain):
+def upgrade_to_json(target_brain:str ) -> None:
     "Upgrade from a version 1.2 pyborg brain to 1.4 mono-json dict format"
     if target_brain == "current":
         brain_path = "archive.zip"
@@ -291,7 +299,7 @@ def upgrade_to_json(target_brain):
     else:
         brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
     words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
-    version = u"1.4.0"
+    version_str = u"1.4.0"
     tag_name = datetime.datetime.now().strftime("%m-%d-%y-import-archive")
     save_path = os.path.join(folder, "brains", "{}.pyborg.json".format(tag_name))
     for key, value in words.items():
@@ -313,7 +321,7 @@ def upgrade_to_json(target_brain):
         words[key] = new_packed
 
     with open(save_path, 'wb') as brain_file:
-        out = {"words": words, "lines": lines, "version": version}
+        out = {"words": words, "lines": lines, "version": version_str}
         json.dump(out, brain_file)
     print("Wrote out pyborg brain into {}".format(save_path))
 
@@ -321,7 +329,8 @@ def upgrade_to_json(target_brain):
 @brain.command()
 @click.option('--one-two', is_flag=True)
 @click.argument('target_brain', default="current")
-def doctor(target_brain, one_two):
+def doctor(target_brain: str, one_two: bool) -> None:
+    "run diagnostics on a specific pyborg brain"
     cnt = collections.Counter()
     brain_path = resolve_brain(target_brain)
 
@@ -338,8 +347,8 @@ def doctor(target_brain, one_two):
         sys.exit(8)
 
     # Type check the brain
-    assert isinstance(words, dict) # nosec
-    assert isinstance(lines, dict) # nosec
+    assert isinstance(words, dict)  # nosec
+    assert isinstance(lines, dict)  # nosec
     for key, value in words.items():
         cnt[type(key)] += 1
         for i in value:
@@ -350,7 +359,8 @@ def doctor(target_brain, one_two):
     print(cnt)
 
 
-def check_server(server, port=2001):
+def check_server(server: str, port: int =2001) -> None:
+    "checks if the server is up or bails (exits)"
     try:
         response = requests.get(f"http://{server}:{port}/")
         response.raise_for_status()
@@ -358,7 +368,9 @@ def check_server(server, port=2001):
         logger.error("pyborg http server uncontactable! exiting")
         sys.exit(8080)
 
-def run_mastodon(conf_file, secret_folder):
+
+def run_mastodon(conf_file: str, secret_folder: str) -> None:
+    "run mastodon utility function"
     with open(conf_file) as f:
         settings = toml.load(f)
     try:
@@ -383,7 +395,7 @@ def run_mastodon(conf_file, secret_folder):
 @click.option("--base-url", default="https://botsin.space/")
 @click.option("--conf-file", default=os.path.join(folder, "mastodon.toml"))
 @click.option("--secret-folder", default=folder)
-def mastodon(ctx, base_url, conf_file, secret_folder):
+def mastodon(ctx: click.Context, base_url: str, conf_file: str, secret_folder: str) -> None:
     "Run the mastodon mod; run register and login first"
     ctx.obj = dict()
     ctx.obj['base_url'] = base_url
@@ -398,7 +410,8 @@ def mastodon(ctx, base_url, conf_file, secret_folder):
 @click.option(
     "--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path()
 )
-def mastodon_register(ctx, cred_file, bot_name):
+def mastodon_register(ctx: click.Context, cred_file: str, bot_name: str) -> None:
+    "register your bot's account on the homeserver"
     Mastodon.create_app(bot_name, api_base_url=ctx.obj['base_url'], to_file=os.path.join(ctx.obj['secret_folder'], cred_file))
 
 
@@ -411,14 +424,15 @@ def mastodon_register(ctx, cred_file, bot_name):
     default='pyborg_mastodon_clientcred.secret',
     type=click.Path(exists=True),
 )
-def mastodon_login(ctx, cred_file, username, password):
-    mastodon = Mastodon(client_id=cred_file, api_base_url=ctx.obj['base_url'])
-    mastodon.log_in(username, password, to_file=os.path.join(ctx.obj['secret_folder'], 'pyborg_mastodon_usercred.secret'))
+def mastodon_login(ctx: click.Context, cred_file: str, username: str, password: str) -> None:
+    "login to your homeserver"
+    masto = Mastodon(client_id=cred_file, api_base_url=ctx.obj['base_url'])
+    masto.log_in(username, password, to_file=os.path.join(ctx.obj['secret_folder'], 'pyborg_mastodon_usercred.secret'))
 
 
 @cli_base.command()
 @click.option("--conf-file", type=click.Path(), default=os.path.join(folder, "irc.toml"))
-def irc(conf_file):
+def irc(conf_file: str) -> None:
     "runs the irc2 module a slim, secure pyborg irc bot"
     pyb = pyborg.pyborg.pyborg
     settings = toml.load(conf_file)
@@ -454,7 +468,7 @@ def irc(conf_file):
 
 @cli_base.command()
 @click.option("--conf-file", type=click.Path(), default=os.path.join(folder, "tumblr.toml"))
-def tumblr(conf_file):
+def tumblr(conf_file: str) -> None:
     "watch a tumblr tag for posts to respond to"
 
     bot = PyborgTumblr(conf_file)
@@ -474,9 +488,9 @@ def tumblr(conf_file):
 @click.option("--host", default="localhost")
 @click.option("--port", default=2001)
 @click.option("--reloader", default=False)
-def http(reloader, port, host, brain):
+def http(reloader: bool, port: int, host: str, brain_name: str) -> None:
     "Run a server for mutliheaded (multiplex) pyborg"
-    brain_path = resolve_brain(brain)
+    brain_path = resolve_brain(brain_name)
     bottle.install(BottledPyborg(brain_path=brain_path))
     bottle.run(host=host, port=port, reloader=reloader)
     bottle.default_app().close()
@@ -484,7 +498,7 @@ def http(reloader, port, host, brain):
 
 @cli_base.command('set-log-level')
 @click.argument("log-level")
-def set_logging_level(log_level):
+def set_logging_level(log_level: str) -> None:
     """configure mod_http's log level after launch
 
     use the levels from `logging`: (DEBUG, INFO, WARNING, ERROR, CRITICAL)
@@ -499,7 +513,7 @@ if aeidon:
     @cli_base.command()
     @click.argument("subtitle-file")
     @click.option("--conf-file", default=os.path.join(folder, "subtitle.toml"))
-    def subtitles(conf_file, subtitle_file):
+    def subtitles(conf_file: str, subtitle_file: str) -> None:
         "learn from subtitles! python3 only! thx aeidon"
         subs = PyborgSubtitles(conf_file=conf_file, subs_file=subtitle_file)
         subs.start()
@@ -507,9 +521,8 @@ if aeidon:
 
 @cli_base.command()
 @click.option("--conf-file", default=os.path.join(folder, "twitter.toml"))
-def twitter(conf_file):
+def twitter(conf_file: str) -> None:
     "be your own horse_ebooks: twitter module"
-    from pyborg.mod.mod_twitter import PyborgTwitter
 
     mod = PyborgTwitter(conf_file)
     try:
@@ -522,8 +535,8 @@ def twitter(conf_file):
         raise
 
 
-def get_api(conf_file):
-    import tweepy
+def get_api(conf_file: str) -> tweepy.API:
+    "get twitter api utility function"
 
     twsettings = toml.load(conf_file)
     auth = tweepy.OAuthHandler(
@@ -541,7 +554,7 @@ def get_api(conf_file):
 @cli_base.command()
 @click.argument("target-user")
 @click.option("--conf-file", default=os.path.join(folder, "twitter.toml"))
-def follow_twitter_user(conf_file, target_user):
+def follow_twitter_user(conf_file: str, target_user: str) -> None:
     "follow a twitter user over the api"
     api = get_api(conf_file)
     api.create_friendship(target_user)
@@ -558,9 +571,8 @@ def follow_twitter_user(conf_file, target_user):
 @cli_base.command()
 @click.argument("input-file")
 @click.option("--multiplex", default=True, type=click.BOOL)
-def filein(multiplex, input_file):
+def filein(multiplex: bool, input_file: str) -> None:
     """ascii file input module"""
-    from pyborg.mod.mod_filein import ModFileIn
 
     mod = ModFileIn(multiplexing=multiplex)
     mod.run(input_file)
@@ -568,9 +580,9 @@ def filein(multiplex, input_file):
 
 @cli_base.command()
 @click.option("--conf-file", default=os.path.join(folder, "discord.toml"))
-def discord(conf_file):
+def discord(conf_file: str) -> None:
     "Run the discord client"
-    bot = PyborgDiscord(conf_file)
+    bot = PyborgDiscord(toml_file=conf_file)
     try:
         bot.our_start()
     except KeyboardInterrupt:
@@ -583,7 +595,7 @@ def discord(conf_file):
 
 @cli_base.command()
 @click.option("--conf-file", default="reddit.toml")
-def reddit(conf_file):
+def reddit(conf_file: str) -> None:
     "Runs the reddit module"
     bot = PyborgReddit(conf_file)
     try:
@@ -598,7 +610,7 @@ def reddit(conf_file):
 
 @cli_base.command()
 @click.option("--multiplex", default=True, type=click.BOOL)
-def linein(multiplex):
+def linein(multiplex: bool) -> None:
     "This is a commandline repl for interacting with pyborg locally"
     my_pyborg = pyborg.pyborg.pyborg
     try:
@@ -610,7 +622,7 @@ def linein(multiplex):
 
 
 @cli_base.command()
-def version():
+def version() -> None:
     "output a version summary"
     print("I am a version {} pyborg!".format(pyborg.__version__))
     print(
@@ -625,4 +637,4 @@ def version():
 if __name__ == '__main__':
     # use this if we want to import third party commands or something
     # cli = click.CommandCollection(sources=[cli_base, brain])
-    cli_base()  # noqa
+    cli_base()  # noqa pylint: disable=E1120
