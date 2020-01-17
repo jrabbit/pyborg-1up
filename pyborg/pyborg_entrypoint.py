@@ -484,7 +484,7 @@ def tumblr(conf_file: str) -> None:
 
 
 @cli_base.command()
-@click.option("--brain", default="current")
+@click.option("--brain_name", default="current")
 @click.option("--host", default="localhost")
 @click.option("--port", default=2001)
 @click.option("--reloader", default=False)
