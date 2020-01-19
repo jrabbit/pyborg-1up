@@ -66,6 +66,7 @@ ipython = "^7.6"
 docutils = "^0.15"
 pylint = "^2.3.1"
 bandit = "^1.6.2"
+black = "^19.10b0"
 
 [tool.poetry.extras]
 nlp = ["nltk"]
