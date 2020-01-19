@@ -34,6 +34,7 @@ from pyborg.util.hate_filter import SUBREDDIT_HATE_LIST
 
 logger = logging.getLogger(__name__)
 
+
 @attr.s
 class PyborgReddit():
     """Takes a toml config file path"""

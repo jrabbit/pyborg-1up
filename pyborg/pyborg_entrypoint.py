@@ -46,7 +46,7 @@ logger = logging.getLogger(__name__)
 
 folder = click.get_app_dir("Pyborg")
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 def resolve_brain(target_brain: str) -> str:
@@ -64,9 +64,9 @@ def resolve_brain(target_brain: str) -> str:
 
 
 @click.group(context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
-@click.option('--version', 'my_version', default=False, is_flag=True, help="output a version summary")
-@click.option('--debug', default=False, is_flag=True, help="control log level")
-@click.option('--verbose/--silent', default=True, help="control log level")
+@click.option("--version", "my_version", default=False, is_flag=True, help="output a version summary")
+@click.option("--debug", default=False, is_flag=True, help="control log level")
+@click.option("--verbose/--silent", default=True, help="control log level")
 @click.pass_context
 def cli_base(ctx: click.Context, verbose: bool, debug: bool, my_version: bool) -> None:
     """Pyborg is a markov chain bot for IRC
@@ -125,6 +125,7 @@ def yeet_systemd() -> None:
     print("generating systemd files seems weird.")
     init_systemd()
 
+
 # Discord utils
 
 
@@ -134,7 +135,7 @@ def discord_mgr() -> None:
     pass  # pylint: disable=W0107
 
 
-def _eris(f: Callable, debug: bool =False) -> None:
+def _eris(f: Callable, debug: bool = False) -> None:
     "wrangle discord"
     conf = os.path.join(folder, "discord.toml")
     loop = asyncio.new_event_loop()
@@ -159,6 +160,7 @@ def list_discord_servers() -> None:
                 print(guild, guild.id)
             except:
                 logger.exception("manage-discord: had discord api issue probably")
+
     _eris(list_inner)
 
 
@@ -226,6 +228,7 @@ def info_discord_server(server_id_partial: str) -> None:
 
     _eris(info_inner)
 
+
 # Brains!
 
 
@@ -245,8 +248,8 @@ def list_brains() -> None:
 
 
 @brain.command()
-@click.option('--output', type=click.Path())
-@click.argument('target_brain', default="current")
+@click.option("--output", type=click.Path())
+@click.argument("target_brain", default="current")
 def backup(target_brain: str, output: str) -> None:
     "Backup a specific brain"
     target = resolve_brain(target_brain)
@@ -257,25 +260,17 @@ def backup(target_brain: str, output: str) -> None:
 
 
 @brain.command()
-@click.argument('target_brain', default="current")
+@click.argument("target_brain", default="current")
 def stats(target_brain: str) -> None:
     "Get stats about a brain"
     brain_path = resolve_brain(target_brain)
     pyb = pyborg.pyborg.pyborg(brain=brain_path)
-    print(
-        json.dumps(
-            {
-                "words": pyb.settings.num_words,
-                "contexts": pyb.settings.num_contexts,
-                "lines": len(pyb.lines),
-            }
-        )
-    )
+    print(json.dumps({"words": pyb.settings.num_words, "contexts": pyb.settings.num_contexts, "lines": len(pyb.lines),}))
 
 
 @brain.command("import")
-@click.argument('target_brain', type=click.Path(exists=True), default="archive.zip")
-@click.option('--tag')
+@click.argument("target_brain", type=click.Path(exists=True), default="archive.zip")
+@click.option("--tag")
 def convert(target_brain: str, tag: str) -> None:
     "move your brain to the new central location"
     mk_folder()
@@ -289,8 +284,8 @@ def convert(target_brain: str, tag: str) -> None:
 
 
 @brain.command("upgrade")
-@click.argument('target_brain', default="current")
-def upgrade_to_json(target_brain:str ) -> None:
+@click.argument("target_brain", default="current")
+def upgrade_to_json(target_brain: str) -> None:
     "Upgrade from a version 1.2 pyborg brain to 1.4 mono-json dict format"
     if target_brain == "current":
         brain_path = "archive.zip"
@@ -299,14 +294,14 @@ def upgrade_to_json(target_brain:str ) -> None:
     else:
         brain_path = os.path.join(folder, "brains", "{}.zip".format(target_brain))
     words, lines = pyborg.pyborg.pyborg.load_brain_2(brain_path)
-    version_str = u"1.4.0"
+    version_str = "1.4.0"
     tag_name = datetime.datetime.now().strftime("%m-%d-%y-import-archive")
     save_path = os.path.join(folder, "brains", "{}.pyborg.json".format(tag_name))
     for key, value in words.items():
         if isinstance(key, six.text_type):
             logger.info("Repairing bad unicode type in dictionary...")
             del words[key]
-            safe_key = key.encode('utf-8')
+            safe_key = key.encode("utf-8")
             logger.info("New type: %s", type(safe_key))
             logger.info("new key: %s", safe_key)
             words[safe_key] = value
@@ -320,15 +315,15 @@ def upgrade_to_json(target_brain:str ) -> None:
             new_packed.append({"hashval": hashval, "index": idx})
         words[key] = new_packed
 
-    with open(save_path, 'wb') as brain_file:
+    with open(save_path, "wb") as brain_file:
         out = {"words": words, "lines": lines, "version": version_str}
         json.dump(out, brain_file)
     print("Wrote out pyborg brain into {}".format(save_path))
 
 
 @brain.command()
-@click.option('--one-two', is_flag=True)
-@click.argument('target_brain', default="current")
+@click.option("--one-two", is_flag=True)
+@click.argument("target_brain", default="current")
 def doctor(target_brain: str, one_two: bool) -> None:
     "run diagnostics on a specific pyborg brain"
     cnt = collections.Counter()
@@ -359,7 +354,7 @@ def doctor(target_brain: str, one_two: bool) -> None:
     print(cnt)
 
 
-def check_server(server: str, port: int =2001) -> None:
+def check_server(server: str, port: int = 2001) -> None:
     "checks if the server is up or bails (exits)"
     try:
         response = requests.get(f"http://{server}:{port}/")
@@ -398,8 +393,8 @@ def run_mastodon(conf_file: str, secret_folder: str) -> None:
 def mastodon(ctx: click.Context, base_url: str, conf_file: str, secret_folder: str) -> None:
     "Run the mastodon mod; run register and login first"
     ctx.obj = dict()
-    ctx.obj['base_url'] = base_url
-    ctx.obj['secret_folder'] = secret_folder
+    ctx.obj["base_url"] = base_url
+    ctx.obj["secret_folder"] = secret_folder
     if ctx.invoked_subcommand is None:
         run_mastodon(conf_file, secret_folder)
 
@@ -407,12 +402,10 @@ def mastodon(ctx: click.Context, base_url: str, conf_file: str, secret_folder: s
 @mastodon.command(name="register")
 @click.argument("bot_name")
 @click.pass_context
-@click.option(
-    "--cred-file", default='pyborg_mastodon_clientcred.secret', type=click.Path()
-)
+@click.option("--cred-file", default="pyborg_mastodon_clientcred.secret", type=click.Path())
 def mastodon_register(ctx: click.Context, cred_file: str, bot_name: str) -> None:
     "register your bot's account on the homeserver"
-    Mastodon.create_app(bot_name, api_base_url=ctx.obj['base_url'], to_file=os.path.join(ctx.obj['secret_folder'], cred_file))
+    Mastodon.create_app(bot_name, api_base_url=ctx.obj["base_url"], to_file=os.path.join(ctx.obj["secret_folder"], cred_file))
 
 
 @mastodon.command("login")
@@ -420,14 +413,12 @@ def mastodon_register(ctx: click.Context, cred_file: str, bot_name: str) -> None
 @click.password_option()
 @click.pass_context
 @click.option(
-    "--cred-file",
-    default='pyborg_mastodon_clientcred.secret',
-    type=click.Path(exists=True),
+    "--cred-file", default="pyborg_mastodon_clientcred.secret", type=click.Path(exists=True),
 )
 def mastodon_login(ctx: click.Context, cred_file: str, username: str, password: str) -> None:
     "login to your homeserver"
-    masto = Mastodon(client_id=cred_file, api_base_url=ctx.obj['base_url'])
-    masto.log_in(username, password, to_file=os.path.join(ctx.obj['secret_folder'], 'pyborg_mastodon_usercred.secret'))
+    masto = Mastodon(client_id=cred_file, api_base_url=ctx.obj["base_url"])
+    masto.log_in(username, password, to_file=os.path.join(ctx.obj["secret_folder"], "pyborg_mastodon_usercred.secret"))
 
 
 @cli_base.command()
@@ -436,9 +427,9 @@ def irc(conf_file: str) -> None:
     "runs the irc2 module a slim, secure pyborg irc bot"
     pyb = pyborg.pyborg.pyborg
     settings = toml.load(conf_file)
-    if settings['multiplex']:
+    if settings["multiplex"]:
         try:
-            check_server(settings['multiplex_server'])
+            check_server(settings["multiplex_server"])
         except requests.exceptions.ConnectionError:
             logger.error("Connection to pyborg server failed!")
             print("Is pyborg_http running?")
@@ -453,7 +444,7 @@ def irc(conf_file: str) -> None:
         bot.teardown()
         bot.disconnect("Killed at terminal.")
     except IOError as e:
-        if bot.settings['multiplex']:
+        if bot.settings["multiplex"]:
             logger.error(e)
             logger.info("Is pyborg http running?")
         else:
@@ -496,20 +487,19 @@ def http(reloader: bool, port: int, host: str, brain_name: str) -> None:
     bottle.default_app().close()
 
 
-@cli_base.command('set-log-level')
+@cli_base.command("set-log-level")
 @click.argument("log-level")
 def set_logging_level(log_level: str) -> None:
     """configure mod_http's log level after launch
 
     use the levels from `logging`: (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     """
-    ret = requests.post(
-        "http://localhost:2001/logging-level", data={"level": log_level}
-    )
+    ret = requests.post("http://localhost:2001/logging-level", data={"level": log_level})
     ret.raise_for_status()
 
 
 if aeidon:
+
     @cli_base.command()
     @click.argument("subtitle-file")
     @click.option("--conf-file", default=os.path.join(folder, "subtitle.toml"))
@@ -539,13 +529,9 @@ def get_api(conf_file: str) -> tweepy.API:
     "get twitter api utility function"
 
     twsettings = toml.load(conf_file)
-    auth = tweepy.OAuthHandler(
-        twsettings['twitter']['auth']['consumer_key'],
-        twsettings['twitter']['auth']['consumer_secret'],
-    )
+    auth = tweepy.OAuthHandler(twsettings["twitter"]["auth"]["consumer_key"], twsettings["twitter"]["auth"]["consumer_secret"],)
     auth.set_access_token(
-        twsettings['twitter']['auth']['access_token'],
-        twsettings['twitter']['auth']['access_token_secret'],
+        twsettings["twitter"]["auth"]["access_token"], twsettings["twitter"]["auth"]["access_token_secret"],
     )
     api = tweepy.API(auth)
     return api
@@ -625,16 +611,10 @@ def linein(multiplex: bool) -> None:
 def version() -> None:
     "output a version summary"
     print("I am a version {} pyborg!".format(pyborg.__version__))
-    print(
-        "I'm running on {} {}/{}".format(
-            platform.python_implementation(),
-            platform.python_version(),
-            platform.platform(),
-        )
-    )
+    print("I'm running on {} {}/{}".format(platform.python_implementation(), platform.python_version(), platform.platform(),))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # use this if we want to import third party commands or something
     # cli = click.CommandCollection(sources=[cli_base, brain])
     cli_base()  # noqa pylint: disable=E1120
