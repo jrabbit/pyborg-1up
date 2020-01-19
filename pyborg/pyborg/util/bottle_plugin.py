@@ -13,6 +13,7 @@ folder = click.get_app_dir("Pyborg")
 logger = logging.getLogger(__name__)
 SAVE_LOCK = FileLock(Path(folder, ".pyborg_is_saving.lock"))
 
+
 @attr.s
 class BottledPyborg():
     brain_path = attr.ib()
