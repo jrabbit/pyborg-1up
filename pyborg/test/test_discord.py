@@ -102,6 +102,7 @@ class TestPlaintexPing(unittest.TestCase):
         patched_learn.assert_called_once_with(patched_normalize.return_value)
         patched_reply.assert_called_once_with(patched_normalize.return_value)
 
+@unittest.skip("not implemented yet")
 @mock.patch("pyborg.mod.mod_discord.PyborgDiscord._plaintext_name")
 @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
 @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
