@@ -118,11 +118,11 @@ def dump_httpd_info() -> None:
     logging.debug(r)
     print(f"server is {'saving' if r.json()['status'] else 'not saving'}")
 
-
 @utils.command("systemd")
 def yeet_systemd() -> None:
-    "Set up systemd unit files for `pyborg http` and friends"
-    print("generating systemd files seems weird.")
+    "put systemd unit files in current directory"
+    print("generated systemd files are here in this directory. Copy them into systemd (try /usr/lib/systemd/system/) with any adjustments")
+    print("then run `systemctl reload-daemon`")
     init_systemd()
 
 

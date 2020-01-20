@@ -62,3 +62,4 @@ archive.zip
 misc/
 /@*_tmp*
 .coverage*
+*.service
