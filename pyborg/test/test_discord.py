@@ -102,6 +102,29 @@ class TestPlaintexPing(unittest.TestCase):
         patched_learn.assert_called_once_with(patched_normalize.return_value)
         patched_reply.assert_called_once_with(patched_normalize.return_value)
 
+@mock.patch("pyborg.mod.mod_discord.PyborgDiscord._plaintext_name")
+@mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
+@asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+@asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+class TestPlaintextPingRedact(unittest.TestCase):
+    def setUp(self):
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
+        self.pybd = pyborg.mod.mod_discord.PyborgDiscord(Path("pyborg", "test", "fixtures", "discord.toml"))
+    
+    def tearDown(self):
+        self.loop.close()
+
+    def test_nick_purged(self, patched_reply, patched_learn, patched_user, patched_plaintext):
+        msg = asynctest.MagicMock()
+        msg.channel.send = asynctest.CoroutineMock()
+        msg.content.return_value = "pyborg tell me about life"
+        patched_user.mentioned_in.return_value = False
+        patched_plaintext.return_value = True  # implict
+        self.loop.run_until_complete(self.pybd.on_message(msg))
+        patched_learn.assert_called_once_with("#nick tell me about life")
+        patched_reply.assert_called_once_with("tell me about life")
+
 
 @unittest.skip
 class TestCustomEmojis(unittest.TestCase):
