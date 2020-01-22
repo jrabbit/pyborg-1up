@@ -122,7 +122,8 @@ def dump_httpd_info() -> None:
 def yeet_systemd() -> None:
     "put systemd unit files in current directory"
     print("generated systemd files are here in this directory. Copy them into systemd (try /usr/lib/systemd/system/) with any adjustments")
-    print("then run `systemctl reload-daemon`")
+    print("for pyborg's http server:\n\tsudo install ./pyborg_http.service /usr/lib/systemd/system/")
+    print("then run: \n\tsudo systemctl reload-daemon")
     init_systemd()
 
 

@@ -94,6 +94,15 @@ def docker_gauntlet(c):
     pprint(results)
 
 @task
+def systemd_tests(c):
+    "test systemd units with a podman container"
+    with c.cd("misc/systemd_explorer"):
+        c.run("podman build -t pyborg_systemd_explorer .", pty=True)
+    g = c.run("podman run -d -v $PWD:/srv pyborg_systemd_explorer")
+    cid = g.stdout
+    c.run(f"podman exec -ti {cid} /srv/misc/systemd_explorer/systemd_install.sh", pty=True)
+
+@task
 def outdated(c):
     "outdated packages"
     c.run("poetry show -o")
