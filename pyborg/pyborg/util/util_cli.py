@@ -57,7 +57,7 @@ class Service:
         config = configparser.ConfigParser()
         # we cant caps preserved
         # https://docs.python.org/3/library/configparser.html#configparser.ConfigParser.optionxform
-        config.optionxform = lambda option: option
+        config.optionxform = lambda option: option # type: ignore
         config["Unit"] = dict()
         config["Unit"]["Description"] = self.desc
         config["Unit"]["After"] = "network.target"
