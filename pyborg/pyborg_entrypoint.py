@@ -33,7 +33,7 @@ from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.mod.mod_tumblr import PyborgTumblr
 from pyborg.mod.mod_twitter import PyborgTwitter
 from pyborg.util.bottle_plugin import BottledPyborg
-from pyborg.util.util_cli import init_systemd, mk_folder
+from pyborg.util.util_cli import init_systemd, mk_folder, networkx_demo
 
 try:
     import aeidon
@@ -266,6 +266,13 @@ def stats(target_brain: str) -> None:
     brain_path = resolve_brain(target_brain)
     pyb = pyborg.pyborg.pyborg(brain=brain_path)
     print(json.dumps({"words": pyb.settings.num_words, "contexts": pyb.settings.num_contexts, "lines": len(pyb.lines),}))
+
+@brain.command()
+@click.argument("target_brain", default="current")
+def graph(target_brain: str) -> None:
+    brain_path = resolve_brain(target_brain)
+    pyb = pyborg.pyborg.pyborg(brain_path)
+    print(networkx_demo(pyb, export=True))
 
 
 @brain.command("import")
