@@ -80,7 +80,7 @@ class TestPyborgInit(unittest.TestCase):
         self.assertEqual(words, expected_words)
         self.assertEqual(lines, expected_lines)
 
-
+@unittest.skip("archive.zip handling removed.")
 class TestPyborgClobbersave(unittest.TestCase):
 
     def setUp(self):
