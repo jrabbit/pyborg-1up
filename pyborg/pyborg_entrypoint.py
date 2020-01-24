@@ -238,6 +238,12 @@ def brain() -> None:
     "Pyborg brain (pybrain.json) utils"
     pass  # pylint: disable=W0107
 
+@brain.command("ls")
+@click.pass_context
+def ls_brains(ctx) -> None:
+    "shortcut for list"
+    ctx.invoke(list_brains)
+
 
 @brain.command("list")
 def list_brains() -> None:
