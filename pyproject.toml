@@ -17,9 +17,6 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Topic :: Communications :: Chat :: Internet Relay Chat",
     "Topic :: Games/Entertainment",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
 ]
 [tool.poetry.scripts]
 pyborg = 'pyborg_entrypoint:cli_base'
