@@ -82,6 +82,10 @@ class Service:
         with open(unit_file, "w") as fp:
             config.write(fp)
 
+@attr.s
+class Timer:
+    name: str = attr.ib()
+
 SERVICES = [
     Service("http", "pyborg multiplexing server"),
     Service("discord", "pyborg discord client", wants="pyborg_http"),

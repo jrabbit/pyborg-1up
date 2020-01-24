@@ -4,7 +4,7 @@ import requests
 
 import pyborg
 
-from .util.irc import command
+from .util.commands import command
 
 logger = logging.getLogger(__name__)
 
