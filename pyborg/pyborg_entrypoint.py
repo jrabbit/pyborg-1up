@@ -10,8 +10,8 @@ import platform
 import shutil
 import struct
 import sys
-from typing import Callable, Union
 from pathlib import Path
+from typing import Callable, Union
 
 import click
 import humanize
@@ -34,8 +34,8 @@ from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.mod.mod_tumblr import PyborgTumblr
 from pyborg.mod.mod_twitter import PyborgTwitter
 from pyborg.util.bottle_plugin import BottledPyborg
-from pyborg.util.util_cli import init_systemd, mk_folder, networkx_demo
 from pyborg.util.config_defaults import configs as STOCK_CONFIGS
+from pyborg.util.util_cli import init_systemd, mk_folder, networkx_demo
 
 try:
     import aeidon
