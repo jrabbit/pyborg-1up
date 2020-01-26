@@ -6,15 +6,16 @@ from functools import partial
 import irc
 import irc.bot
 import irc.strings
-import pyborg.pyborg
-import pyborg.commands
-import venusian
 import requests
+import venusian
+
+import pyborg.commands
+import pyborg.pyborg
 
 logger = logging.getLogger(__name__)
 
 
-class Registry(object):
+class Registry():
     """Command registry of decorated pyborg commands"""
 
     def __init__(self, mod_irc):

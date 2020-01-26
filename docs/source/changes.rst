@@ -3,8 +3,20 @@ Changes
 
 Changelog summaries; for past changes check `the github releases <https://github.com/jrabbit/pyborg-1up/releases>`_
 
+2.0
+---
 
-Next (1.4.0)
+- Dropped python 2 support
+- async http client use in discord module
+- api rewrite, optional v1 bridge class for old style compat w/ the class formerly known as pyborg's new internals
+- discord server management commands
+- new package depenency extras: :kbd:`nlp`, :kbd:`subtitles`
+- uses poetry for package lifecycle management
+- coverage reporting fixed
+- `stronger tokenizer <https://www.nltk.org/api/nltk.tokenize.html#module-nltk.tokenize.casual>`_ more tuned for internet text
+- mastodon toml config fields normalized to :kbd:`[pyborg][multiplex_server]`, :kbd:`[pyborg][multiplex_port]`
+
+1.4.0
 ------------
 
 - Added nickname plaintext pings in discord module.

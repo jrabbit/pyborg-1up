@@ -1,7 +1,7 @@
 #
 # PyBorg reddit file input module
 #
-# Copyright (c) 2000, 2006, 2010-2017 Tom Morton, Sebastien Dailly, Jrabbit
+# Copyright (c) 2000, 2006, 2010-2019 Tom Morton, Sebastien Dailly, Jrabbit
 #
 #
 # This program is free software; you can redistribute it and/or
@@ -21,11 +21,13 @@
 import logging
 import time
 
+import attr
 import arrow
 import praw
 import requests
 import six
 import toml
+from typing import MutableMapping
 
 from pyborg import pyborg
 from pyborg.util.hate_filter import SUBREDDIT_HATE_LIST
@@ -33,10 +35,19 @@ from pyborg.util.hate_filter import SUBREDDIT_HATE_LIST
 logger = logging.getLogger(__name__)
 
 
-class PyborgReddit(object):
-
+@attr.s
+class PyborgReddit():
     """Takes a toml config file path"""
-    CHUNKING = 100
+
+    CHUNKING: int = attr.ib(default=100)
+    toml_file = attr.ib(default="reddit.toml")
+    settings: MutableMapping = attr.ib(init=False)
+    multiplexing: bool = attr.ib(init=False)
+    multi_server: str = attr.ib(init=False)
+    hate_filter_off: bool = attr.ib(init=False)
+    auth_app_id: str = attr.ib(init=False)
+    auth_script_secret: str = attr.ib(init=False)
+    reddit: praw.Reddit = attr.ib(init=False)
 
     def __init__(self, toml_file="reddit.toml"):
         self.toml_file = toml_file
@@ -55,7 +66,7 @@ class PyborgReddit(object):
 
         self.reddit = praw.Reddit(client_id=self.auth_app_id,
                                   client_secret=self.auth_script_secret,
-                                  user_agent='pyborg for reddit/0.0.3 pyborg/1.3.0')
+                                  user_agent='pyborg for reddit/0.0.4 pyborg/2.0.0')
 
         if not self.multiplexing:
             self.pyborg = pyborg.pyborg()

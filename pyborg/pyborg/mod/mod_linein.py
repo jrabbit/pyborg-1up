@@ -42,12 +42,12 @@ history = InMemoryHistory()
 #         return None
 
 
-class ModLineIn(object):
-
+class ModLineIn():
     """
     Module to interface console input and output with the PyBorg learn
     and reply modules. Allows offline chat with PyBorg.
     """
+
     # Command list for this module
     commandlist = "LineIn Module Commands:\n!quit"
     commanddict = {

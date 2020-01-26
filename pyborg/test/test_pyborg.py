@@ -1,17 +1,18 @@
 import logging
 import unittest
+from unittest import mock
 
 import pyborg.pyborg
 from pyborg.mod.mod_http import DumbyIOMod
 
 try:
-    from unittest import mock
+    import nltk
 except ImportError:
-    import mock
+    nltk = None
 
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 
 class TestPyborgInit(unittest.TestCase):
@@ -79,7 +80,7 @@ class TestPyborgInit(unittest.TestCase):
         self.assertEqual(words, expected_words)
         self.assertEqual(lines, expected_lines)
 
-
+@unittest.skip("archive.zip handling removed.")
 class TestPyborgClobbersave(unittest.TestCase):
 
     def setUp(self):
@@ -135,8 +136,7 @@ class TestPyborgSave(unittest.TestCase):
     @mock.patch("toml.load")
     def test_save_db(self, patched_toml, patched_json):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
-        patched_json.return_value = {
-            'version': u"1.4.0", 'words': self.words, 'lines': self.lines}
+        patched_json.return_value = {'version': u"1.4.0", 'words': self.words, 'lines': self.lines}
         # m = mock.mock_open()
         # with mock.patch('pyborg.pyborg.open', m):
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
@@ -148,9 +148,13 @@ class TestPyborgSave(unittest.TestCase):
 
 class TestPyborgLearning(unittest.TestCase):
     "Test learning"
+
+    @mock.patch("json.loads")
     @mock.patch("toml.load")
-    def test_functional_learn(self, patched_toml):
+    def test_functional_learn(self, patched_toml, patched_json):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        with open("pyborg/test/fixtures/small.brain.pyborg.json") as f:
+            patched_json.return_value = f.read()
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
         our_pyb.learn("Read a book, any book - Trotskist Proverb")
         our_pyb.learn("You should play dota 2 it's fun")
@@ -161,6 +165,20 @@ class TestPyborgLearning(unittest.TestCase):
         print(our_pyb)
         self.assertNotEqual(len(our_pyb.words), 0)
 
+@unittest.skipIf(not nltk, "advanced lexing uses nltk, install the `nlp` extra.")
+class TestPyborgParsesQuestions(unittest.TestCase):
+    "check if pyborg keeps punctuation on the word or not"
+
+    @mock.patch("toml.load")
+    def test_parse_question(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path-like")
+        our_pyb.learn("the grand nagus")
+        our_pyb.learn("who is the grand nagus")
+        our_pyb.learn("where is the grand nagus?")
+        self.assertIn("nagus", our_pyb.words)
+        self.assertIn("the", our_pyb.words)
+        self.assertNotIn("nagus?", our_pyb.words)
 
 @mock.patch("toml.load")
 class TestPyborgUnlearnWord(unittest.TestCase):
