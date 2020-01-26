@@ -27,10 +27,18 @@ class PyborgDiscord(discord.Client):
     multiplexing: bool = attr.ib(default=True)
     multi_server: str = attr.ib(default="localhost")
     registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
+    aio_session: aiohttp.ClientSession = attr.ib(init=False)
+    save_status_count : int = attr.ib(default=0, init=False)
+    pyborg = attr.ib(default=None)
+    scanner = attr.ib(default=None)
+    loop = attr.ib(default=None)
+    settings: Dict = attr.ib(default=None)
+    prefix: str = atrr.ib(default="!")
 
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
         try:
+            self.prefix = self.settings['discord']['prefix']
             self.multiplexing = self.settings['pyborg']['multiplex']
             self.multi_server = self.settings['pyborg']['multiplex_server']
             self.multi_port = self.settings['pyborg']['multiplex_port']
@@ -82,12 +90,12 @@ class PyborgDiscord(discord.Client):
     async def on_message(self, message: discord.Message) -> None:
         """message.content  ~= <@221134985560588289> you should play dota"""
         logger.debug(message.content)
-        if message.content and message.content[0] == "!":
+        if message.content and message.content[0] == self.prefix:
             command_name = message.content.split()[0][1:]
             if command_name in ["list", "help"]:
                 help_text = "I have a bunch of commands:"
                 for k, v in self.registry.registered.items():
-                    help_text += " !{}".format(k)
+                    help_text += f" {self.prefix}{k}"
                 await message.channel.send(help_text)
             else:
                 if command_name in self.registry.registered:
