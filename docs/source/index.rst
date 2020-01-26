@@ -33,7 +33,7 @@ We're on the cheeseshop.
 
 optional extras:
    - nlp (need nltk data deps)
-   - subtitles (need libenchant-dev)
+   - subtitles
 
 
 Advanced NLTK integration
