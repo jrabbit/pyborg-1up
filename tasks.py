@@ -114,10 +114,10 @@ def lint(c, mypy=True, pylint=False):
     pp = Path("pyborg", "pyborg")
     if mypy:
         print("mypy")
-        c.run(f"poetry run mypy {pp}", warn=True)
+        c.run(f"poetry run mypy {pp}", warn=True, pty=True)
     if pylint:
         print("pylint")
         entrypoint = Path("pyborg", "pyborg_entrypoint.py")
-        c.run(f"poetry run pylint {pp} {entrypoint}", warn=True)
+        c.run(f"poetry run pylint {pp} {entrypoint}", warn=True, pty=True)
     print("flake8")
-    c.run("poetry run flake8 --config=tox.ini --count pyborg", warn=True)
+    c.run("poetry run flake8 --config=tox.ini --count pyborg", warn=True, pty=True)

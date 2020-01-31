@@ -47,7 +47,7 @@ class Service:
     "a pyborg process a user may be running"
     name: str = attr.ib()
     desc: str = attr.ib()
-    wants: str = attr.ib(default=False)
+    wants: str = attr.ib(default=None)
 
     def yeet(self, working_directory=None, user=True) -> None:
         "make a systemd unit file for this service"

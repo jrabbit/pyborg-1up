@@ -1,4 +1,5 @@
-from typing import Callable
+"command loading utils for the venusian powered decorator registry pattern"
+from typing import Callable, Dict, Any
 from pathlib import Path
 import logging
 
@@ -20,11 +21,12 @@ def command(internals: bool = False, pass_msg: bool = False) -> Callable:
     return decorator
 
 
-def load_simple_commands(directory: Path):
+def load_simple_commands(directory: Path) -> Dict[str, Callable]:
     "load sinmple commands"
-    out = dict()
+    out: Dict[str, Callable] = dict()
     files = directory.glob("*.toml")
     for f in files:
         with open(f) as fd:
             dx = toml.load(fd)
             out.update(dx)
+    return out

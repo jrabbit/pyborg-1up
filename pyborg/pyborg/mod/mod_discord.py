@@ -4,9 +4,15 @@ pyborg discord module
 import asyncio
 import logging
 import re
+import sys
 from functools import partial
 from types import ModuleType
-from typing import Any, Callable, Dict, List, MutableMapping, Optional, Union
+from typing import cast, overload, Any, Callable, Dict, List, MutableMapping, Optional, Union
+from pathlib import Path
+if sys.version_info >= (3,8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
 
 import aiohttp
 import attr
@@ -25,12 +31,12 @@ logger = logging.getLogger(__name__)
 class PyborgDiscord(discord.Client):
     """This is the pyborg discord client module.
     It connects over http to a running pyborg/http service."""
-    toml_file: str = attr.ib()  # any old path
+    toml_file: Union[Path, str] = attr.ib()
     multi_port: int = attr.ib(default=2001)
     multiplexing: bool = attr.ib(default=True)
     multi_server: str = attr.ib(default="localhost")
     multi_protocol: str = attr.ib(default="http")
-    registry = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
+    registry: "Registry" = attr.ib(default=attr.Factory(lambda self: Registry(self), takes_self=True))
     aio_session: aiohttp.ClientSession = attr.ib(init=False)
     save_status_count: int = attr.ib(default=0, init=False)
     pyborg: Optional[pyb_core.pyborg] = attr.ib(default=None)
@@ -117,7 +123,7 @@ class PyborgDiscord(discord.Client):
                     logger.debug("cmd: Running command %s", command)
                     logger.debug("cmd: pass message?: %s", command.pass_msg)
                     if command.pass_msg:
-                        await message.channel.send(command(msg=message.content))
+                        await message.channel.send(command(msg=str(message.content)))
                     else:
                         await message.channel.send(command())
         if message.author == self.user:
@@ -223,25 +229,38 @@ class PyborgDiscord(discord.Client):
         "look for commands to add to registry"
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
-#
-#class FancyCallable(Callable):
-#    pass_msg: bool
 
+class FancyCallable(Protocol):
+    "this encodes the type of commands for mypy checking, has no runtime effects"
+    pass_msg: bool
+
+    @overload
+    def __call__(self) -> str:
+        ...
+    @overload
+    def __call__(self, msg: Optional[str])-> str:
+        ...
+    @overload
+    def __call__(self, multiplex: Optional[bool], multi_server: Optional[str]) -> str:
+        ...
+    def __call__(self, multiplex: Optional[bool], multi_server: Optional[str], msg: Optional[str]) -> str:
+        ...
 
 class Registry():
     """Command registry of decorated pyborg commands"""
     def __init__(self, mod: PyborgDiscord) -> None:
-        self.registered: Dict[str, Callable] = {}
+        self.registered: Dict[str, FancyCallable] = {}
         self.mod = mod
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.mod} command registry with {len(self.registered.keys())}"
 
     def add(self, name: str, ob: Callable, internals: bool, pass_msg: bool) -> None:
-        "add command to the registry. takes two config options."
-        self.registered[name] = ob
+        """add command to the registry. takes two config options.
+        typing info: makes ob into a FancyCallable"""
+        self.registered[name] = cast(FancyCallable, ob)
         if internals:
-            self.registered[name] = partial(ob, self.mod.multiplexing, multi_server="http://{}:{}/".format(self.mod.multi_server, self.mod.multi_port))
+            self.registered[name] = cast(FancyCallable,partial(ob, self.mod.multiplexing, multi_server="http://{}:{}/".format(self.mod.multi_server, self.mod.multi_port)))
             self.registered[name].pass_msg = False
         if pass_msg:
             self.registered[name].pass_msg = True

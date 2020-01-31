@@ -1545,7 +1545,6 @@ version = "1.4.1"
 [[package]]
 category = "main"
 description = "Backported and Experimental Type Hints for Python 3.5+"
-marker = "python_version < \"3.7\" or python_version >= \"3.7\""
 name = "typing-extensions"
 optional = false
 python-versions = "*"
@@ -1688,7 +1687,7 @@ nlp = ["nltk"]
 subtitles = ["aeidon"]
 
 [metadata]
-content-hash = "d14eabf2ed47e57545e2f9fc249ebdd83492fcce3928dc7b9376d22fcee3bb40"
+content-hash = "acfcfdf4d064433a419d20a8595ab0f70f5cb4a8ae2a8eca32decdfcdf289280"
 python-versions = "^3.6.1"
 
 [metadata.files]

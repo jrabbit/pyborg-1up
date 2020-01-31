@@ -59,9 +59,6 @@ except ImportError:
     nltk = None
     logger.debug("No nltk, won't be using advanced part of speech tagging.")
 
-xrange = range
-
-
 def filter_message(message: str, bot) -> str:
     """
     Filter a message body so it is suitable for learning from and
@@ -153,9 +150,10 @@ class InternalCommand:
 
     def get_help(self):
         if help is True:
-            #introsepct the function here
+            # introsepct the function here
             return self.function.__doc__
         return self.help
+
 
 def checkdict(pyb: "PyborgExperimental") -> str:
     "Check for broken links in the dictionary"
@@ -164,7 +162,7 @@ def checkdict(pyb: "PyborgExperimental") -> str:
     num_bad = 0
     for w in pyb.words.keys():
         wlist = pyb.words[w]
-        for i in xrange(len(wlist) - 1, -1, -1):
+        for i in range(len(wlist) - 1, -1, -1):
             line_idx = wlist[i]['hashval']
             word_num = wlist[i]['index']
             # Nasty critical error we should fix
@@ -188,6 +186,7 @@ def checkdict(pyb: "PyborgExperimental") -> str:
     logging.info(output)
     return output
 
+
 def known_command(pyb: "PyborgExperimental", word: str) -> str:
     if word in pyb.words:
         c = len(pyb.words[word])
@@ -195,6 +194,7 @@ def known_command(pyb: "PyborgExperimental", word: str) -> str:
     else:
         msg = "%s is unknown." % word
     return msg
+
 
 def known2(pyb, words: List[str]) -> str:
     msg = "Number of contexts: "
@@ -206,11 +206,10 @@ def known2(pyb, words: List[str]) -> str:
             msg += x + "/0 "
     return msg
 
+
 def _internal_commands_generate() -> Dict:
     return {"checkdict": InternalCommand(name="checkdict", function=checkdict, help="check the brain for broken links (legacy)"),
             "known": InternalCommand(name="known", function=known_command, input=True, help=True)}
-
-
 
 def _create_new_database() -> str:
     mk_folder()
@@ -258,14 +257,14 @@ class PyborgExperimental:
             self.has_nltk = True
 
     def __repr__(self) -> str:
-        return "{} with {} words and {} lines. With a settings of: {}".format(self.ver_string, len(self.words), len(self.lines), self.settings)
+        return f"{self.ver_string} with {len(self.words)} words and {len(self.lines)} lines. With a settings of: {self.settings}"
 
     def __str__(self) -> str:
         return self.ver_string
 
     @classmethod
     def from_brain(cls, brain: Path) -> "PyborgExperimental":
-        lines, words = pyborg.load_brain_json(brain)
+        words, lines = pyborg.load_brain_json(brain)
         return cls(brain=brain, lines=lines, words=words)
 
     def make_reply(self, body: str) -> str:
@@ -361,7 +360,7 @@ class pyborg:
         return words, lines
 
     @staticmethod
-    def load_brain_json(brain_path: str) -> Tuple[Dict[str, int], Dict[int, Tuple[str, int]]]:
+    def load_brain_json(brain_path: Union[Path, str]) -> Tuple[Dict[str, int], Dict[int, Tuple[str, int]]]:
         """Load the new format"""
         saves_version = u"1.4.0"
         # folder = click.get_app_dir("Pyborg")
@@ -813,7 +812,7 @@ class pyborg:
                         msg = "I will not use the word(s) %s" % ", ".join(self.settings.censored)
                 # add every word listed to censored list
                 else:
-                    for x in xrange(1, len(command_list)):
+                    for x in range(1, len(command_list)):
                         if command_list[x] in self.settings.censored:
                             msg += "%s is already censored" % command_list[x]
                         else:
@@ -826,7 +825,7 @@ class pyborg:
             elif command_list[0] == "!uncensor":
                 # Remove everyone listed from the ignore list
                 # eg !unignore tom dick harry
-                for x in xrange(1, len(command_list)):
+                for x in range(1, len(command_list)):
                     try:
                         self.settings.censored.remove(command_list[x].lower())
                         msg = "done"
@@ -857,7 +856,7 @@ class pyborg:
                         self.settings.aliases[command_list[1]] = [command_list[1][1:]]
                         self.replace(command_list[1][1:], command_list[1])
                         msg += command_list[1][1:] + " "
-                    for x in xrange(2, len(command_list)):
+                    for x in range(2, len(command_list)):
                         msg += "%s " % command_list[x]
                         self.settings.aliases[command_list[1]].append(command_list[x])
                         # replace each words by his alias
@@ -975,7 +974,7 @@ class pyborg:
         for x in wordlist:
             word_contexts = words[x]
             # Check all the word's links (backwards so we can delete)
-            for y in xrange(len(word_contexts) - 1, -1, -1):
+            for y in range(len(word_contexts) - 1, -1, -1):
                 # Check for any of the deleted contexts
                 hashval = word_contexts[y]['hashval']
                 if hashval in dellist:
@@ -1079,7 +1078,7 @@ class pyborg:
             tagged = nltk.pos_tag(tokenized)
             logger.info(tagged)
             weighted_choices = list(map(_mappable_nick_clean, tagged))
-            population = [val for val, cnt in weighted_choices for i in xrange(cnt)]
+            population = [val for val, cnt in weighted_choices for i in range(cnt)]
             word = random.choice(population)
             # make sure the word is known
             counter = 0
@@ -1101,7 +1100,7 @@ class pyborg:
             pre_words = {"": 0}
             # this is for prevent the case when we have an ignore_listed word
             word = str(sentence[0].split(" ")[0])
-            for x in xrange(0, len(self.words[word]) - 1):
+            for x in range(0, len(self.words[word]) - 1):
                 logger.debug(locals())
                 logger.debug('trying to unpack: %s', self.words[word][x])
                 l = self.words[word][x]['hashval']  # noqa: E741
@@ -1136,12 +1135,12 @@ class pyborg:
             liste = list(pre_words.items())  # this is a view in py3
             liste.sort(key=lambda x: x[1])
             numbers = [liste[0][1]]
-            for x in xrange(1, len(liste)):
+            for x in range(1, len(liste)):
                 numbers.append(liste[x][1] + numbers[x - 1])
 
             # take one them from the list ( randomly )
             mot = randint(0, numbers[len(numbers) - 1])
-            for x in xrange(0, len(numbers)):
+            for x in range(0, len(numbers)):
                 if mot <= numbers[x]:
                     mot = liste[x][0]
                     break
@@ -1178,7 +1177,7 @@ class pyborg:
             # create a dictionary wich will contain all the words we can found before the "chosen" word
             post_words = {"": 0}
             word = str(sentence[-1].split(" ")[-1])
-            for x in xrange(0, len(self.words[word])):
+            for x in range(0, len(self.words[word])):
                 l = self.words[word][x]['hashval']  # noqa: E741
                 w = self.words[word][x]['index']
                 context = self.lines[l][0]
@@ -1206,12 +1205,12 @@ class pyborg:
             liste.sort(key=lambda x: x[1])
             numbers = [liste[0][1]]
 
-            for x in xrange(1, len(liste)):
+            for x in range(1, len(liste)):
                 numbers.append(liste[x][1] + numbers[x - 1])
 
             # take one them from the list ( randomly )
             mot = randint(0, numbers[len(numbers) - 1])
-            for x in xrange(0, len(numbers)):
+            for x in range(0, len(numbers)):
                 if mot <= numbers[x]:
                     mot = liste[x][0]
                     break
@@ -1234,16 +1233,16 @@ class pyborg:
         # this seems bogus? how does this work???
 
         # Replace aliases
-        for x in xrange(0, len(sentence)):
+        for x in range(0, len(sentence)):
             if sentence[x][0] == "~":
                 sentence[x] = sentence[x][1:]
 
         # Insert space between each words
-        list(map((lambda x: sentence.insert(1 + x * 2, " ")), xrange(0, len(sentence) - 1)))
+        list(map((lambda x: sentence.insert(1 + x * 2, " ")), range(0, len(sentence) - 1)))
 
         # correct the ' & , spaces problem
         # code is not very good and can be improve but does his job...
-        for x in xrange(0, len(sentence)):
+        for x in range(0, len(sentence)):
             if sentence[x] == "'":
                 sentence[x - 1] = ""
                 sentence[x + 1] = ""
@@ -1258,7 +1257,7 @@ class pyborg:
         final = "".join(sentence)
         return final
 
-    def learn(self, body: str, num_context: int =1) -> None:
+    def learn(self, body: str, num_context: int = 1) -> None:
         """
         Lines should be cleaned (filter_message()) before passing
         to this.
