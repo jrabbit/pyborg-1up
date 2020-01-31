@@ -22,7 +22,7 @@ classifiers = [
 pyborg = 'pyborg_entrypoint:cli_base'
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.1"
 toml = "^0.10.0"
 arrow = "^0.15"
 PyTumblr = "^0.1.0"
