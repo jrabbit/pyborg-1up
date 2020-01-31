@@ -14,9 +14,9 @@ import discord
 import toml
 import venusian
 
-from .. import pyborg as pyb_core
 import pyborg.commands as builtin_commands
 from pyborg.util.awoo import normalize_awoos
+from .. import pyborg as pyb_core
 
 logger = logging.getLogger(__name__)
 
@@ -205,8 +205,12 @@ class PyborgDiscord(discord.Client):
         if self.settings['pyborg']['multiplex']:
             url = f"http://{self.multi_server}:{self.multi_port}/reply"
             async with self.aio_session.post(url, data={"body": body}, raise_for_status=True) as ret:
-                reply = await ret.text()
-                logger.debug("got reply: %s", reply)
+                try:
+                    reply = await ret.text()
+                    logger.debug("got reply: %s", reply)
+                except aiohttp.ClientError:
+                    logger.exception("pyborg http server issue")
+                    await self.change_presence(status=discord.Status.idle, activity=discord.Game("Error, see logs"))
             return reply
         else:
             raise NotImplementedError
