@@ -154,9 +154,8 @@ class InternalCommand:
     def get_help(self):
         if help is True:
             #introsepct the function here
-            pass
-        else:
-            return self.help
+            return self.function.__doc__
+        return self.help
 
 def checkdict(pyb: "PyborgExperimental") -> str:
     "Check for broken links in the dictionary"
@@ -189,7 +188,7 @@ def checkdict(pyb: "PyborgExperimental") -> str:
     logging.info(output)
     return output
 
-def known(pyb: "PyborgExperimental", word: str) -> str:
+def known_command(pyb: "PyborgExperimental", word: str) -> str:
     if word in pyb.words:
         c = len(pyb.words[word])
         msg = "%s is known (%d contexts)" % (word, c)
@@ -197,7 +196,7 @@ def known(pyb: "PyborgExperimental", word: str) -> str:
         msg = "%s is unknown." % word
     return msg
 
-def known2(pyb, words:List[str]) -> str:
+def known2(pyb, words: List[str]) -> str:
     msg = "Number of contexts: "
     for x in words:
         if x in pyb.words:
@@ -209,7 +208,7 @@ def known2(pyb, words:List[str]) -> str:
 
 def _internal_commands_generate() -> Dict:
     return {"checkdict": InternalCommand(name="checkdict", function=checkdict, help="check the brain for broken links (legacy)"),
-            "known": InternalCommand(name="known", function=known, input=True, help=True)}
+            "known": InternalCommand(name="known", function=known_command, input=True, help=True)}
 
 
 
@@ -331,7 +330,7 @@ class pyborg:
     }
 
     @staticmethod
-    def load_brain_2(brain_path: Union[str,Path]) -> Tuple[Dict, Dict]:
+    def load_brain_2(brain_path: Union[str, Path]) -> Tuple[Dict, Dict]:
         """1.2.0 marshal.zip loader
         Returns tuple (words, lines)"""
 
@@ -491,7 +490,7 @@ class pyborg:
                         for alias in self.settings.aliases[z]:
                             pattern = "^%s$" % alias
                             if re.search(pattern, x):
-                                logger.info("replace %s with %s" % (x, z))
+                                logger.info("replace %s with %s", x, z)
                                 self.replace(x, z)
 
             for x in self.words.keys():
@@ -552,7 +551,7 @@ class pyborg:
             # write each words known
             wordlist = []
             # Sort the list befor to export
-            for key in self.words.keys():
+            for key in self.words:
                 wordlist.append([key, len(self.words[key])])
             wordlist.sort(key=lambda x: x[1])
             list(map((lambda x: f.write(str(x[0]) + "\n\r")), wordlist))
@@ -562,7 +561,7 @@ class pyborg:
             # write each words known
             wordlist = []
             # Sort the list befor to export
-            for key in self.unfilterd.keys():
+            for key in self.unfilterd:
                 wordlist.append([key, self.unfilterd[key]])
             # wordlist.sort(lambda x, y: cmp(y[1], x[1]))
             wordlist.sort(key=lambda x: x[1])
@@ -1093,7 +1092,7 @@ class pyborg:
 
         # Build sentence backwards from "chosen" word
         if self._is_censored(word):
-            logger.debug("chosen word: %s***%s is censored. ignoring.", (word[0], word[-1]))
+            logger.debug("chosen word: %s***%s is censored. ignoring.", word[0], word[-1])
             return None
         sentence = [word]
         done = 0
@@ -1259,7 +1258,7 @@ class pyborg:
         final = "".join(sentence)
         return final
 
-    def learn(self, body: str, num_context:int =1) -> None:
+    def learn(self, body: str, num_context: int =1) -> None:
         """
         Lines should be cleaned (filter_message()) before passing
         to this.

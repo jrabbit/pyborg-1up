@@ -40,7 +40,7 @@ def networkx_demo(pyb, graphics=False, export=False):
         data = json_graph.node_link_data(G)
         s = json.dumps(data)
         return s
-
+    return G
 
 @attr.s
 class Service:
