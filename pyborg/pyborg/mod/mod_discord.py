@@ -37,7 +37,7 @@ class PyborgDiscord(discord.Client):
     scanner: venusian.Scanner = attr.ib(default=None)
     loop: Optional[asyncio.BaseEventLoop] = attr.ib(default=None)
     settings: MutableMapping[str, Any] = attr.ib(default=None)
-    prefix: str = atrr.ib(default="!")
+    prefix: str = attr.ib(default="!")
 
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
