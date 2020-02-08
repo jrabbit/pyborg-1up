@@ -60,7 +60,6 @@ class PyborgDiscord(discord.Client):
             raise NotImplementedError
         else:
             self.pyborg = None
-        self.aio_session = aiohttp.ClientSession()
         super().__init__(loop=self.loop)  # this might create a asyncio.loop!
 
     def our_start(self) -> None:
@@ -73,12 +72,14 @@ class PyborgDiscord(discord.Client):
             logger.error("No Token. Set one in your conf file.")
 
     async def fancy_login(self) -> None:
+        "calls Client.login only! no command scan"
         if 'token' in self.settings['discord']:
             await self.login(self.settings['discord']['token'])
         else:
             logger.error("No Token. Set one in your conf file.")
 
     async def on_ready(self) -> None:
+        self.aio_session = aiohttp.ClientSession()
         print('Logged in as')
         print(self.user.name)
         print(self.user.id)
