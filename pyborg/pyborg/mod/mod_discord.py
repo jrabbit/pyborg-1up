@@ -3,6 +3,7 @@ pyborg discord module
 """
 import asyncio
 import logging
+import random
 import re
 import sys
 from functools import partial
@@ -173,7 +174,11 @@ class PyborgDiscord(discord.Client):
         if self.settings['discord']['learning']:
             await self.learn(line)
 
-        if self.user.mentioned_in(message) or self._plaintext_name(message):
+        random_reply = False
+        if "reply_chance" in self.settings['discord'] and self.settings['discord']['reply_chance']:
+            random_reply = random.randint(1,100) <= int(self.settings['discord']['reply_chance'])
+
+        if random_reply or self.user.mentioned_in(message) or self._plaintext_name(message):
             async with message.channel.typing():
                 msg = await self.reply(line)
                 logger.debug("on message: %s", msg)

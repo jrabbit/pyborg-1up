@@ -2,6 +2,7 @@
 learning = true
 token = "FAKETOKEN"
 plaintext_ping = false
+reply_chance = 5
 [pyborg]
 multiplex = true
 multiplex_server = "localhost"

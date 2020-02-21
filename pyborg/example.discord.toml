@@ -1,5 +1,6 @@
 [discord]
 learning = true
 plaintext_ping = true
+reply_chance = 5
 [pyborg]
 multiplex = true
