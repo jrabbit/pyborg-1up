@@ -8,6 +8,7 @@ import irc.bot
 import irc.strings
 import requests
 import venusian
+import time
 
 import pyborg.commands
 import pyborg.pyborg
@@ -56,6 +57,10 @@ class ModIRC(irc.bot.SingleServerIRCBot):
 
     def on_welcome(self, c, e):
         logger.info("Connected to IRC server.")
+        # identify to nickserv
+        if "nickserv_password" in self.settings["server"] and self.settings["server"]["nickserv_password"]:
+            c.privmsg("nickserv", "identify %s %s" % (c.get_nickname(), self.settings["server"]["nickserv_password"]))
+            time.sleep(5)
         # stops timeouts
         c.set_keepalive(5)
         for chan_dict in self.settings["server"]["channels"]:

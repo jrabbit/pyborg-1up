@@ -24,6 +24,7 @@ multiplex_server = "localhost"
     server = "chat.freenode.net"
     port = 6697
     ssl = true
+    nickserv_password = "password"
     # Owner(s) nickname
     owners = ["jrabbit"]
     # Ignore these nicknames:
