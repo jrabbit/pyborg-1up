@@ -224,7 +224,11 @@ class PyborgDiscord(discord.Client):
 
     async def teardown(self) -> None:
         "turn off the bot"
-        await self.aio_session.close()
+        # special case when not actually running against discord, aiohttp session may not exist!
+        try:
+            await self.aio_session.close()
+        except AttributeError:
+            pass
 
     def scan(self, module: ModuleType = builtin_commands) -> None:
         "look for commands to add to registry"
