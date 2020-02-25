@@ -15,6 +15,9 @@ Changelog summaries; for past changes check `the github releases <https://github
 - coverage reporting fixed
 - `stronger tokenizer <https://www.nltk.org/api/nltk.tokenize.html#module-nltk.tokenize.casual>`_ more tuned for internet text
 - mastodon toml config fields normalized to :kbd:`[pyborg][multiplex_server]`, :kbd:`[pyborg][multiplex_port]`
+- (pr #113) added optional random reply rate for discord module use :kbd:`[discord][reply_chance]` in the discord.toml config.
+- (pr #114) add option for supplying a nickserv password on irc use :kbd:`[server][nickserv_password]` in your irc.toml config file.
+- sub comamnd http uses the standardized :kbd:`--brain_name` option now (related pr #105)
 
 1.4.0
 ------------
