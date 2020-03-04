@@ -1,7 +1,7 @@
 #
 # PyBorg: The python AI bot.
 #
-# Copyright (c) 2000, 2006, 2013-2019 Tom Morton, Sebastien Dailly, Jack Laxson
+# Copyright (c) 2000, 2006, 2013-2020 Tom Morton, Sebastien Dailly, Jack Laxson
 #
 #
 # This bot was inspired by the PerlBorg, by Eric Bock.
@@ -58,6 +58,12 @@ try:
 except ImportError:
     nltk = None
     logger.debug("No nltk, won't be using advanced part of speech tagging.")
+
+try:
+    import systemd.daemon
+except ImportError:
+    systemd = None
+    logger.debug("no systemd support detected")
 
 def filter_message(message: str, bot) -> str:
     """
@@ -238,6 +244,7 @@ def PyborgBridge(brain: Any) -> "PyborgExperimental":
     return their_pyb
 
 
+
 @attr.s
 class PyborgExperimental:
     brain: Path = attr.ib()
@@ -248,6 +255,7 @@ class PyborgExperimental:
     internal_commands: Dict[str, InternalCommand] = attr.ib(default=_internal_commands_generate())
     ver_string: str = attr.ib(default=f"I am a version {__version__} Pyborg")
     saves_version: str = attr.ib(default="1.4.0")
+    ready: bool = attr.ib(default=False)
     has_nltk: bool = attr.ib(init=False)
 
     def __attrs_post_init__(self) -> None:
@@ -262,10 +270,18 @@ class PyborgExperimental:
     def __str__(self) -> str:
         return self.ver_string
 
+    def on_ready(self):
+        """does nothing! implement or override. used internally for systemd notify."""
+        pass
+
     @classmethod
     def from_brain(cls, brain: Path) -> "PyborgExperimental":
         words, lines = pyborg.load_brain_json(brain)
-        return cls(brain=brain, lines=lines, words=words)
+        # READY can be sent here
+        instance = cls(brain=brain, lines=lines, words=words)
+        instance.on_ready()
+        instance.ready = True
+        return instance
 
     def make_reply(self, body: str) -> str:
         pass
@@ -299,6 +315,11 @@ class PyborgExperimental:
         # if we didn't crash
         os.rename(tmp_file, self.brain)
         logger.debug("Successful writing of brain & renaming. Quitting.")
+
+
+class PyborgSystemdNotify(PyborgExperimental):
+    def on_ready(self):
+        systemd.daemon.notify('READY=1')
 
 
 class pyborg:

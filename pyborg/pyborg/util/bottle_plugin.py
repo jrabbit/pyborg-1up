@@ -7,7 +7,7 @@ import attr
 import click
 from filelock import FileLock
 
-from pyborg.pyborg import pyborg
+from pyborg.pyborg import pyborg, PyborgSystemdNotify
 
 folder = click.get_app_dir("Pyborg")
 logger = logging.getLogger(__name__)
@@ -17,11 +17,15 @@ SAVE_LOCK = FileLock(Path(folder, ".pyborg_is_saving.lock"))
 @attr.s
 class BottledPyborg():
     brain_path = attr.ib()
+    notify: bool = attr.ib(default=False)
     name = "bottled_pyborg"
     api = 2
 
     def setup(self, app) -> None:
-        self.pyb = pyborg(self.brain_path)
+        if self.notify:
+            self.pyb = PyborgSystemdNotify.from_brain(self.brain_path)
+        else:
+            self.pyb = pyborg(self.brain_path)
 
     def close(self) -> None:
         logger.debug("bottled pyborg save via close() initiated.")

@@ -48,7 +48,8 @@ class Service:
     name: str = attr.ib()
     desc: str = attr.ib()
     wants: str = attr.ib(default=None)
-
+    service_type: str = attr.ib(default="simple")
+    
     def yeet(self, working_directory=None, user=True) -> None:
         "make a systemd unit file for this service"
 
@@ -71,6 +72,7 @@ class Service:
         config["Service"]["ExecReload"] = "/bin/kill -HUP $MAINPID"
         config["Service"]["KillMode"] = "process"
         config["Service"]["SyslogIdentifier"] = f"pyborg_f{self.name}"
+        config["Service"]["Environment"] = "PYTHONUNBUFFERED=1"
         if working_directory:
             config["Service"]["WordkingDirectory"] = working_directory
         config["Service"]["Restart"] = "on-failure"
@@ -87,7 +89,7 @@ class Timer:
     name: str = attr.ib()
 
 SERVICES = [
-    Service("http", "pyborg multiplexing server"),
+    Service("http", "pyborg multiplexing server", service_type="notify"),
     Service("discord", "pyborg discord client", wants="pyborg_http"),
     Service("mastodon", "pyborg mastodon/activitypub client", wants="pyborg_http"),
     Service("twitter", "pyborg twitter client", wants="pyborg_http"),

@@ -43,24 +43,24 @@ def learn(pyborg) -> str:
 def reply(pyborg) -> str:
     body = request.POST.getunicode("body")
     logger.debug(type(body))
-    return pyborg.reply(body)
+    return pyborg.make_reply(body)
 
 
 @bottle.route("/save", method="POST")
 def save(pyborg) -> str:
     with SAVE_LOCK:
-        pyborg.save_brain()
-        return f"Saved to {pyborg.brain_path}"
+        pyborg.save()
+        return f"Saved to {pyborg.brain}"
 
 
 @bottle.route("/info")
 def info(pyborg) -> tuple:
-    return pyborg.ver_string, pyborg.brain_path
+    return pyborg.ver_string, pyborg.brain
 
 
 @bottle.route("/info.json")
 def info2(pyborg) -> Dict:
-    return {"version_string": pyborg.ver_string, "brain": pyborg.brain_path}
+    return {"version_string": pyborg.ver_string, "brain": pyborg.brain}
 
 
 @bottle.route("/stats", method="POST")

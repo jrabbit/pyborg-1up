@@ -43,8 +43,15 @@ try:
 except ImportError:
     aeidon = False
 
+try:
+    import systemd.daemon
+except ImportError:
+    systemd = None
+
+
 
 logger = logging.getLogger(__name__)
+
 
 folder = click.get_app_dir("Pyborg")
 
@@ -503,7 +510,11 @@ def tumblr(conf_file: str) -> None:
 def http(reloader: bool, port: int, host: str, brain_name: str) -> None:
     "Run a server for mutliheaded (multiplex) pyborg"
     brain_path = resolve_brain(brain_name)
-    bottle.install(BottledPyborg(brain_path=brain_path))
+    if systemd:
+        logger.info("booting with systemd notify support")
+        bottle.install(BottledPyborg(brain_path=brain_path, notify=True))
+    else:
+        bottle.install(BottledPyborg(brain_path=brain_path))
     bottle.run(host=host, port=port, reloader=reloader)
     bottle.default_app().close()
 
