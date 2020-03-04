@@ -34,7 +34,7 @@ We're on the cheeseshop.
 optional extras:
    - nlp (need nltk data deps)
    - subtitles
-
+   - systemd (for notify support in the http server app)
 
 Advanced NLTK integration
 -------------------------
