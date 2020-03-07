@@ -22,6 +22,7 @@ def mk_folder() -> None:
     except OSError:
         logger.info("pyborg folder already exists.")
 
+
 def networkx_demo(pyb, graphics=False, export=False):
     G = nx.Graph()
     print(pyb)
@@ -42,6 +43,7 @@ def networkx_demo(pyb, graphics=False, export=False):
         return s
     return G
 
+
 @attr.s
 class Service:
     "a pyborg process a user may be running"
@@ -58,7 +60,7 @@ class Service:
         config = configparser.ConfigParser()
         # we cant caps preserved
         # https://docs.python.org/3/library/configparser.html#configparser.ConfigParser.optionxform
-        config.optionxform = lambda option: option # type: ignore
+        config.optionxform = lambda option: option  # type: ignore
         config["Unit"] = dict()
         config["Unit"]["Description"] = self.desc
         config["Unit"]["Documentation"] = "https://pyborg.readthedocs.io/en/latest/deploy.html"
@@ -82,9 +84,11 @@ class Service:
         with open(unit_file, "w") as fp:
             config.write(fp)
 
+
 @attr.s
 class Timer:
     name: str = attr.ib()
+
 
 SERVICES = [
     Service("http", "pyborg multiplexing server"),
