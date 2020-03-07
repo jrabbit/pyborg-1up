@@ -48,7 +48,7 @@ def release(c, clean=True, docker=False):
 @task
 def bandit(c):
     "security audit tool"
-    c.run("poetry run bandit --exclude=build,test -s B311 -r pyborg", pty=True)
+    c.run("poetry run bandit --exclude=build,test -s=B311,B302 -r pyborg", pty=True)
 
 @task
 def docs(c):
