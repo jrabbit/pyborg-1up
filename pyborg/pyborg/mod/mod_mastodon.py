@@ -8,11 +8,11 @@ import time
 
 import arrow
 import attr
-import lxml.html
 import requests
 import toml
 from mastodon import Mastodon
-
+from defusedxml.ElementTree import fromstring as defused_from_string
+from defusedxml.ElementTree import ParseError
 logger = logging.getLogger(__name__)
 
 # https://mastodonpy.readthedocs.io/en/stable/#notification-dicts
@@ -119,33 +119,36 @@ class PyborgMastodon():
             logger.debug(arrow.get(item["created_at"]) - self.last_look)
             if (arrow.get(item["created_at"]) > self.last_look) and item["account"]["id"] is not self.my_id:
                 # its new, does it have CW? if so, skip, if user has #nobot, skip
-
                 if self.toot_has_cw(item):
                     continue
                 if self.user_has_nobot(item):
                     continue
-                
                 logger.info("Got New Toot: {}".format(item))
                 fromacct = item['account']['acct']  # to check if we've banned them?
+                try:
+                    etree = defused_from_string(item['content'])
+                    body = etree.text
+                    # will this work always??
+                    logger.debug(f"got body: {body}")
 
-                parsed_html = lxml.html.fromstring(item['content'])
-                body = parsed_html.text_content()
+                    if self.settings['pyborg'].get('learning', True):
+                        self.learn(body)
 
-                if self.settings['pyborg'].get('learning', True):
-                    self.learn(body)
+                    reply = self.reply(body)
 
-                reply = self.reply(body)
-
-                if reply:
-                    logger.debug("got reply from http: %s", reply)
-                    if (self.should_reply_direct(fromacct) or self.is_reply_to_me(item)):
-                        self.mastodon.status_post(reply, in_reply_to_id=item['id'])
+                    if reply:
+                        logger.debug("got reply from http: %s", reply)
+                        if (self.should_reply_direct(fromacct) or self.is_reply_to_me(item)):
+                            self.mastodon.status_post(reply, in_reply_to_id=item['id'])
+                        else:
+                            logger.info("Got reply but declined to toot. recv'd body: %s", body)
                     else:
-                        logger.info("Got reply but declined to toot. recv'd body: %s", body)
-                else:
-                    logger.info("Couldn't toot.")
+                        logger.info("Couldn't toot.")
+                except ParseError:
+                    logging.exception(f"couldn't parse: {item['content']}")
 
-    def start(self, folder: str= ".") -> None:
+
+    def start(self, folder: str = ".") -> None:
         "This actually runs the bot"
         self.mastodon = Mastodon(
             client_id=os.path.join(folder, 'pyborg_mastodon_clientcred.secret'),
