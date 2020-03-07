@@ -13,6 +13,7 @@ import toml
 from mastodon import Mastodon
 from defusedxml.ElementTree import fromstring as defused_from_string
 from defusedxml.ElementTree import ParseError
+
 logger = logging.getLogger(__name__)
 
 # https://mastodonpy.readthedocs.io/en/stable/#notification-dicts
@@ -25,8 +26,9 @@ NO_BOT = re.compile("#nobot")
 
 
 @attr.s
-class PyborgMastodon():
+class PyborgMastodon:
     """it does toots"""
+
     toml_file: str = attr.ib()
     settings: MutableMapping[str, Any] = attr.ib(default=None)
     last_look: arrow.Arrow = attr.ib(default=None)
@@ -39,12 +41,12 @@ class PyborgMastodon():
     def __attrs_post_init__(self) -> None:
         self.settings = toml.load(self.toml_file)
         with contextlib.suppress(KeyError):
-            self.last_look = arrow.get(self.settings['mastodon']['last_look'])
-            self.multi_server = self.settings['pyborg']['multiplex_server']
-            self.multi_port = self.settings['pyborg']['multiplex_port']
+            self.last_look = arrow.get(self.settings["mastodon"]["last_look"])
+            self.multi_server = self.settings["pyborg"]["multiplex_server"]
+            self.multi_port = self.settings["pyborg"]["multiplex_port"]
 
     def teardown(self) -> None:
-        self.settings['mastodon']['last_look'] = self.last_look.datetime
+        self.settings["mastodon"]["last_look"] = self.last_look.datetime
         with open(self.toml_file, "w") as f:
             toml.dump(self.settings, f)
             logging.info("saved mastodon config at: %s", self.toml_file)
@@ -91,18 +93,18 @@ class PyborgMastodon():
 
     def should_reply_direct(self, usern: str) -> bool:
         should_reply = []
-        should_reply.extend([a['acct'] for a in self.mastodon.account_followers(self.my_id)])  # is this cached?
+        should_reply.extend([a["acct"] for a in self.mastodon.account_followers(self.my_id)])  # is this cached?
         return usern in should_reply
 
     def is_reply_to_me(self, item: Union[NotificationDict, TootDict]) -> bool:
         logger.debug(item)
         try:
-            our_id: int = item["in_reply_to_account_id"] 
+            our_id: int = item["in_reply_to_account_id"]
             return our_id == self.my_id
         except KeyError:
             if item["type"] == "mention":
                 mentions: Sequence = item["mentions"]
-                return any([True for mention in mentions if mention['id'] == self.my_id])
+                return any([True for mention in mentions if mention["id"] == self.my_id])
             else:
                 return False
 
@@ -115,7 +117,7 @@ class PyborgMastodon():
     def handle_toots(self, toots: ManyToot) -> None:
         for item in toots:
             # logger.debug(arrow.get(item["created_at"]) > self.last_look)
-            logger.debug(item['content'])
+            logger.debug(item["content"])
             logger.debug(arrow.get(item["created_at"]) - self.last_look)
             if (arrow.get(item["created_at"]) > self.last_look) and item["account"]["id"] is not self.my_id:
                 # its new, does it have CW? if so, skip, if user has #nobot, skip
@@ -124,22 +126,22 @@ class PyborgMastodon():
                 if self.user_has_nobot(item):
                     continue
                 logger.info("Got New Toot: {}".format(item))
-                fromacct = item['account']['acct']  # to check if we've banned them?
+                fromacct = item["account"]["acct"]  # to check if we've banned them?
                 try:
-                    etree = defused_from_string(item['content'])
+                    etree = defused_from_string(item["content"])
                     body = etree.text
                     # will this work always??
                     logger.debug(f"got body: {body}")
 
-                    if self.settings['pyborg'].get('learning', True):
+                    if self.settings["pyborg"].get("learning", True):
                         self.learn(body)
 
                     reply = self.reply(body)
 
                     if reply:
                         logger.debug("got reply from http: %s", reply)
-                        if (self.should_reply_direct(fromacct) or self.is_reply_to_me(item)):
-                            self.mastodon.status_post(reply, in_reply_to_id=item['id'])
+                        if self.should_reply_direct(fromacct) or self.is_reply_to_me(item):
+                            self.mastodon.status_post(reply, in_reply_to_id=item["id"])
                         else:
                             logger.info("Got reply but declined to toot. recv'd body: %s", body)
                     else:
@@ -147,23 +149,22 @@ class PyborgMastodon():
                 except ParseError:
                     logging.exception(f"couldn't parse: {item['content']}")
 
-
     def start(self, folder: str = ".") -> None:
         "This actually runs the bot"
         self.mastodon = Mastodon(
-            client_id=os.path.join(folder, 'pyborg_mastodon_clientcred.secret'),
-            access_token=os.path.join(folder, 'pyborg_mastodon_usercred.secret'),
-            api_base_url=self.settings['mastodon']['base_url']
+            client_id=os.path.join(folder, "pyborg_mastodon_clientcred.secret"),
+            access_token=os.path.join(folder, "pyborg_mastodon_usercred.secret"),
+            api_base_url=self.settings["mastodon"]["base_url"],
         )
-        self.my_id = self.mastodon.account_verify_credentials()['id']
+        self.my_id = self.mastodon.account_verify_credentials()["id"]
 
         while True:
             tl = self.mastodon.timeline()
             toots: ManyToot = list()
-            mentions = [notif['status'] for notif in self.mastodon.notifications() if notif['type'] == "mention"]
+            mentions = [notif["status"] for notif in self.mastodon.notifications() if notif["type"] == "mention"]
             toots.extend(tl)
             toots.extend(mentions)
             self.handle_toots(toots)
             self.last_look = arrow.utcnow()
-            logger.debug("Sleeping for {} seconds".format(self.settings['mastodon']['cooldown']))
-            time.sleep(self.settings['mastodon']['cooldown'])
+            logger.debug("Sleeping for {} seconds".format(self.settings["mastodon"]["cooldown"]))
+            time.sleep(self.settings["mastodon"]["cooldown"])
