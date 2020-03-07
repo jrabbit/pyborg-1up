@@ -3,10 +3,11 @@ Issues, pull requests, feedback all accepted and welcome.
 Development workflow
 ====================
 
-[poetry](https://poetry.eustace.io/) is used to manage dependencies and building wheels.
+[poetry](https://python-poetry.org/) is used to manage dependencies and building wheels.
 
 NOTE: Pyborg 2.0 will be python 3+ only!
 
+`dev` is the main source branch.
 
 Tips
 ====
