@@ -1,21 +1,22 @@
-from typing import MutableMapping, Any, Mapping, Union, Optional, Sequence, List
 import contextlib
 import logging
 import os.path
 import re
 import sys
 import time
+from typing import Any, List, Mapping, MutableMapping, Optional, Sequence, Union, cast
 
 import arrow
 import attr
 import requests
 import toml
-from mastodon import Mastodon
-from defusedxml.ElementTree import fromstring as defused_from_string
 from defusedxml.ElementTree import ParseError
+from defusedxml.ElementTree import fromstring as defused_from_string
+from mastodon import Mastodon
 
 logger = logging.getLogger(__name__)
 
+# mypy typing hints
 # https://mastodonpy.readthedocs.io/en/stable/#notification-dicts
 NotificationDict = Mapping[str, Union[str, Mapping[str, Any]]]
 # https://mastodonpy.readthedocs.io/en/stable/#toot-dicts
@@ -99,34 +100,34 @@ class PyborgMastodon:
     def is_reply_to_me(self, item: Union[NotificationDict, TootDict]) -> bool:
         logger.debug(item)
         try:
-            our_id: int = item["in_reply_to_account_id"]
+            our_id = cast(int, item["in_reply_to_account_id"])
             return our_id == self.my_id
         except KeyError:
             if item["type"] == "mention":
-                mentions: Sequence = item["mentions"]
+                mentions = cast(Sequence, item["mentions"])
                 return any([True for mention in mentions if mention["id"] == self.my_id])
             else:
                 return False
 
     def toot_has_cw(self, toot: Union[NotificationDict, TootDict]) -> bool:
-        return toot["sensitive"]
+        return cast(bool, toot["sensitive"])
 
     def user_has_nobot(self, toot: Union[NotificationDict, TootDict]) -> bool:
-        return bool(NO_BOT.match(toot["account"]["note"]))
+        return cast(bool, NO_BOT.match(cast(Mapping, toot["account"])["note"]))
 
     def handle_toots(self, toots: ManyToot) -> None:
         for item in toots:
             # logger.debug(arrow.get(item["created_at"]) > self.last_look)
             logger.debug(item["content"])
             logger.debug(arrow.get(item["created_at"]) - self.last_look)
-            if (arrow.get(item["created_at"]) > self.last_look) and item["account"]["id"] is not self.my_id:
+            if (arrow.get(item["created_at"]) > self.last_look) and cast(Mapping, item["account"])["id"] is not self.my_id:
                 # its new, does it have CW? if so, skip, if user has #nobot, skip
                 if self.toot_has_cw(item):
                     continue
                 if self.user_has_nobot(item):
                     continue
                 logger.info("Got New Toot: {}".format(item))
-                fromacct = item["account"]["acct"]  # to check if we've banned them?
+                fromacct = cast(Mapping, item["account"])["acct"]  # to check if we've banned them?
                 try:
                     etree = defused_from_string(item["content"])
                     body = etree.text
