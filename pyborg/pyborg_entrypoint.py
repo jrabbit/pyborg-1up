@@ -23,19 +23,17 @@ from discord import Client, Guild
 from mastodon import Mastodon
 
 import pyborg
-import pyborg.pyborg
+import pyborg.pyborg # expensive
 from pyborg.mod.mod_discord import PyborgDiscord
 from pyborg.mod.mod_filein import ModFileIn
 from pyborg.mod.mod_http import bottle
 from pyborg.mod.mod_irc import ModIRC
-from pyborg.mod.mod_linein import ModLineIn
 from pyborg.mod.mod_mastodon import PyborgMastodon
-from pyborg.mod.mod_reddit import PyborgReddit
 from pyborg.mod.mod_tumblr import PyborgTumblr
 from pyborg.mod.mod_twitter import PyborgTwitter
 from pyborg.util.bottle_plugin import BottledPyborg
 from pyborg.util.config_defaults import configs as STOCK_CONFIGS
-from pyborg.util.util_cli import init_systemd, mk_folder, networkx_demo
+from pyborg.util.util_cli import init_systemd, mk_folder
 
 try:
     import aeidon
@@ -279,6 +277,7 @@ def stats(target_brain: str) -> None:
 @brain.command()
 @click.argument("target_brain", default="current")
 def graph(target_brain: str) -> None:
+    from pyborg.utils.graphing import networkx_demo
     brain_path = resolve_brain(target_brain)
     pyb = pyborg.pyborg.pyborg(brain_path)
     print(networkx_demo(pyb, export=True))
@@ -604,6 +603,7 @@ def discord(conf_file: str) -> None:
 @click.option("--conf-file", default="reddit.toml")
 def reddit(conf_file: str) -> None:
     "Runs the reddit module"
+    from pyborg.mod.mod_reddit import PyborgReddit # expensive
     bot = PyborgReddit(conf_file)
     try:
         bot.start()
@@ -619,6 +619,7 @@ def reddit(conf_file: str) -> None:
 @click.option("--multiplex", default=True, type=click.BOOL)
 def linein(multiplex: bool) -> None:
     "This is a commandline repl for interacting with pyborg locally"
+    from pyborg.mod.mod_linein import ModLineIn # expensive
     my_pyborg = pyborg.pyborg.pyborg
     try:
         mod = ModLineIn(my_pyborg, multiplex)

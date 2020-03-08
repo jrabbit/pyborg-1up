@@ -1,14 +1,10 @@
 import configparser
 import logging
 import os
-import json
 from typing import Optional
 
 import click
 import attr
-import networkx as nx
-import matplotlib.pyplot as plt
-from networkx.readwrite import json_graph
 
 logger = logging.getLogger(__name__)
 folder = click.get_app_dir("Pyborg")
@@ -22,27 +18,6 @@ def mk_folder() -> None:
         logger.info("pyborg folder created.")
     except OSError:
         logger.info("pyborg folder already exists.")
-
-
-def networkx_demo(pyb, graphics=False, export=False):
-    G = nx.Graph()
-    print(pyb)
-
-    G.add_node("fuck")
-
-    for p in pyb.words["fuck"]:
-        G.add_edge("fuck", pyb.lines[p["hashval"]][0])
-
-    logger.info(G)
-
-    if graphics:
-        nx.draw(G)
-        plt.show()
-    if export:
-        data = json_graph.node_link_data(G)
-        s = json.dumps(data)
-        return s
-    return G
 
 
 @attr.s
