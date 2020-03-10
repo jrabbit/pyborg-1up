@@ -50,6 +50,8 @@ networkx = "^2.4"
 matplotlib = "^3.1.2"
 typing_extensions = "^3.7.4"
 defusedxml = "^0.6.0"
+isort = {extras = ["pyproject"], version = "^4.3.21"}
+aiopg = {extras = ["sa"], version = "^1.0.0"}
 
 [tool.poetry.dev-dependencies]
 green = "*"
