@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+    pybd:
+        build: .
+        depends_on:
+            - db
+    db:
+        image: "postgres:12"
+        environment:
+            POSTGRES_PASSWORD: "0V1!v@aS"
+            POSTGRES_USER: pyborg
