@@ -4,8 +4,11 @@ services:
         build: .
         depends_on:
             - db
+        volumes:
+            - .:/srv/
+        command: python -X dev /srv/db_tester.py
     db:
         image: "postgres:12"
         environment:
-            POSTGRES_PASSWORD: "0V1!v@aS"
+            POSTGRES_PASSWORD: "trustno1"
             POSTGRES_USER: pyborg
