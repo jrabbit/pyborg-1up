@@ -51,7 +51,7 @@ matplotlib = "^3.1.2"
 typing_extensions = "^3.7.4"
 defusedxml = "^0.6.0"
 isort = {extras = ["pyproject"], version = "^4.3.21"}
-aiopg = {extras = ["sa"], version = "^1.0.0"}
+aiopg = {extras = ["sa"], version = "^1.0.0", optional = true}
 
 [tool.poetry.dev-dependencies]
 green = "*"
@@ -73,6 +73,8 @@ black = "^19.10b0"
 [tool.poetry.extras]
 nlp = ["nltk"]
 subtitles = ["aeidon"]
+database = ["aiopg"]
+all = ["nltk", "aeidon", "aiopg"]
 
 [tool.isort]
 known_third_party = ["aeidon"]
