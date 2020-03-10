@@ -10,6 +10,7 @@ Changelog summaries; for past changes check `the github releases <https://github
 - async http client use in discord module
 - api rewrite, optional v1 bridge class for old style compat w/ the class formerly known as pyborg's new internals
 - discord server management commands
+- discord prefix configurable in discord.toml config. use key :kbd:`[discord][prefix]` default is still :kbd:`!`
 - new package depenency extras: :kbd:`nlp`, :kbd:`subtitles`
 - uses poetry for package lifecycle management
 - coverage reporting fixed
