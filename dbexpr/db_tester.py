@@ -32,7 +32,7 @@ class PybMeta(Base):
 
 
 async def go():
-    async with create_engine(user="pyborg", database="pyborg", "host"="db", "password"="0V1!v@aS") as engine
+    async with create_engine(user="pyborg", database="pyborg", host="db", password="0V1!v@aS") as engine:
         async with engine.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("SELECT 1")
