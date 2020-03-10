@@ -18,6 +18,8 @@ addons:
   apt:
     packages:
       - libenchant-dev
+services:
+  - postgresql
 cache:
   directories:
     - $HOME/.cache/pypoetry/cache
