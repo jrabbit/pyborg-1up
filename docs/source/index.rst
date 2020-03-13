@@ -9,6 +9,8 @@ The pyborg documentation
 Contents:
 
 .. toctree::
+   :maxdepth: 2
+   
    command
    api
    deploy
