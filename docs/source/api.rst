@@ -4,6 +4,7 @@ New API
 .. autoclass:: pyborg.pyborg.PyborgExperimental
     :members: learn, make_reply, from_brain, save
     :undoc-members:
+
 Old API
 =======
 
