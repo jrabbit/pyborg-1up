@@ -23,14 +23,16 @@ class TestOnMessage(asynctest.TestCase):
     async def tearDown(self):
         await self.our_pybd.teardown()
 
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord._plaintext_name")
     @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
     @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
     @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
-    def test_no_reply(self, patched_reply, patched_learn, patched_user):
+    def test_no_reply(self, patched_reply, patched_learn, patched_user, patched_namecheck):
         msg = mock.Mock()
         msg.content = "Yolo!"
         patched_reply.return_value = ""
         patched_user.mentioned_in.return_value = False
+        patched_namecheck.return_value = False
 
         self.loop.run_until_complete(self.our_pybd.on_message(msg))
         patched_reply.assert_not_called()
