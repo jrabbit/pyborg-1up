@@ -104,24 +104,6 @@ class TestPlaintexPing(unittest.TestCase):
         patched_learn.assert_called_once_with(patched_normalize.return_value)
         patched_reply.assert_called_once_with(patched_normalize.return_value)
 
-class TestVoiceChannelChooser(unittest.TestCase):
-    def setUp(self):
-        self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.loop)
-        self.pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
-
-    def tearDown(self):
-        self.loop.close()
-
-    def test_one_user(self):
-        mock_guild = mock.MagicMock()
-        ch1 = mock.MagicMock()
-        ch1.members.return_value = ["person1", "person2"]
-        ch2 = mock.MagicMock()
-        ch2.members.return_value = []
-        mock_guild.voice_channels = [ch1, ch2]
-        pybd = pyborg.mod.mod_discord.PyborgDiscord("pyborg/test/fixtures/discord.toml")
-        pref_channel = pybd._vc_with_people(mock_guild)
 
 @unittest.skip
 class TestCustomEmojis(unittest.TestCase):
@@ -129,6 +111,7 @@ class TestCustomEmojis(unittest.TestCase):
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
         # self.loop.set_debug(True)
+
 
 @unittest.skip("not implemented yet")
 @mock.patch("pyborg.mod.mod_discord.PyborgDiscord._plaintext_name")

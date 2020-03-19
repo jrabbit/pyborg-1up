@@ -4,6 +4,7 @@ import logging
 import xml.etree.ElementTree as ET
 
 import attr
+import aiohttp
 import requests
 
 logger = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ class MyLittleResult():
     session_id = attr.ib()
 
 async def mk_audio(content, delete=False, download=False):
-    "send a string to voiceforge to make a mp3 (I think ogg is broken on their end)"
+    "VOICEFORGE: send a string to voiceforge to make a mp3 (I think ogg is broken on their end)"
     sess = requests.Session()
     # pretend we're a real ~~boy~~ browser
     sess.get("https://www.voiceforge.com/demo?uservoice=Wiseguy").raise_for_status()
@@ -35,8 +36,16 @@ async def mk_audio(content, delete=False, download=False):
 
 
 async def post_hoc_delete(phpsess):
-    "wipeout files even after you closed the session"
+    "VOICEFORGE: wipeout files even after you closed the session"
     requests.post("https://www.voiceforge.com/demos/deleteAudio.php", cookies={"PHPSESSID": phpsess}).raise_for_status()
+
+
+async def tacotron(content: str, taco_server: str, session: aiohttp.ClientSession) -> None:
+    "connect to local tacotron model."
+    async with session.get(f"{taco_server}/meta/status.json", raise_for_status=True) as ret_status:
+        data = await ret_status.json()
+        logger.info(data)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level="INFO")
