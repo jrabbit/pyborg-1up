@@ -27,40 +27,40 @@ class Service:
     desc: str = attr.ib()
     wants: Optional[str] = attr.ib(default=None)
     service_type: str = attr.ib(default="simple")
-    
+    conf = attr.ib(factory=configparser.ConfigParser)
+
     def yeet(self, working_directory=None, user=True) -> None:
         "make a systemd unit file for this service"
 
         unit_file = f"pyborg_{self.name}.service"
         command = f"pyborg {self.name}"
         # configparser is ini
-        config = configparser.ConfigParser()
         # we cant caps preserved
         # https://docs.python.org/3/library/configparser.html#configparser.ConfigParser.optionxform
-        config.optionxform = lambda option: option  # type: ignore
-        config["Unit"] = dict()
-        config["Unit"]["Description"] = self.desc
-        config["Unit"]["Documentation"] = "https://pyborg.readthedocs.io/en/latest/deploy.html"
-        config["Unit"]["After"] = "network.target"
+        self.config.optionxform = lambda option: option  # type: ignore
+        self.config["Unit"] = dict()
+        self.config["Unit"]["Description"] = self.desc
+        self.config["Unit"]["Documentation"] = "https://pyborg.readthedocs.io/en/latest/deploy.html"
+        self.config["Unit"]["After"] = "network.target"
         if self.wants:
-            config["Unit"]["Wants"] = self.wants
+            self.config["Unit"]["Wants"] = self.wants
         startline = f"poetry run {command}"
-        config["Service"] = dict()
-        config["Service"]["ExecStart"] = startline
-        config["Service"]["ExecReload"] = "/bin/kill -HUP $MAINPID"
-        config["Service"]["KillMode"] = "process"
-        config["Service"]["SyslogIdentifier"] = f"pyborg_f{self.name}"
-        config["Service"]["Environment"] = "PYTHONUNBUFFERED=1"
+        self.config["Service"] = dict()
+        self.config["Service"]["ExecStart"] = startline
+        self.config["Service"]["ExecReload"] = "/bin/kill -HUP $MAINPID"
+        self.config["Service"]["KillMode"] = "process"
+        self.config["Service"]["SyslogIdentifier"] = f"pyborg_f{self.name}"
+        self.config["Service"]["Environment"] = "PYTHONUNBUFFERED=1"
         if working_directory:
-            config["Service"]["WordkingDirectory"] = working_directory
-        config["Service"]["Restart"] = "on-failure"
+            self.config["Service"]["WordkingDirectory"] = working_directory
+        self.config["Service"]["Restart"] = "on-failure"
         if user:
-            config["Service"]["User"] = "pyborg"
-        config["Install"] = dict()
-        config["Install"]["WantedBy"] = "multi-user.target"
+            self.config["Service"]["User"] = "pyborg"
+        self.config["Install"] = dict()
+        self.config["Install"]["WantedBy"] = "multi-user.target"
 
         with open(unit_file, "w") as fp:
-            config.write(fp)
+            self.config.write(fp)
 
 
 @attr.s
