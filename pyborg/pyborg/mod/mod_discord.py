@@ -268,7 +268,7 @@ class PyborgDiscord(discord.Client):
                     msg = msg.replace("#nick", str(message.author.mention))
                     msg = msg.replace("@everyone", "`@everyone`")
                     msg = msg.replace("@here", "`@here`")
-                    if self.garf_map[message.guild]:
+                    if self.garf_map.get(message.guild, False):
                         self.loop.create_task(self._shove_message_into_voice(msg, message.guild))
                     await message.channel.send(msg)
 
