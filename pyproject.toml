@@ -51,6 +51,7 @@ matplotlib = "^3.1.2"
 typing_extensions = "^3.7.4"
 defusedxml = "^0.6.0"
 systemd = {version = "^0.16.1", optional = true}
+python-box = "^4.2.2"
 
 [tool.poetry.dev-dependencies]
 green = "*"
