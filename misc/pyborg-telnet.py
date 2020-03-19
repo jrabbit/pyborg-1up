@@ -20,12 +20,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-import sys
-import string
 import socket
 import SocketServer
+import string
+import sys
 
 from pyborg import pyborg
+
 
 class handler(SocketServer.BaseRequestHandler):
     # Command list for this module
@@ -115,4 +116,3 @@ if __name__ == '__main__':
             print "Server shut down"
         my_pyborg.save_all()
         del my_pyborg
-

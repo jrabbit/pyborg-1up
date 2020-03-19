@@ -1,6 +1,7 @@
 [discord]
 learning = true
 plaintext_ping = true
+reply_chance = 5
 enable_voice = true
 [pyborg]
 multiplex = true

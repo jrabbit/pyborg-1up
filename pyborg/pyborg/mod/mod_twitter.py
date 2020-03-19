@@ -2,7 +2,7 @@ import logging
 import random
 import sys
 import time
-from typing import List, Union, Dict
+from typing import Dict, List, Union
 
 import arrow
 import requests

@@ -1,14 +1,5 @@
 .DS_Store
-pyborg/answers.txt
-pyborg/archive.zip
-pyborg/cfgfile.pyc
-pyborg/pyborg.cfg
-pyborg/pyborg.pyc
-pyborg/sentences.txt
-pyborg/words.txt
-pyborg/lines.dat
-pyborg/words.dat
-pyborg/version
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -68,5 +59,7 @@ pyborg/pyborg-irc.cfg
 archive.zip
 .env
 .envrc
-misc/docker_caches
-misc
+misc/
+/@*_tmp*
+.coverage*
+*.service

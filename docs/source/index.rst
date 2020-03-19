@@ -9,6 +9,8 @@ The pyborg documentation
 Contents:
 
 .. toctree::
+   :maxdepth: 2
+   
    command
    api
    deploy
@@ -32,6 +34,10 @@ We're on the cheeseshop.
 	pip install pyborg
 
 
+optional extras:
+   - nlp (need nltk data deps)
+   - subtitles
+   - systemd (for notify support in the http server app)
 
 Advanced NLTK integration
 -------------------------

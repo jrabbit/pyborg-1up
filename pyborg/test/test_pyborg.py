@@ -1,18 +1,18 @@
 import logging
 import unittest
-import os
+from unittest import mock
 
 import pyborg.pyborg
 from pyborg.mod.mod_http import DumbyIOMod
 
 try:
-    from unittest import mock
+    import nltk
 except ImportError:
-    import mock
+    nltk = None
 
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 
 class TestPyborgInit(unittest.TestCase):
@@ -22,7 +22,6 @@ class TestPyborgInit(unittest.TestCase):
     old_style_brain = "pyborg/test/fixtures/old.brain.pyborg.archive.zip"
     small_brain = "pyborg/test/fixtures/small.brain.pyborg.json"
 
-    @mock.patch("pyborg.pyborg.open", mock.mock_open())
     @mock.patch("pyborg.pyborg.pyborg.__init__")  # skip loading brain
     @mock.patch("toml.load")
     def test_load_settings(self, patched_toml, patched_init):
@@ -37,41 +36,44 @@ class TestPyborgInit(unittest.TestCase):
     #   words, lines = pyborg.pyborg.pyborg.load_brain_2(self.old_style_brain)
 
     def test_load_brain_json_retuns_dicts(self):
-        words, lines = pyborg.pyborg.pyborg.load_brain_json(
-            self.blank_brain_path)
+        words, lines = pyborg.pyborg.pyborg.load_brain_json(self.blank_brain_path)
         self.assertIsInstance(words, dict)
         self.assertIsInstance(lines, dict)
         self.assertEqual(len(words), 0)
         self.assertEqual(len(lines), 0)
 
     def test_load_brain_json_loads_small(self):
-        expected_lines = {713833202: ['destroy edgar', 1],
-                          1071494628: ['murder edgar', 1],
-                          2622503271: ['kill edgar', 2],
-                          3025701897: ['fuck the moon', 1],
-                          3127776909: ['fuck space', 1],
-                          3710277035: ['are you a murderer', 1],
-                          3953240527: ['fuck reddit', 1],
-                          4186136012: ['fuck', 1]}
+        expected_lines = {
+            713833202: ["destroy edgar", 1],
+            1071494628: ["murder edgar", 1],
+            2622503271: ["kill edgar", 2],
+            3025701897: ["fuck the moon", 1],
+            3127776909: ["fuck space", 1],
+            3710277035: ["are you a murderer", 1],
+            3953240527: ["fuck reddit", 1],
+            4186136012: ["fuck", 1],
+        }
 
-        expected_words = {'a': [{'hashval': 3710277035, 'index': 2}],
-                          'are': [{'hashval': 3710277035, 'index': 0}],
-                          'destroy': [{'hashval': 713833202, 'index': 0}],
-                          'edgar': [{'hashval': 2622503271, 'index': 1},
-                                    {'hashval': 713833202, 'index': 1},
-                                    {'hashval': 1071494628, 'index': 1}],
-                          'fuck': [{'hashval': 4186136012, 'index': 0},
-                                   {'hashval': 3025701897, 'index': 0},
-                                   {'hashval': 3127776909, 'index': 0},
-                                   {'hashval': 3953240527, 'index': 0}],
-                          'kill': [{'hashval': 2622503271, 'index': 0}],
-                          'moon': [{'hashval': 3025701897, 'index': 2}],
-                          'murder': [{'hashval': 1071494628, 'index': 0}],
-                          'murderer': [{'hashval': 3710277035, 'index': 3}],
-                          'reddit': [{'hashval': 3953240527, 'index': 1}],
-                          'space': [{'hashval': 3127776909, 'index': 1}],
-                          'the': [{'hashval': 3025701897, 'index': 1}],
-                          'you': [{'hashval': 3710277035, 'index': 1}]}
+        expected_words = {
+            "a": [{"hashval": 3710277035, "index": 2}],
+            "are": [{"hashval": 3710277035, "index": 0}],
+            "destroy": [{"hashval": 713833202, "index": 0}],
+            "edgar": [{"hashval": 2622503271, "index": 1}, {"hashval": 713833202, "index": 1}, {"hashval": 1071494628, "index": 1}],
+            "fuck": [
+                {"hashval": 4186136012, "index": 0},
+                {"hashval": 3025701897, "index": 0},
+                {"hashval": 3127776909, "index": 0},
+                {"hashval": 3953240527, "index": 0},
+            ],
+            "kill": [{"hashval": 2622503271, "index": 0}],
+            "moon": [{"hashval": 3025701897, "index": 2}],
+            "murder": [{"hashval": 1071494628, "index": 0}],
+            "murderer": [{"hashval": 3710277035, "index": 3}],
+            "reddit": [{"hashval": 3953240527, "index": 1}],
+            "space": [{"hashval": 3127776909, "index": 1}],
+            "the": [{"hashval": 3025701897, "index": 1}],
+            "you": [{"hashval": 3710277035, "index": 1}],
+        }
 
         words, lines = pyborg.pyborg.pyborg.load_brain_json(self.small_brain)
         self.assertIsInstance(words, dict)
@@ -82,8 +84,8 @@ class TestPyborgInit(unittest.TestCase):
         self.assertEqual(lines, expected_lines)
 
 
+@unittest.skip("archive.zip handling removed.")
 class TestPyborgClobbersave(unittest.TestCase):
-
     def setUp(self):
         with open("archive.zip", "w") as archive:
             # touch the cat; do it stat!
@@ -91,69 +93,77 @@ class TestPyborgClobbersave(unittest.TestCase):
 
     @mock.patch("toml.load")
     @mock.patch("pyborg.pyborg.pyborg.load_brain_json")
-    def test_no_clobber(self, patched_load_brain, patched_toml, ):
+    def test_no_clobber(
+        self, patched_load_brain, patched_toml,
+    ):
         "sometimes 1.4 will nuke archive.zip"
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
         patched_load_brain.side_effect = IOError
         our_pyb = pyborg.pyborg.pyborg()
-        if os.path.exists("archive.zip"):
-            with open("archive.zip") as archive:
-                self.assertEqual(archive.read(), "")
+
+        with open("archive.zip") as archive:
+            self.assertEqual(archive.read(), "")
         self.assertNotEqual(our_pyb.brain_path, "archive.zip")
 
 
 class TestPyborgSave(unittest.TestCase):
     blank_brain_path = "pyborg/test/fixtures/blank.brain.pyborg.json"
 
-    lines = {713833202: ['destroy edgar', 1],
-             1071494628: ['murder edgar', 1],
-             2622503271: ['kill edgar', 2],
-             3025701897: ['fuck the moon', 1],
-             3127776909: ['fuck space', 1],
-             3710277035: ['are you a murderer', 1],
-             3953240527: ['fuck reddit', 1],
-             4186136012: ['fuck', 1]}
+    lines = {
+        713833202: ["destroy edgar", 1],
+        1071494628: ["murder edgar", 1],
+        2622503271: ["kill edgar", 2],
+        3025701897: ["fuck the moon", 1],
+        3127776909: ["fuck space", 1],
+        3710277035: ["are you a murderer", 1],
+        3953240527: ["fuck reddit", 1],
+        4186136012: ["fuck", 1],
+    }
 
-    words = {'a': [{'hashval': 3710277035, 'index': 2}],
-             'are': [{'hashval': 3710277035, 'index': 0}],
-             'destroy': [{'hashval': 713833202, 'index': 0}],
-             'edgar': [{'hashval': 2622503271, 'index': 1},
-                       {'hashval': 713833202, 'index': 1},
-                       {'hashval': 1071494628, 'index': 1}],
-             'fuck': [{'hashval': 4186136012, 'index': 0},
-                      {'hashval': 3025701897, 'index': 0},
-                      {'hashval': 3127776909, 'index': 0},
-                      {'hashval': 3953240527, 'index': 0}],
-             'kill': [{'hashval': 2622503271, 'index': 0}],
-             'moon': [{'hashval': 3025701897, 'index': 2}],
-             'murder': [{'hashval': 1071494628, 'index': 0}],
-             'murderer': [{'hashval': 3710277035, 'index': 3}],
-             'reddit': [{'hashval': 3953240527, 'index': 1}],
-             'space': [{'hashval': 3127776909, 'index': 1}],
-             'the': [{'hashval': 3025701897, 'index': 1}],
-             'you': [{'hashval': 3710277035, 'index': 1}]}
+    words = {
+        "a": [{"hashval": 3710277035, "index": 2}],
+        "are": [{"hashval": 3710277035, "index": 0}],
+        "destroy": [{"hashval": 713833202, "index": 0}],
+        "edgar": [{"hashval": 2622503271, "index": 1}, {"hashval": 713833202, "index": 1}, {"hashval": 1071494628, "index": 1}],
+        "fuck": [
+            {"hashval": 4186136012, "index": 0},
+            {"hashval": 3025701897, "index": 0},
+            {"hashval": 3127776909, "index": 0},
+            {"hashval": 3953240527, "index": 0},
+        ],
+        "kill": [{"hashval": 2622503271, "index": 0}],
+        "moon": [{"hashval": 3025701897, "index": 2}],
+        "murder": [{"hashval": 1071494628, "index": 0}],
+        "murderer": [{"hashval": 3710277035, "index": 3}],
+        "reddit": [{"hashval": 3953240527, "index": 1}],
+        "space": [{"hashval": 3127776909, "index": 1}],
+        "the": [{"hashval": 3025701897, "index": 1}],
+        "you": [{"hashval": 3710277035, "index": 1}],
+    }
 
-    @mock.patch("os.rename")
-    @mock.patch("pyborg.pyborg.open", mock.mock_open())
     @mock.patch("json.loads")
     @mock.patch("toml.load")
-    def test_save_db(self, patched_toml, patched_json, patched_rename):
+    def test_save_db(self, patched_toml, patched_json):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
-        patched_json.return_value = {'version': u"1.4.0", 'words': self.words, 'lines': self.lines}
+        patched_json.return_value = {"version": u"1.4.0", "words": self.words, "lines": self.lines}
+        # m = mock.mock_open()
+        # with mock.patch('pyborg.pyborg.open', m):
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
         # our_pyb.brain_path = ""
         our_pyb.save_brain()
+
         # print(m.mock_calls)
 
 
 class TestPyborgLearning(unittest.TestCase):
     "Test learning"
 
-    @mock.patch("pyborg.pyborg.pyborg.load_brain_json")
+    @mock.patch("json.loads")
     @mock.patch("toml.load")
-    def test_functional_learn(self, patched_toml, patched_load):
+    def test_functional_learn(self, patched_toml, patched_json):
         patched_toml.return_value = {"pyborg-core": {"max_words": False}}
-        patched_load.return_value = (dict(), dict())
+        with open("pyborg/test/fixtures/small.brain.pyborg.json") as f:
+            patched_json.return_value = f.read()
         our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path")
         our_pyb.learn("Read a book, any book - Trotskist Proverb")
         our_pyb.learn("You should play dota 2 it's fun")
@@ -163,6 +173,22 @@ class TestPyborgLearning(unittest.TestCase):
         print(our_pyb.settings.num_words)
         print(our_pyb)
         self.assertNotEqual(len(our_pyb.words), 0)
+
+
+@unittest.skipIf(not nltk, "advanced lexing uses nltk, install the `nlp` extra.")
+class TestPyborgParsesQuestions(unittest.TestCase):
+    "check if pyborg keeps punctuation on the word or not"
+
+    @mock.patch("toml.load")
+    def test_parse_question(self, patched_toml):
+        patched_toml.return_value = {"pyborg-core": {"max_words": False}}
+        our_pyb = pyborg.pyborg.pyborg(brain="/bogus/path-like")
+        our_pyb.learn("the grand nagus")
+        our_pyb.learn("who is the grand nagus")
+        our_pyb.learn("where is the grand nagus?")
+        self.assertIn("nagus", our_pyb.words)
+        self.assertIn("the", our_pyb.words)
+        self.assertNotIn("nagus?", our_pyb.words)
 
 
 @mock.patch("toml.load")

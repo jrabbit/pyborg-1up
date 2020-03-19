@@ -3,10 +3,11 @@ Issues, pull requests, feedback all accepted and welcome.
 Development workflow
 ====================
 
-Use [pipenv](https://docs.pipenv.org/index.html) and the pipfile[.lock]. It's really good.
+[poetry](https://python-poetry.org/) is used to manage dependencies and building wheels.
 
-for dev-deps use `pipenv sync -d` (dev env targets py3 and py2 support is best effort.)
+NOTE: Pyborg 2.0 will be python 3+ only!
 
+`dev` is the main source branch.
 
 Tips
 ====

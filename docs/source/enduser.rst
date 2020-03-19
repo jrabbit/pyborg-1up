@@ -6,9 +6,11 @@ You talk to it: it talks back! What's not to love!
 
 Some commands your local pyborg might have in your chat room:
 
- * !words
- * !info
- * !help
+* !words
+* !info
+* !help
+* !spray
+* !blap
 
 Garfield Mode
 =============
@@ -26,4 +28,4 @@ Who knows what that does though!
 Best Of
 =======
 
-	* `"Kittens are gone, like tears in rain" <https://cdn.discordapp.com/attachments/349045982085906444/349048491483463680/kittens.PNG>`_ -
+* `"Kittens are gone, like tears in rain" <https://cdn.discordapp.com/attachments/349045982085906444/349048491483463680/kittens.PNG>`_ -
