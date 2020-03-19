@@ -20,7 +20,7 @@ class TestBot(unittest.TestCase):
             "tags": ["hello bill"],
         },
     }
-    with open(Path(".", "pyborg", "test", "fixtures", "tumblr_posts.json")) as fixture_f:
+    with open(Path(".", "pyborg", "test", "fixtures", "tumblr_posts.json"), encoding='utf-8') as fixture_f:
         posts = json.load(fixture_f,)
 
     @mock.patch("pyborg.pyborg.pyborg")
