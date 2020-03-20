@@ -12,7 +12,7 @@ from operator import itemgetter
 from types import ModuleType
 from typing import cast, overload, Any, Callable, Dict, List, MutableMapping, Optional, Union, IO
 from pathlib import Path
-if sys.version_info >= (3,8):
+if sys.version_info >= (3, 8):
     from typing import Protocol
 else:
     from typing_extensions import Protocol
@@ -74,10 +74,8 @@ class PyborgDiscord(discord.Client):
             self.pyborg = None
         super().__init__(loop=self.loop)  # this might create a asyncio.loop!
 
-    def our_start(self) -> None:
-        "launch discord.Client main event loop (calls Client.run)"
-
     def our_start(self, opus_lib="libopus.so.0") -> None:
+        "launch discord.Client main event loop (calls Client.run)"
         self.scan()
         if self.voice_enabled:
             discord.opus.load_opus(opus_lib)
@@ -249,7 +247,7 @@ class PyborgDiscord(discord.Client):
 
         random_reply = False
         if "reply_chance" in self.settings['discord'] and self.settings['discord']['reply_chance']:
-            random_reply = random.randint(1,100) <= int(self.settings['discord']['reply_chance'])
+            random_reply = random.randint(1, 100) <= int(self.settings['discord']['reply_chance'])
 
         if random_reply or self.user.mentioned_in(message) or self._plaintext_name(message):
             async with message.channel.typing():

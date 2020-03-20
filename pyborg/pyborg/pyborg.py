@@ -1354,7 +1354,6 @@ class pyborg:
                     self.lines[hashval] = [cleanbody, num_context]
                     # Add link for each word
                     for i, word in enumerate(words):
-                    #for x in range(0, len(words)):
                         if word in self.words:
                             # Add entry. (line number, word number)
                             self.words[word].append({"hashval": hashval, "index": i})
