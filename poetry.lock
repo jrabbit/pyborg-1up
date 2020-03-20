@@ -438,11 +438,28 @@ unidecode = "*"
 
 [[package]]
 category = "main"
+description = "WSGI HTTP Server for UNIX"
+name = "gunicorn"
+optional = false
+python-versions = ">=3.4"
+version = "20.0.4"
+
+[package.dependencies]
+setuptools = ">=3.0"
+
+[package.extras]
+eventlet = ["eventlet (>=0.9.7)"]
+gevent = ["gevent (>=0.13)"]
+setproctitle = ["setproctitle"]
+tornado = ["tornado (>=0.2)"]
+
+[[package]]
+category = "main"
 description = "Python humanize utilities"
 name = "humanize"
 optional = false
 python-versions = ">=3.5"
-version = "2.0.0"
+version = "2.1.0"
 
 [package.extras]
 tests = ["freezegun", "pytest", "pytest-cov"]
@@ -1500,7 +1517,7 @@ description = "Objects and routines pertaining to date and time (tempora)"
 name = "tempora"
 optional = false
 python-versions = ">=3.6"
-version = "2.1.0"
+version = "3.0.0"
 
 [package.dependencies]
 "jaraco.functools" = ">=1.20"
@@ -1748,7 +1765,7 @@ subtitles = ["aeidon"]
 systemd = ["systemd"]
 
 [metadata]
-content-hash = "c03ae94810a8471294b6cf51b940644232b95259aba52bb5db9418aae25e4e17"
+content-hash = "ea584ee8b3fcafd3a68b1edd4fbaed463b7c599e0511be04a61a43ceae26d794"
 python-versions = "^3.6.1"
 
 [metadata.files]
@@ -2004,9 +2021,13 @@ gitpython = [
 green = [
     {file = "green-3.1.0.tar.gz", hash = "sha256:c7297578d801200a93e4306c746962731131bb828a2041f74575deec7dbffd74"},
 ]
+gunicorn = [
+    {file = "gunicorn-20.0.4-py2.py3-none-any.whl", hash = "sha256:cd4a810dd51bf497552cf3f863b575dabd73d6ad6a91075b65936b151cbf4f9c"},
+    {file = "gunicorn-20.0.4.tar.gz", hash = "sha256:1904bb2b8a43658807108d59c3f3d56c2b6121a701161de0ddf9ad140073c626"},
+]
 humanize = [
-    {file = "humanize-2.0.0-py3-none-any.whl", hash = "sha256:50423d4264ae51b660087a9b8fc26aa5b93319b26fa6430fc63facb7befd2e1e"},
-    {file = "humanize-2.0.0.tar.gz", hash = "sha256:1766e8b82772abdf54a0b3620b14b21b36feba5160401838f97d18a4c58c7f71"},
+    {file = "humanize-2.1.0-py3-none-any.whl", hash = "sha256:c7dc91741bbfc48cfb580e93217ce5100f942e550bf774e69ada53a2cc0740f8"},
+    {file = "humanize-2.1.0.tar.gz", hash = "sha256:f3276eb7b86d8e34db883f98d9dffd7baac3284f307b3c7505ed24298a3e8c5f"},
 ]
 idna = [
     {file = "idna-2.9-py2.py3-none-any.whl", hash = "sha256:a068a21ceac8a4d63dbfd964670474107f541babbd2250d61922f029858365fa"},
@@ -2203,11 +2224,6 @@ markupsafe = [
     {file = "MarkupSafe-1.1.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:ba59edeaa2fc6114428f1637ffff42da1e311e29382d81b339c1817d37ec93c6"},
     {file = "MarkupSafe-1.1.1-cp37-cp37m-win32.whl", hash = "sha256:b00c1de48212e4cc9603895652c5c410df699856a2853135b3967591e4beebc2"},
     {file = "MarkupSafe-1.1.1-cp37-cp37m-win_amd64.whl", hash = "sha256:9bf40443012702a1d2070043cb6291650a0841ece432556f784f004937f0f32c"},
-    {file = "MarkupSafe-1.1.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:6788b695d50a51edb699cb55e35487e430fa21f1ed838122d722e0ff0ac5ba15"},
-    {file = "MarkupSafe-1.1.1-cp38-cp38-manylinux1_i686.whl", hash = "sha256:cdb132fc825c38e1aeec2c8aa9338310d29d337bebbd7baa06889d09a60a1fa2"},
-    {file = "MarkupSafe-1.1.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:13d3144e1e340870b25e7b10b98d779608c02016d5184cfb9927a9f10c689f42"},
-    {file = "MarkupSafe-1.1.1-cp38-cp38-win32.whl", hash = "sha256:596510de112c685489095da617b5bcbbac7dd6384aeebeda4df6025d0256a81b"},
-    {file = "MarkupSafe-1.1.1-cp38-cp38-win_amd64.whl", hash = "sha256:e8313f01ba26fbbe36c7be1966a7b7424942f670f38e666995b88d012765b9be"},
     {file = "MarkupSafe-1.1.1.tar.gz", hash = "sha256:29872e92839765e546828bb7754a68c418d927cd064fd4708fab9fe9c8bb116b"},
 ]
 "mastodon.py" = [
@@ -2575,8 +2591,8 @@ tabulate = [
     {file = "tabulate-0.8.6.tar.gz", hash = "sha256:5470cc6687a091c7042cee89b2946d9235fe9f6d49c193a4ae2ac7bf386737c8"},
 ]
 tempora = [
-    {file = "tempora-2.1.0-py2.py3-none-any.whl", hash = "sha256:540780d3a0ed431c21d1b901db38d20111a1b6f4d247099d25373d223ea05fc2"},
-    {file = "tempora-2.1.0.tar.gz", hash = "sha256:61287665ed38bb86a3f4293de5c7613c56b525f9db2ec099d794b9c97f7d5e54"},
+    {file = "tempora-3.0.0-py2.py3-none-any.whl", hash = "sha256:70503a3a10fb341f49e7919d193f0b6362bbfddffb560fac47df3e977414c0c6"},
+    {file = "tempora-3.0.0.tar.gz", hash = "sha256:e370d822cf48f5356aab0734ea45807250f5120e291c76712a1d766b49ae34f8"},
 ]
 toml = [
     {file = "toml-0.10.0-py2.7.egg", hash = "sha256:f1db651f9657708513243e61e6cc67d101a39bad662eaa9b5546f789338e07a3"},
@@ -2659,7 +2675,6 @@ watchdog = [
 ]
 wcwidth = [
     {file = "wcwidth-0.1.8-py2.py3-none-any.whl", hash = "sha256:8fd29383f539be45b20bd4df0dc29c20ba48654a41e661925e612311e9f3c603"},
-    {file = "wcwidth-0.1.8.tar.gz", hash = "sha256:f28b3e8a6483e5d49e7f8949ac1a78314e740333ae305b4ba5defd3e74fb37a8"},
 ]
 websocket-client = [
     {file = "websocket_client-0.57.0-py2.py3-none-any.whl", hash = "sha256:0fc45c961324d79c781bab301359d5a1b00b13ad1b10415a4780229ef71a5549"},
