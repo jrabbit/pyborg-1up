@@ -105,14 +105,6 @@ class TestPlaintexPing(unittest.TestCase):
         patched_reply.assert_called_once_with(patched_normalize.return_value)
 
 
-@unittest.skip
-class TestCustomEmojis(unittest.TestCase):
-    def setUp(self):
-        self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.loop)
-        # self.loop.set_debug(True)
-
-
 @unittest.skip("not implemented yet")
 @mock.patch("pyborg.mod.mod_discord.PyborgDiscord._plaintext_name")
 @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)

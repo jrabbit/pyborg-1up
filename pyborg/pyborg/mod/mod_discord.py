@@ -121,9 +121,9 @@ class PyborgDiscord(discord.Client):
         "write out url into tmp file and returns it"
         tmp = tempfile.NamedTemporaryFile(delete=False)
         # tmp = open("keep.mp3", "wb")
-        ret = requests.get(url, stream=True)
-        for chunk in ret.iter_content(1024):
-            tmp.write(chunk)
+        async with self.aio_session.get(url, chunked=True) as ret:
+            async for data, _ in ret.content.iter_chunks():
+                tmp.write(data)
         return tmp
 
     async def _shove_message_into_voice(self, body: str, guild: discord.Guild, target_vchannel: Optional[discord.VoiceChannel] = None, finalizer: Optional[Callable] = None) -> None:
@@ -321,7 +321,7 @@ class FancyCallable(Protocol):
     def __call__(self) -> str:
         ...
     @overload
-    def __call__(self, msg: Optional[str])-> str:
+    def __call__(self, msg: Optional[str]) -> str:
         ...
     @overload
     def __call__(self, multiplex: Optional[bool], multi_server: Optional[str]) -> str:
@@ -343,7 +343,7 @@ class Registry():
         typing info: makes ob into a FancyCallable"""
         self.registered[name] = cast(FancyCallable, ob)
         if internals:
-            self.registered[name] = cast(FancyCallable,partial(ob, self.mod.multiplexing, multi_server="http://{}:{}/".format(self.mod.multi_server, self.mod.multi_port)))
+            self.registered[name] = cast(FancyCallable, partial(ob, self.mod.multiplexing, multi_server="http://{}:{}/".format(self.mod.multi_server, self.mod.multi_port)))
             self.registered[name].pass_msg = False
         if pass_msg:
             self.registered[name].pass_msg = True

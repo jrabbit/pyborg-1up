@@ -280,7 +280,7 @@ def stats(target_brain: str) -> None:
     "Get stats about a brain"
     brain_path = resolve_brain(target_brain)
     pyb = pyborg.pyborg.pyborg(brain=brain_path)
-    print(json.dumps({"words": pyb.settings.num_words, "contexts": pyb.settings.num_contexts, "lines": len(pyb.lines),}))
+    print(json.dumps({"words": pyb.settings.num_words, "contexts": pyb.settings.num_contexts, "lines": len(pyb.lines)}))
 
 @brain.command()
 @click.argument("target_brain", default="current")
@@ -406,12 +406,15 @@ def run_mastodon(conf_file: str, secret_folder: str) -> None:
     except Exception:
         bot.teardown()
         raise
+
+
 @cli_base.command()
 def yeet_config():
     for filename, settings in STOCK_CONFIGS:
         with open(Path(folder, filename)) as fd:
             toml.dump(fd, settings)
     print(f"put the files in {folder}")
+
 
 @cli_base.group(invoke_without_command=True)
 @click.pass_context

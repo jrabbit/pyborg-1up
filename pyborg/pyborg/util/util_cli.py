@@ -27,7 +27,7 @@ class Service:
     desc: str = attr.ib()
     wants: Optional[str] = attr.ib(default=None)
     service_type: str = attr.ib(default="simple")
-    conf = attr.ib(factory=configparser.ConfigParser)
+    config = attr.ib(factory=configparser.ConfigParser)
 
     def yeet(self, working_directory=None, user=True) -> None:
         "make a systemd unit file for this service"

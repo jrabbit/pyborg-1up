@@ -1,13 +1,13 @@
 import inspect
 import logging
-from typing import Callable
+from typing import Callable, Union
 from pathlib import Path
 
 import attr
 import click
 from filelock import FileLock
 
-from pyborg.pyborg import pyborg, PyborgSystemdNotify
+from pyborg.pyborg import pyborg, PyborgSystemdNotify, PyborgExperimental
 
 folder = click.get_app_dir("Pyborg")
 logger = logging.getLogger(__name__)
@@ -18,6 +18,7 @@ SAVE_LOCK = FileLock(Path(folder, ".pyborg_is_saving.lock"))
 class BottledPyborg():
     brain_path = attr.ib()
     notify: bool = attr.ib(default=False)
+    pyb: Union[pyborg, PyborgExperimental] = attr.ib(init=False)
     name = "bottled_pyborg"
     api = 2
 

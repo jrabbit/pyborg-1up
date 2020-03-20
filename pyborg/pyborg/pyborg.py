@@ -289,7 +289,7 @@ class PyborgExperimental:
     def learn(self, body: str) -> None:
         pass
 
-    def save(self) -> None:
+    def save_brain(self) -> None:
         """
         Save brain as 1.4.0 JSON-Unsigned format
         """
@@ -351,7 +351,7 @@ class pyborg:
 
     @staticmethod
     def load_brain_2(brain_path: Union[str, Path]) -> Tuple[Dict, Dict]:
-        """1.2.0 marshal.zip loader
+        """ Legacy 1.2.0 marshal.zip loader
         Returns tuple (words, lines)"""
 
         saves_version = b"1.2.0"
