@@ -407,9 +407,9 @@ def run_mastodon(conf_file: str, secret_folder: str) -> None:
         raise
 @cli_base.command()
 def yeet_config():
-    for filename, settings in STOCK_CONFIGS:
-        with open(Path(folder, filename)) as fd:
-            toml.dump(fd, settings)
+    for filename, settings in STOCK_CONFIGS.items():
+        with open(Path(folder, filename), mode="w") as fd:
+            toml.dump(settings, fd)
     print(f"put the files in {folder}")
             
 @cli_base.group(invoke_without_command=True)
