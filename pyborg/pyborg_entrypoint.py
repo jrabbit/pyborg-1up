@@ -405,12 +405,16 @@ def run_mastodon(conf_file: str, secret_folder: str) -> None:
     except Exception:
         bot.teardown()
         raise
+
+
 @cli_base.command()
 def yeet_config():
+    "create example toml configurations in pyborg setting folder"
     for filename, settings in STOCK_CONFIGS.items():
         with open(Path(folder, filename), mode="w") as fd:
             toml.dump(settings, fd)
     print(f"put the files in {folder}")
+
             
 @cli_base.group(invoke_without_command=True)
 @click.pass_context
