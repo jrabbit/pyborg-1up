@@ -31,17 +31,18 @@ class Registry():
 
 
 class ModIRC(irc.bot.SingleServerIRCBot):
-    def __init__(self, my_pyborg, settings, channel=None, nickname=None, server=None, port=None, **connect_params):
+    def __init__(self, my_pyborg, settings, channel=None, nickname=None, server=None, port=None, password=None, **connect_params):
         self.settings = settings
         server = server or self.settings["server"]["server"]
         port = port or self.settings["server"]["port"]
+        password = password or self.settings["server"]["password"]
         nickname = nickname or self.settings["nickname"]
         realname = nickname or self.settings["realname"]
         if self.settings["server"]["ssl"]:
             ssl_factory = irc.connection.Factory(wrapper=ssl.wrap_socket)
-            super(ModIRC, self).__init__([(server, port)], nickname, realname, connect_factory=ssl_factory, **connect_params)
+            super(ModIRC, self).__init__([(server, port, password)], nickname, realname, connect_factory=ssl_factory, **connect_params)
         else:
-            super(ModIRC, self).__init__([(server, port)], nickname, realname, **connect_params)
+            super(ModIRC, self).__init__([(server, port, password)], nickname, realname, **connect_params)
         if not self.settings["multiplex"]:
             self.my_pyborg = my_pyborg()
 
