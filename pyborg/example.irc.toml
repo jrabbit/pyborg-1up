@@ -23,6 +23,7 @@ multiplex_server = "localhost"
 [server]
     server = "chat.freenode.net"
     port = 6697
+    password = ""
     ssl = true
     nickserv_password = "password"
     # Owner(s) nickname
