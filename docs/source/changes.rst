@@ -23,6 +23,7 @@ Changelog summaries; for past changes check `the github releases <https://github
 - mastodon toml config fields normalized to :kbd:`[pyborg][multiplex_server]`, :kbd:`[pyborg][multiplex_port]`
 - (pr #113) added optional random reply rate for discord module use :kbd:`[discord][reply_chance]` in the discord.toml config.
 - (pr #114) add option for supplying a nickserv password on irc use :kbd:`[server][nickserv_password]` in your irc.toml config file.
+- (pr #119) IRC modules gains support for supplying a server password; use :kbd:`[server][password]` in your irc.toml config file.
 - sub comamnd http uses the standardized :kbd:`--brain_name` option now (related pr #105)
 - systemd extra to support systemd `service daemon notify <https://www.freedesktop.org/software/systemd/man/systemd-notify.html>`_ in the http server.
 - new :py:class:`pyborg.pyborg.ExpermientalPyborg` class. an api rework of :py:class:`pyborg.pyborg.pyborg`
