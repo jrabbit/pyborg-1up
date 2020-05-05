@@ -428,7 +428,7 @@ description = "Green is a clean, colorful, fast python test runner."
 name = "green"
 optional = false
 python-versions = "*"
-version = "3.1.1"
+version = "3.1.2"
 
 [package.dependencies]
 colorama = "*"
@@ -1738,7 +1738,7 @@ subtitles = ["aeidon"]
 systemd = ["systemd"]
 
 [metadata]
-content-hash = "0ccc9ea1935d1922a4cc2c56220c6e444f80734119ba7addb6c75cff33472270"
+content-hash = "eb7ee4acbac749bfbedd96881b2aa5e7a655412da494367f819ebd9b54bf1fe4"
 python-versions = "^3.6.1"
 
 [metadata.files]
@@ -1991,7 +1991,7 @@ gitpython = [
     {file = "GitPython-3.1.1.tar.gz", hash = "sha256:6d4f10e2aaad1864bb0f17ec06a2c2831534140e5883c350d58b4e85189dab74"},
 ]
 green = [
-    {file = "green-3.1.1.tar.gz", hash = "sha256:c2759ce0181d0044a229774ca139bad0eeadaa471195b6a7b428aa1b4cfd78e2"},
+    {file = "green-3.1.2.tar.gz", hash = "sha256:95a9016015b659d7f82d09c12ad0ec6eb899e33762a10209b460ddaaa2f7cf88"},
 ]
 humanize = [
     {file = "humanize-2.4.0-py3-none-any.whl", hash = "sha256:07dd1293bac6c77daa5ccdc22c0b41b2315bee0e339a9f035ba86a9f1a272002"},
