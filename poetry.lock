@@ -1388,6 +1388,18 @@ test = ["pytest"]
 
 [[package]]
 category = "dev"
+description = "Link to GitHub issues, pull requests, commits and users from Sphinx docs."
+name = "sphinxcontrib-github-alt"
+optional = false
+python-versions = "*"
+version = "1.2"
+
+[package.dependencies]
+docutils = "*"
+sphinx = "*"
+
+[[package]]
+category = "dev"
 description = "sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files"
 name = "sphinxcontrib-htmlhelp"
 optional = false
@@ -1738,7 +1750,7 @@ subtitles = ["aeidon"]
 systemd = ["systemd"]
 
 [metadata]
-content-hash = "eb7ee4acbac749bfbedd96881b2aa5e7a655412da494367f819ebd9b54bf1fe4"
+content-hash = "9e606e5f05fbd3f34111117e264a255e236fd14904b778fe0738125cc51d6ba4"
 python-versions = "^3.6.1"
 
 [metadata.files]
@@ -2480,6 +2492,10 @@ sphinxcontrib-applehelp = [
 sphinxcontrib-devhelp = [
     {file = "sphinxcontrib-devhelp-1.0.2.tar.gz", hash = "sha256:ff7f1afa7b9642e7060379360a67e9c41e8f3121f2ce9164266f61b9f4b338e4"},
     {file = "sphinxcontrib_devhelp-1.0.2-py2.py3-none-any.whl", hash = "sha256:8165223f9a335cc1af7ffe1ed31d2871f325254c0423bc0c4c7cd1c1e4734a2e"},
+]
+sphinxcontrib-github-alt = [
+    {file = "sphinxcontrib_github_alt-1.2-py2.py3-none-any.whl", hash = "sha256:cdd1f61090e9ca1f317283dc85b311d788864d7e41baa479882c9fc914b43641"},
+    {file = "sphinxcontrib_github_alt-1.2.tar.gz", hash = "sha256:cfd7584d559bb89a1dde3b418fea3b5b8e601e1f50459873635256b5d1712af5"},
 ]
 sphinxcontrib-htmlhelp = [
     {file = "sphinxcontrib-htmlhelp-1.0.3.tar.gz", hash = "sha256:e8f5bb7e31b2dbb25b9cc435c8ab7a79787ebf7f906155729338f3156d93659b"},

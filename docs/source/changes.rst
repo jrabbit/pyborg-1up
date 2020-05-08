@@ -16,15 +16,15 @@ Changelog summaries; for past changes check `the github releases <https://github
 - api rewrite, optional v1 bridge class for old style compat w/ the class formerly known as pyborg's new internals
 - discord server management commands
 - discord prefix configurable in discord.toml config. use key :kbd:`[discord][prefix]` default is still :kbd:`!`
-- new package depenency extras: :kbd:`nlp`, :kbd:`subtitles`
+- new package depenency extras: :kbd:`nlp`, :kbd:`subtitles`, :kbd:`systemd`, :kbd:`graphing` (experimental/in development)
 - uses poetry for package lifecycle management
 - coverage reporting fixed
 - `stronger tokenizer <https://www.nltk.org/api/nltk.tokenize.html#module-nltk.tokenize.casual>`_ more tuned for internet text
 - mastodon toml config fields normalized to :kbd:`[pyborg][multiplex_server]`, :kbd:`[pyborg][multiplex_port]`
-- (pr #113) added optional random reply rate for discord module use :kbd:`[discord][reply_chance]` in the discord.toml config.
-- (pr #114) add option for supplying a nickserv password on irc use :kbd:`[server][nickserv_password]` in your irc.toml config file.
-- (pr #119) IRC modules gains support for supplying a server password; use :kbd:`[server][password]` in your irc.toml config file.
-- sub comamnd http uses the standardized :kbd:`--brain_name` option now (related pr #105)
+- :ghpull:`113` added optional random reply rate for discord module use :kbd:`[discord][reply_chance]` in the discord.toml config.
+- :ghpull:`114` add option for supplying a nickserv password on irc use :kbd:`[server][nickserv_password]` in your irc.toml config file.
+- :ghpull:`119` IRC modules gains support for supplying a server password; use :kbd:`[server][password]` in your irc.toml config file.
+- :ghpull:`105` sub comamnd http uses the standardized :kbd:`--brain_name` option now
 - systemd extra to support systemd `service daemon notify <https://www.freedesktop.org/software/systemd/man/systemd-notify.html>`_ in the http server.
 - new :py:class:`pyborg.pyborg.ExpermientalPyborg` class. an api rework of :py:class:`pyborg.pyborg.pyborg`
 

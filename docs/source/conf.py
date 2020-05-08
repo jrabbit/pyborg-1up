@@ -38,6 +38,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinx_click.ext',
+    'sphinxcontrib_github_alt',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -339,3 +340,5 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #
 # texinfo_no_detailmenu = False
+
+github_project_url = "https://github.com/jrabbit/pyborg-1up/"
