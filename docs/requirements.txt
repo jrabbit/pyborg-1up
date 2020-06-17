@@ -1,2 +1,3 @@
 sphinx-click
+sphinxcontrib_github_alt
 .
