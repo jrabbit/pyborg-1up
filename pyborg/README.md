@@ -11,7 +11,7 @@ We're on the cheeseshop! Yay!
 
 `pip install pyborg`
 
-If you want the latest git via pip you'll need to install it via [poetry.](https://python-poetry.org/docs/)
+If you want the latest version from git you'll need to install the project with [poetry.](https://python-poetry.org/docs/) in the source directory.
 
 Early test/beta releases can be found via:
 
@@ -23,7 +23,7 @@ Note that we're using Python 3.6+ (for fancy type declarations).
 Python 2 support was [dropped with](https://pythonclock.org/) the release of pyborg 2.0.
 
 
-There are three extras: "nlp", "systemd", and "subtitles". 
+There are several extras: "nlp", "systemd", "subtitles", "graphing". Some extras may be rather experimental like "graphing" at time of writing.
 
 e.g. `pip install pyborg[nlp]`
 
