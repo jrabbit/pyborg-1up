@@ -11,7 +11,7 @@ We're on the cheeseshop! Yay!
 
 `pip install pyborg`
 
-If you want the latest version from git you'll need to install the project with [poetry.](https://python-poetry.org/docs/) in the source directory.
+If you want the latest version from git you'll need to install the project with [poetry](https://python-poetry.org/docs/) in the source directory.
 
 Early test/beta releases can be found via:
 
