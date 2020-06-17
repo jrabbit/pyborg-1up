@@ -40,7 +40,7 @@ extensions = [
     'sphinx_click.ext',
     'sphinxcontrib_github_alt',
 ]
-
+github_project_url = "https://github.com/jrabbit/pyborg-1up/"
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
