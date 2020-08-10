@@ -11,7 +11,7 @@ import requests
 
 logging.basicConfig(level=logging.DEBUG)
 
-poetry_path = subprocess.run(["whereis", "poetry"], text=True, check=True, capture_output=True).stdout.split(":")[1]
+poetry_path = subprocess.run(["whereis", "-b", "poetry"], text=True, check=True, capture_output=True).stdout.split(":")[1]
 
 
 class TestIntegrationRuns(unittest.TestCase):
