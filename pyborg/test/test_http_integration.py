@@ -8,11 +8,10 @@ from unittest import mock
 
 import requests
 
-from pyborg_entrypoint import cli_base
 
 logging.basicConfig(level=logging.DEBUG)
 
-poetry_path = "/home/jack/.poetry/bin/poetry"
+poetry_path = subprocess.run(["whereis", "poetry"], text=True, check=True, capture_output=True).stdout.split(":")[1]
 
 
 class TestIntegrationRuns(unittest.TestCase):
