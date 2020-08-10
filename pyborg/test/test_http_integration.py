@@ -35,8 +35,8 @@ class TestIntegratesFullServerReply(unittest.TestCase):
             ret = requests.post("http://localhost:2001/learn", data={"body": "pee pee"})
         except:
             print(self.run.stdout)
-            raise
             self.run.kill()
+            raise
         ret.raise_for_status()
         self.run.terminate()
 
@@ -59,6 +59,7 @@ class TestIntegratesFullServerReply(unittest.TestCase):
             raise
         ret.raise_for_status()
         self.run.terminate()
+
     def test_stats(self):
         try:
             ret = requests.post("http://localhost:2001/stats")
