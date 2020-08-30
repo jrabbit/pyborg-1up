@@ -10,7 +10,7 @@ from functools import partial
 from types import ModuleType
 from typing import cast, overload, Any, Callable, Dict, List, MutableMapping, Optional, Union
 from pathlib import Path
-if sys.version_info >= (3,8):
+if sys.version_info >= (3, 8):
     from typing import Protocol
 else:
     from typing_extensions import Protocol
@@ -64,7 +64,7 @@ class PyborgDiscord(discord.Client):
         super().__init__(loop=self.loop)  # this might create a asyncio.loop!
 
     def our_start(self) -> None:
-        "launch discord.Client main event loop (calls Client.run)"
+        """launch discord.Client main event loop (calls Client.run)"""
 
         self.scan()
         if 'token' in self.settings['discord']:
@@ -73,7 +73,7 @@ class PyborgDiscord(discord.Client):
             logger.error("No Token. Set one in your conf file.")
 
     async def fancy_login(self) -> None:
-        "calls Client.login only! no command scan"
+        """calls Client.login only! no command scan"""
         if 'token' in self.settings['discord']:
             await self.login(self.settings['discord']['token'])
         else:
@@ -176,7 +176,7 @@ class PyborgDiscord(discord.Client):
 
         random_reply = False
         if "reply_chance" in self.settings['discord'] and self.settings['discord']['reply_chance']:
-            random_reply = random.randint(1,100) <= int(self.settings['discord']['reply_chance'])
+            random_reply = random.randint(1, 100) <= int(self.settings['discord']['reply_chance'])
 
         if random_reply or self.user.mentioned_in(message) or self._plaintext_name(message):
             async with message.channel.typing():
@@ -198,7 +198,7 @@ class PyborgDiscord(discord.Client):
                     await message.channel.send(msg)
 
     def _plaintext_name(self, message: discord.Message) -> bool:
-        "returns true if should ping with plaintext nickname per-server if configured"
+        """returns true if should ping with plaintext nickname per-server if configured"""
         try:
             if self.settings["discord"]["plaintext_ping"]:
                 return message.guild.me.display_name.lower() in message.content.lower()
@@ -228,7 +228,7 @@ class PyborgDiscord(discord.Client):
             raise NotImplementedError
 
     async def teardown(self) -> None:
-        "turn off the bot"
+        """turn off the bot"""
         # special case when not actually running against discord, aiohttp session may not exist!
         try:
             await self.aio_session.close()
@@ -236,19 +236,19 @@ class PyborgDiscord(discord.Client):
             pass
 
     def scan(self, module: ModuleType = builtin_commands) -> None:
-        "look for commands to add to registry"
+        """look for commands to add to registry"""
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
 
 class FancyCallable(Protocol):
-    "this encodes the type of commands for mypy checking, has no runtime effects"
+    """this encodes the type of commands for mypy checking, has no runtime effects"""
     pass_msg: bool
 
     @overload
     def __call__(self) -> str:
         ...
     @overload
-    def __call__(self, msg: Optional[str])-> str:
+    def __call__(self, msg: Optional[str]) -> str:
         ...
     @overload
     def __call__(self, multiplex: Optional[bool], multi_server: Optional[str]) -> str:
@@ -256,7 +256,7 @@ class FancyCallable(Protocol):
     def __call__(self, multiplex: Optional[bool], multi_server: Optional[str], msg: Optional[str]) -> str:
         ...
 
-class Registry():
+class Registry:
     """Command registry of decorated pyborg commands"""
     def __init__(self, mod: PyborgDiscord) -> None:
         self.registered: Dict[str, FancyCallable] = {}
@@ -270,7 +270,7 @@ class Registry():
         typing info: makes ob into a FancyCallable"""
         self.registered[name] = cast(FancyCallable, ob)
         if internals:
-            self.registered[name] = cast(FancyCallable,partial(ob, self.mod.multiplexing, multi_server="http://{}:{}/".format(self.mod.multi_server, self.mod.multi_port)))
+            self.registered[name] = cast(FancyCallable, partial(ob, self.mod.multiplexing, multi_server="http://{}:{}/".format(self.mod.multi_server, self.mod.multi_port)))
             self.registered[name].pass_msg = False
         if pass_msg:
             self.registered[name].pass_msg = True
