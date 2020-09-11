@@ -22,7 +22,7 @@ classifiers = [
 pyborg = 'pyborg_entrypoint:cli_base'
 
 [tool.poetry.dependencies]
-python = "^3.6.1"
+python = "^3.7"
 toml = "^0.10.0"
 arrow = "^0.16"
 PyTumblr = "^0.1.0"
@@ -64,7 +64,7 @@ flake8 = "^3.7"
 invoke = "^1.2"
 fabric2 = "^2.4"
 asynctest = "^0.13.0"
-ipython = "*"
+ipython = "^7"
 docutils = "*"
 pylint = "^2.3.1"
 bandit = "*"
