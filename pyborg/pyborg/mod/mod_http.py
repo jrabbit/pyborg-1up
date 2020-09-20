@@ -43,14 +43,14 @@ def learn(pyborg) -> str:
 def reply(pyborg) -> str:
     body = request.POST.getunicode("body")
     logger.debug(type(body))
-    return pyborg.make_reply(body)
+    return pyborg.reply(body)
 
 
 @bottle.route("/save", method="POST")
 def save(pyborg) -> str:
     with SAVE_LOCK:
-        pyborg.save()
-        return f"Saved to {pyborg.brain}"
+        pyborg.save_brain()
+        return f"Saved to {pyborg.brain_path}"
 
 
 @bottle.route("/info")
