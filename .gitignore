@@ -63,3 +63,4 @@ misc/
 /@*_tmp*
 .coverage*
 *.service
+graph_demo.dot
