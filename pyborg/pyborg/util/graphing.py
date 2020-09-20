@@ -7,17 +7,23 @@ from networkx.readwrite import json_graph
 
 logger = logging.getLogger(__name__)
 
-def networkx_demo(pyb, graphics=False, export=False):
+def networkx_demo(pyb, graphics=False, export=False, dot=True, limit=700):
     G = nx.Graph()
     print(pyb)
-
-    G.add_node("fuck")
-
-    for p in pyb.words["fuck"]:
-        G.add_edge("fuck", pyb.lines[p["hashval"]][0])
-
+    for counter, word in enumerate(pyb.words.keys()):
+        if counter >= limit:
+            break
+        G.add_node(word)
+        for p in pyb.words[word]:
+            print(p)
+            try:
+                G.add_edge(word, pyb.lines[p["hash"]][0])
+            except KeyError:
+                G.add_edge(word, pyb.lines[p["hashval"]][0])
     logger.info(G)
 
+    if dot:
+        nx.nx_pydot.write_dot(G, "graph_demo.dot")
     if graphics:
         nx.draw(G)
         plt.show()

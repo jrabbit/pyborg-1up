@@ -22,7 +22,7 @@ classifiers = [
 pyborg = 'pyborg_entrypoint:cli_base'
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
 toml = "^0.10.0"
 arrow = "^0.16"
 PyTumblr = "^0.1.0"
@@ -52,6 +52,7 @@ typing_extensions = "^3.7.4"
 defusedxml = "^0.6.0"
 systemd = {version = "^0.16.1", optional = true}
 pysocks = "^1.7.1"
+pydot = {version = "^1.4.1", optional = true}
 
 [tool.poetry.dev-dependencies]
 green = "*"
@@ -75,7 +76,7 @@ sphinxcontrib_github_alt = "^1.2"
 nlp = ["nltk"]
 subtitles = ["aeidon"]
 systemd = ["systemd"]
-graphing = ["matplotlib", "networkx"]
+graphing = ["matplotlib", "networkx", "pydot"]
 [tool.isort]
 known_third_party = ["aeidon"]
 line_length = 140
