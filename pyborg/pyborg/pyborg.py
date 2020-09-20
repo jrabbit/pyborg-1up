@@ -526,7 +526,7 @@ class pyborg:
                 for line in f.readlines():
                     self.unlearn(line)
         except (EOFError, IOError) as e:
-            logger.debug("No words to unlearn", exc_info=e)
+            logger.debug("No words to unlearn")
         self.settings.save()
 
     def save_all_2(self):
