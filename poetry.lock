@@ -564,7 +564,7 @@ description = "IRC (Internet Relay Chat) protocol library for Python"
 name = "irc"
 optional = false
 python-versions = ">=3.6"
-version = "18.0.0"
+version = "19.0.1"
 
 [package.dependencies]
 "jaraco.collections" = "*"
@@ -582,7 +582,7 @@ version = "*"
 
 [package.extras]
 docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
-testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-black-multipy", "pytest-cov", "backports.unittest-mock"]
+testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-black (>=0.3.7)", "pytest-cov", "pytest-mypy"]
 
 [[package]]
 category = "dev"
@@ -1749,7 +1749,7 @@ subtitles = ["aeidon"]
 systemd = ["systemd"]
 
 [metadata]
-content-hash = "b1af1c04935c15558408c3bfae1e914041dab636ea00978184e4da4dc26b8a97"
+content-hash = "e640b465298ac8e4be35354508484c162f5b19cae36a69f3c16ae2d487e26fea"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -2041,8 +2041,8 @@ ipython-genutils = [
     {file = "ipython_genutils-0.2.0.tar.gz", hash = "sha256:eb2e116e75ecef9d4d228fdc66af54269afa26ab4463042e33785b887c628ba8"},
 ]
 irc = [
-    {file = "irc-18.0.0-py2.py3-none-any.whl", hash = "sha256:7cbdd492edf93a0f4c1c390a44fd1bdaea4d3401864666b1e43f0c5d693dd1ad"},
-    {file = "irc-18.0.0.tar.gz", hash = "sha256:989b438363c41b371356be6f68f8cdbb7c7748234ae9494e9d16ee5f4d4ae5e1"},
+    {file = "irc-19.0.1-py3-none-any.whl", hash = "sha256:b5179428448947d364edcdcef8cb34a2a7033b4e78e58fec32d092091eab786f"},
+    {file = "irc-19.0.1.tar.gz", hash = "sha256:99fd5d1fa1d054dee4fbb81e0d5193dc1e8200db751d5da9a97850a62162b9ab"},
 ]
 isort = [
     {file = "isort-5.5.3-py3-none-any.whl", hash = "sha256:c16eaa7432a1c004c585d79b12ad080c6c421dd18fe27982ca11f95e6898e432"},

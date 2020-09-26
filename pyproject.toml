@@ -39,7 +39,7 @@ statsd = "^3.3"
 prompt_toolkit = "^3"
 "discord.py" = "^1.2.3"
 "aeidon" = {version= "^1.7.0", optional = true}
-irc = "^18"
+irc = "^19"
 aiohttp = "*"
 tox = "^3.13.2"
 nltk = {version = "^3.4.5", optional = true}
