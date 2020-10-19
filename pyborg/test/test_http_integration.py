@@ -1,27 +1,31 @@
 import logging
+import os
+import random
 import shlex
 import subprocess
+import sys
 import tempfile
 import time
-import random
 import unittest
 from unittest import mock
 
 import requests
 
-
 logging.basicConfig(level=logging.DEBUG)
+if sys.version_info >= (3,7):
+    poetry_path = subprocess.run(["whereis", "-b", "poetry"], text=True, check=True, capture_output=True).stdout.split(":")[1]
+    print(poetry_path)
+else:
+    poetry_path = subprocess.check_output(["whereis", "-b", "poetry"]).split(":")[1]
 
-poetry_path = subprocess.run(["whereis", "-b", "poetry"], universal_newlines=True, check=True, capture_output=True).stdout.split(":")[1]
-
-
-class TestIntegrationRuns(unittest.TestCase):
-    def test_runs(self):
-        try:
-            port = random.randint(3000,5000)
-            run = subprocess.run(shlex.split(f"{poetry_path} run pyborg --debug http --port {port} --brain_name internal_test.pyborg.json"), timeout=3)
-        except subprocess.TimeoutExpired:
-            pass
+logging.info("poetry path: %s", poetry_path)
+# class TestIntegrationRuns(unittest.TestCase):
+    # def test_runs(self):
+        # try:
+            # port = random.randint(3000,5000)
+            # self.run = subprocess.run(shlex.split(f"{poetry_path} run pyborg --debug http --port {port} --brain_name internal_test.pyborg.json"), timeout=3)
+        # except subprocess.TimeoutExpired:
+            # raise
 
 
 class TestIntegratesFullServerReply(unittest.TestCase):
@@ -30,7 +34,10 @@ class TestIntegratesFullServerReply(unittest.TestCase):
         self.tmp_path = "internal_test.pyborg.json"
         self.port = random.randint(3000,5000)
         self.run = subprocess.Popen(shlex.split(f"{poetry_path} run pyborg --debug http --port {self.port} --brain_name {self.tmp_path}"))
-        time.sleep(2)
+        if os.getenv("CI", False):
+            time.sleep(4)
+        else:
+            time.sleep(2)
 
     def test_learns(self):
         try:
