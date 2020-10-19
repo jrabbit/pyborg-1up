@@ -322,6 +322,12 @@ class PyborgSystemdNotify(PyborgExperimental):
         systemd.daemon.notify('READY=1')
 
 
+class PyborgEmptyJSON(Exception):
+    pass
+
+class PyborgNoBrainException(Exception):
+    pass
+
 class pyborg:
 
     ver_string = "I am a version 2.0.0 Pyborg"
@@ -394,8 +400,12 @@ class pyborg:
         except json.decoder.JSONDecodeError as e:
             logger.exception(e)
             logger.info("Tried to open brain %s", brain_path)
-            sys.exit(12)
-
+            # if the file is just empty for instance a Tempfile from `tempfile` just record it and raise a less scary error.
+            # wrapping Paths is fine apparently... probably nasty but whatever
+            if Path(brain_path).stat().st_size < 2:
+                raise PyborgEmptyJSON from e
+            else:
+                raise e
         if brain['version'] == saves_version:
             logger.debug(brain['lines'])
             lines = {int(x): y for x, y in brain['lines'].items()}
@@ -404,7 +414,7 @@ class pyborg:
             print("Error loading dictionary\nPlease convert it before launching pyborg")
             logger.error("Error loading dictionary\nPlease convert it before launching pyborg")
             logger.debug("Pyborg version: %s", saves_version)
-            sys.exit(1)
+            raise PyborgNoBrainException()
 
     def save_brain(self) -> None:
         """
@@ -473,7 +483,7 @@ class pyborg:
             self.brain_path = brain
         try:
             self.words, self.lines = self.load_brain_json(self.brain_path)
-        except (EOFError, IOError) as e:
+        except (EOFError, IOError, PyborgEmptyJSON) as e:
             # Create new database
             self.words = {}
             self.lines = {}
