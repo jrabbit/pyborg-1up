@@ -53,3 +53,7 @@ def blap() -> str:
 @command()
 def spray() -> str:
     return "https://sexyferret.science/blap/spray.gif"
+
+@command()
+def sickos() -> str:
+    return "https://sexyferret.science/blap/sickos.jpg"

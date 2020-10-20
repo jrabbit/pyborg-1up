@@ -23,7 +23,7 @@ def command(internals: bool = False, pass_msg: bool = False) -> Callable:
 
 
 def load_simple_commands(directory: Path) -> Dict[str, Callable]:
-    "load sinmple commands"
+    "load simple commands"
     out: Dict[str, Callable] = dict()
     files = directory.glob("*.toml")
     for f in files:
