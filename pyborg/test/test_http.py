@@ -14,7 +14,8 @@ from pyborg.util.bottle_plugin import BottledPyborg
 logging.basicConfig(level=logging.DEBUG)
 
 
-@mock.patch("toml.load", return_value={"pyborg-core": {"max_words": False}})
+#@mock.patch("toml.load", return_value={"pyborg-core": {"max_words": False}})
+@mock.patch("pyborg.pyborg.pyborg.load_settings")
 @mock.patch("pyborg.pyborg.pyborg.save_brain")
 class TestIntegratesFullServerReply(unittest.TestCase):
     def setUp(self):
