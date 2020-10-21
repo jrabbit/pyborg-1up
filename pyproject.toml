@@ -65,7 +65,7 @@ flake8 = "^3.7"
 invoke = "^1.2"
 fabric2 = "^2.4"
 asynctest = "^0.13.0"
-ipython = "^7"
+ipython = [{version = "^7", python = ">= 3.7"}, {version = "^7.16", python = "<= 3.6"}]
 docutils = "*"
 pylint = "^2.3.1"
 bandit = "*"
