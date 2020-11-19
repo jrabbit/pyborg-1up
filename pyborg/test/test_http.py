@@ -14,9 +14,11 @@ from pyborg.util.bottle_plugin import BottledPyborg
 logging.basicConfig(level=logging.DEBUG)
 
 
-#@mock.patch("toml.load", return_value={"pyborg-core": {"max_words": False}})
-@mock.patch("pyborg.pyborg.pyborg.load_settings")
+@mock.patch("json.loads")
+@mock.patch("builtins.open")
+@mock.patch("toml.load", return_value={"pyborg-core": {"max_words": False}})
 @mock.patch("pyborg.pyborg.pyborg.save_brain")
+@mock.patch("pyborg.pyborg.pyborg.load_settings")
 class TestIntegratesFullServerReply(unittest.TestCase):
     def setUp(self):
         self.tmp_f, self.tmp_path = tempfile.mkstemp()
@@ -25,14 +27,14 @@ class TestIntegratesFullServerReply(unittest.TestCase):
         app = bottle.default_app()
         self.app = TestApp(app)
 
-    def test_learns(self, patched_close, patched_toml):
+    def test_learns(self, patched_close, patched_brain, patched_toml, _, __):
         ret = self.app.post("/learn", {"body": "pee pee"})
-
-    def test_reply(self, patched_close, patched_toml):
+        self.app.reset()
+    def test_reply(self, patched_close, patched_toml, _, __, ___):
         ret = self.app.post("/reply", {"body": "poo poo"})
-
-    def test_save(self, patched_close, patched_toml):
+        self.app.reset()
+    def test_save(self, patched_close, patched_toml, _, __, ___):
         ret = self.app.post("/save")
 
-    def test_stats(self, patched_closed, patched_toml):
+    def test_stats(self, patched_closed, patched_toml, _, __, ___):
         ret = self.app.post("/stats")

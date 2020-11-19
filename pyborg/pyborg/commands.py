@@ -1,4 +1,6 @@
 import logging
+import random
+from importlib.resources import open_text
 
 import requests
 
@@ -61,3 +63,9 @@ def sickos() -> str:
 @command()
 def lockthemup() -> str:
     return "https://sexyferret.science/blap/lockhimup.gif"
+
+@command()
+def italian() -> str:
+    ITALIAN_FIRSTNAMES = open_text(pyborg.utils, "elenco_cognomi.txt").splitlines()
+    ITALIAN_LASTNAMES = open_text(pyborg.utils, "elenco_nomi.txt").splitlines()
+    return random.choice(ITALIAN_FIRSTNAMES) + " " + random.choice(ITALIAN_LASTNAMES)

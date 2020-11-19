@@ -402,6 +402,7 @@ class pyborg:
             logger.info("Tried to open brain %s", brain_path)
             # if the file is just empty for instance a Tempfile from `tempfile` just record it and raise a less scary error.
             # wrapping Paths is fine apparently... probably nasty but whatever
+
             if Path(brain_path).stat().st_size < 2:
                 raise PyborgEmptyJSON from e
             else:
@@ -442,7 +443,7 @@ class pyborg:
             json.dump(brain, f)
         # if we didn't crash
         os.rename(tmp_file, self.brain_path)
-        logger.debug("Successful writing of brain & renaming. Quitting.")
+        logger.debug("Successful writing of brain & renaming.")
 
     def save_all(self) -> None:
         "Legacy wraper for save_brain()"
@@ -483,7 +484,7 @@ class pyborg:
             self.brain_path = brain
         try:
             self.words, self.lines = self.load_brain_json(self.brain_path)
-        except (EOFError, IOError, PyborgEmptyJSON) as e:
+        except (EOFError, IOError, json.decoder.JSONDecodeError, PyborgEmptyJSON) as e:
             # Create new database
             self.words = {}
             self.lines = {}
