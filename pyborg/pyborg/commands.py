@@ -68,4 +68,4 @@ def lockthemup() -> str:
 def italian() -> str:
     ITALIAN_FIRSTNAMES = open_text("pyborg.util", "elenco_cognomi.txt").readlines()
     ITALIAN_LASTNAMES = open_text("pyborg.util", "elenco_nomi.txt").readlines()
-    return random.choice(ITALIAN_FIRSTNAMES) + " " + random.choice(ITALIAN_LASTNAMES)
+    return random.choice(ITALIAN_FIRSTNAMES).strip() + " " + random.choice(ITALIAN_LASTNAMES).strip()
