@@ -65,6 +65,18 @@ def lockthemup() -> str:
     return "https://sexyferret.science/blap/lockhimup.gif"
 
 @command()
+def lockhimup() -> str:
+    return "https://sexyferret.science/blap/lockhimup.gif"
+
+@command()
+def lockherup() -> str:
+    return "https://sexyferret.science/blap/lockhimup.gif"
+
+@command()
+def sundaymorning() -> str:
+    return "https://www.youtube.com/watch?v=LHH6Zycrg8Q"
+
+@command()
 def italian() -> str:
     ITALIAN_FIRSTNAMES = open_text("pyborg.util", "elenco_cognomi.txt").readlines()
     ITALIAN_LASTNAMES = open_text("pyborg.util", "elenco_nomi.txt").readlines()
