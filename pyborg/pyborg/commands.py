@@ -58,7 +58,7 @@ def spray() -> str:
 
 @command()
 def sickos() -> str:
-    return "https://sexyferret.science/blap/sickos.jpg"
+    return "https://sexyferret.science/blap/sickos.png"
 
 @command()
 def lockthemup() -> str:
