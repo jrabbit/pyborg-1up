@@ -27,6 +27,9 @@ class TestIntegratesFullServerReply(unittest.TestCase):
             bottle.install(BottledPyborg(brain_path=self.tmp_path))
             app = bottle.default_app()
             self.app = TestApp(app)
+        if os.getenv("CI", False):
+            # let travis spin up sockets
+            time.sleep(3)
 
     def test_learns(self, patched_close, patched_brain, patched_toml, _, __):
         ret = self.app.post("/learn", {"body": "pee pee"})
