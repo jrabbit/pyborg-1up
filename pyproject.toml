@@ -71,7 +71,6 @@ pylint = "^2.3.1"
 bandit = "*"
 black = "^20.8b1"
 sphinxcontrib_github_alt = "^1.2"
-WebTest = "^2.0.35"
 
 [tool.poetry.extras]
 nlp = ["nltk"]
