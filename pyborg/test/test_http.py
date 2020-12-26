@@ -33,11 +33,9 @@ class TestIntegratesFullServerReply(unittest.TestCase):
 
     def test_learns(self, patched_close, patched_brain, patched_toml, _, __):
         ret = self.app.post("/learn", {"body": "pee pee"})
-        self.app.reset()
 
     def test_reply(self, patched_close, patched_toml, _, __, ___):
         ret = self.app.post("/reply", {"body": "poo poo"})
-        self.app.reset()
 
     def test_save(self, patched_close, patched_toml, _, __, ___):
         ret = self.app.post("/save")

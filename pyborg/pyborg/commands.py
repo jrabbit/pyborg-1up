@@ -1,7 +1,11 @@
 import logging
 import random
-from importlib.resources import open_text
+import sys
 
+if sys.version_info >= (3, 9):
+    from importlib.resources import open_text
+else:
+    from importlib_resources import open_text
 import requests
 
 import pyborg

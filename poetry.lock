@@ -1740,7 +1740,7 @@ systemd = ["systemd"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "6d7392855c90f3d0e4d5d090fa414627da8eb39b64f00b131d27740ea005fa1f"
+content-hash = "37f26adc06fa9a9b0b623cf9ed09f1b020f9a4dab880b89034b5cc9ba8bd2403"
 
 [metadata.files]
 aeidon = [
