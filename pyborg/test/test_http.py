@@ -41,24 +41,24 @@ class TestIntegratesFullServerReply(unittest.TestCase):
 
     def test_save(self, patched_settings, patched_brain_save, patched_toml, _, ___):
         ret = self.app.post("/save")
-        patched_brain_save.assert_called_once()        
+        patched_brain_save.assert_called_once()
 
     def test_stats(self, patched_closed, patched_toml, _, __, ___):
         ret = self.app.post("/stats")
-
 
 
 class TestFunctionalViews(unittest.TestCase):
     def test_save(self):
         fake_pyb = mock.Mock()
         mod_http.save(fake_pyb)
-        fake_pyb.save_brain.assert_called_once()        
+        fake_pyb.save_brain.assert_called_once()
+
     def test_reply(self):
         fake_pyb = mock.Mock()
         mod_http.reply(fake_pyb)
         fake_pyb.reply.assert_called()
+
     def test_learn(self):
         fake_pyb = mock.Mock()
         mod_http.learn(fake_pyb)
         fake_pyb.learn.assert_called()
-

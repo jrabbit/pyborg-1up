@@ -9,7 +9,7 @@ import pyborg
 
 class TestBot(unittest.TestCase):
     settings = {
-        "auth": {"consumer_key": "KEY", "consumer_secret": "SECRET", "oauth_secret": "TOKEN", "oauth_token": "TOKEN",},
+        "auth": {"consumer_key": "KEY", "consumer_secret": "SECRET", "oauth_secret": "TOKEN", "oauth_token": "TOKEN", },
         "pyborg": {"multiplex": False},
         "tumblr": {
             "blog": "billoreilly.tumblr.com",

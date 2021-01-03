@@ -240,6 +240,7 @@ class PyborgDiscord(discord.Client):
         self.scanner = venusian.Scanner(registry=self.registry)
         self.scanner.scan(module)
 
+
 class FancyCallable(Protocol):
     """this encodes the type of commands for mypy checking, has no runtime effects"""
     pass_msg: bool
@@ -247,14 +248,18 @@ class FancyCallable(Protocol):
     @overload
     def __call__(self) -> str:
         ...
+
     @overload
     def __call__(self, msg: Optional[str]) -> str:
         ...
+
     @overload
     def __call__(self, multiplex: Optional[bool], multi_server: Optional[str]) -> str:
         ...
+
     def __call__(self, multiplex: Optional[bool], multi_server: Optional[str], msg: Optional[str]) -> str:
         ...
+
 
 class Registry:
     """Command registry of decorated pyborg commands"""

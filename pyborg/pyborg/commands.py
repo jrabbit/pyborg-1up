@@ -60,21 +60,26 @@ def blap() -> str:
 def spray() -> str:
     return "https://sexyferret.science/blap/spray.gif"
 
+
 @command()
 def sickos() -> str:
     return "https://sexyferret.science/blap/sickos.png"
+
 
 @command()
 def lockthemup() -> str:
     return "https://sexyferret.science/blap/lockhimup.gif"
 
+
 @command()
 def lockhimup() -> str:
     return "https://sexyferret.science/blap/lockhimup.gif"
 
+
 @command()
 def lockherup() -> str:
     return "https://sexyferret.science/blap/lockhimup.gif"
+
 
 @command()
 def sundaymorning() -> str:
