@@ -86,6 +86,10 @@ def sundaymorning() -> str:
     return "https://www.youtube.com/watch?v=LHH6Zycrg8Q"
 
 @command()
+def takes() -> str:
+    return "https://sexyferret.science/blap/takes.png"
+
+@command()
 def italian() -> str:
     ITALIAN_FIRSTNAMES = open_text("pyborg.util", "elenco_cognomi.txt").readlines()
     ITALIAN_LASTNAMES = open_text("pyborg.util", "elenco_nomi.txt").readlines()
