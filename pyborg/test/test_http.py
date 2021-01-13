@@ -46,21 +46,3 @@ class TestIntegratesFullServerReply(unittest.TestCase):
     def test_stats(self, patched_closed, patched_toml, _, __, ___):
         ret = self.app.post("/stats")
 
-
-@mock.patch("filelock.FileLock")
-class TestFunctionalViews(unittest.TestCase):
-    # needs .config/pyborg/ to do filelock?
-    def test_save(self, mocked_filelock):
-        fake_pyb = mock.Mock()
-        mod_http.save(fake_pyb)
-        fake_pyb.save_brain.assert_called_once()
-
-    def test_reply(self, mocked_filelock):
-        fake_pyb = mock.Mock()
-        mod_http.reply(fake_pyb)
-        fake_pyb.reply.assert_called()
-
-    def test_learn(self, mocked_filelock):
-        fake_pyb = mock.Mock()
-        mod_http.learn(fake_pyb)
-        fake_pyb.learn.assert_called()
