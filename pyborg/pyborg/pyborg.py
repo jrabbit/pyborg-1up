@@ -1,7 +1,7 @@
 #
 # PyBorg: The python AI bot.
 #
-# Copyright (c) 2000, 2006, 2013-2020 Tom Morton, Sebastien Dailly, Jack Laxson
+# Copyright (c) 2000, 2006, 2013-2021 Tom Morton, Sebastien Dailly, Jack Laxson
 #
 #
 # This bot was inspired by the PerlBorg, by Eric Bock.
@@ -64,6 +64,7 @@ try:
 except ImportError:
     systemd = None
     logger.debug("no systemd support detected")
+
 
 def filter_message(message: str, bot) -> str:
     """
@@ -226,7 +227,6 @@ def _create_new_database() -> str:
     return brain_path
 
 
-
 def PyborgBridge(brain: Any) -> "PyborgExperimental":
     "cheat and make an api mapping to the old one"
     mk_folder()
@@ -325,8 +325,10 @@ class PyborgSystemdNotify(PyborgExperimental):
 class PyborgEmptyJSON(Exception):
     pass
 
+
 class PyborgNoBrainException(Exception):
     pass
+
 
 class pyborg:
 
@@ -1365,7 +1367,6 @@ class pyborg:
                     self.lines[hashval] = [cleanbody, num_context]
                     # Add link for each word
                     for i, word in enumerate(words):
-                    #for x in range(0, len(words)):
                         if word in self.words:
                             # Add entry. (line number, word number)
                             self.words[word].append({"hashval": hashval, "index": i})
