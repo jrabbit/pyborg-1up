@@ -27,6 +27,7 @@ Changelog summaries; for past changes check `the github releases <https://github
 - :ghpull:`105` sub comamnd http uses the standardized :kbd:`--brain_name` option now
 - systemd extra to support systemd `service daemon notify <https://www.freedesktop.org/software/systemd/man/systemd-notify.html>`_ in the http server.
 - new :py:class:`pyborg.pyborg.ExpermientalPyborg` class. an api rework of :py:class:`pyborg.pyborg.pyborg`
+- dropped 3.6 support for packaging reasons.
 
 1.4.0
 ------------
