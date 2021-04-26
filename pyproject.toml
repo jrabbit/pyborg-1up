@@ -70,9 +70,12 @@ ipython = [{version = "^7", python = ">= 3.7"}, {version = "^7.16", python = "<=
 docutils = "*"
 pylint = "^2.3.1"
 bandit = "*"
-black = "^21.4b0"
 sphinxcontrib_github_alt = "^1.2"
 webtest = "*"
+
+[tool.poetry.dev-dependencies.black]
+version = "*"
+allow-prereleases = true
 
 [tool.poetry.extras]
 nlp = ["nltk"]
