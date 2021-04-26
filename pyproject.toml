@@ -22,7 +22,7 @@ classifiers = [
 pyborg = 'pyborg_entrypoint:cli_base'
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 toml = "^0.10.0"
 arrow = "^0.17"
 PyTumblr = "^0.1.0"
@@ -70,7 +70,7 @@ ipython = [{version = "^7", python = ">= 3.7"}, {version = "^7.16", python = "<=
 docutils = "*"
 pylint = "^2.3.1"
 bandit = "*"
-black = "^20.8b1"
+black = "^21.4b0"
 sphinxcontrib_github_alt = "^1.2"
 webtest = "*"
 
