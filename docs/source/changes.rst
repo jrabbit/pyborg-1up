@@ -8,6 +8,11 @@ Changelog summaries; for past changes check `the github releases <https://github
 -------------
 - new client module base class
 
+
+2.0.1 (Next)
+------------
+
+
 2.0
 ---
 
