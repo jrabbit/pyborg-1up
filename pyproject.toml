@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyborg"
-version = "2.0.0"
+version = "2.1.0a1"
 description = "Markov chain (chat) bot for a suite for modern services (discord, irc, twitter, mastodon, file, linein)"
 license = "GPL-3.0+"
 readme = "pyborg/README.md"
@@ -49,7 +49,7 @@ importlib_resources = {version = "*", python = "< 3.9"}
 networkx = {version = "^2.4", optional = true}
 matplotlib = {version = "^3.1.2", optional = true}
 typing_extensions = "^3.7.4"
-defusedxml = "^0.6.0"
+defusedxml = "^0.7.0"
 systemd = {version = "^0.16.1", optional = true}
 pysocks = "^1.7.1"
 pydot = {version = "^1.4.1", optional = true}
@@ -81,13 +81,14 @@ nlp = ["nltk"]
 subtitles = ["aeidon"]
 systemd = ["systemd"]
 graphing = ["matplotlib", "networkx", "pydot"]
+
 [tool.isort]
 known_third_party = ["aeidon"]
 line_length = 140
 
 [tool.black]
 line-length = 140
+
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
-
