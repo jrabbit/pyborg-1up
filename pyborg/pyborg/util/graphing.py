@@ -7,7 +7,8 @@ from networkx.readwrite import json_graph
 
 logger = logging.getLogger(__name__)
 
-def networkx_demo(pyb, graphics=False, export=False, dot=True, limit=700):
+
+def networkx_demo(pyb, graphics=False, export=False, dot=True, limit=70):
     G = nx.Graph()
     print(pyb)
     for counter, word in enumerate(pyb.words.keys()):
@@ -20,10 +21,10 @@ def networkx_demo(pyb, graphics=False, export=False, dot=True, limit=700):
                 G.add_edge(word, pyb.lines[p["hash"]][0])
             except KeyError:
                 G.add_edge(word, pyb.lines[p["hashval"]][0])
-    logger.info(G)
+    logger.debug(G)
 
     if dot:
-        nx.nx_pydot.write_dot(G, "graph_demo.dot")
+        nx.nx_agraph.write_dot(G, "graph_demo.dot")
     if graphics:
         nx.draw(G)
         plt.show()
