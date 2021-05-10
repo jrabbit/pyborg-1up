@@ -552,7 +552,7 @@ if aeidon:
 @cli_base.command()
 @click.option("--conf-file", default=os.path.join(folder, "twitter.toml"))
 def twitter(conf_file: str) -> None:
-    """be your own horse_ebooks: twitter module"""
+    """pyborg twitter module"""
 
     mod = PyborgTwitter(conf_file)
     try:
@@ -599,7 +599,7 @@ def follow_twitter_user(conf_file: str, target_user: str) -> None:
 @click.argument("input-file")
 @click.option("--multiplex", default=True, type=click.BOOL)
 def filein(multiplex: bool, input_file: str) -> None:
-    """ascii file input module"""
+    """text file input module"""
 
     mod = ModFileIn(multiplexing=multiplex)
     mod.run(input_file)
