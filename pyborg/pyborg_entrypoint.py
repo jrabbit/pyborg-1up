@@ -19,7 +19,6 @@ import requests
 import six
 import toml
 import tweepy
-import ujson
 from discord import Client, Guild
 from mastodon import Mastodon
 
@@ -284,7 +283,7 @@ def stats(target_brain: str) -> None:
     brain_path = resolve_brain(target_brain)
     pyb = pyborg.pyborg.pyborg(brain=brain_path)
     print(
-        ujson.dumps({"words": pyb.settings.num_words, "contexts": pyb.settings.num_contexts, "lines": len(pyb.lines), }))
+        json.dumps({"words": pyb.settings.num_words, "contexts": pyb.settings.num_contexts, "lines": len(pyb.lines), }))
 
 
 @brain.command()
@@ -293,7 +292,7 @@ def graph(target_brain: str) -> None:
     from pyborg.util.graphing import networkx_demo
     brain_path = resolve_brain(target_brain)
     pyb = pyborg.pyborg.pyborg(brain_path)
-    print(networkx_demo(pyb))
+    print(networkx_demo(pyb, export=True))
 
 
 @brain.command("import")
@@ -345,7 +344,7 @@ def upgrade_to_json(target_brain: str) -> None:
 
     with open(save_path, "wb") as brain_file:
         out = {"words": words, "lines": lines, "version": version_str}
-        ujson.dump(out, brain_file)
+        json.dump(out, brain_file)
     print("Wrote out pyborg brain into {}".format(save_path))
 
 

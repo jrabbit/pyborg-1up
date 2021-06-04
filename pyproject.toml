@@ -54,7 +54,6 @@ systemd = {version = "^0.16.1", optional = true}
 pysocks = "^1.7.1"
 pydot = {version = "^1.4.1", optional = true}
 pygraphviz = {version = "^1.7", optional = true}
-ujson = "^4.0.2"
 
 [tool.poetry.dev-dependencies]
 green = "*"
