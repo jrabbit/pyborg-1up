@@ -44,6 +44,7 @@ from zlib import crc32
 import attr
 import click
 import toml
+import ujson
 
 from pyborg.util.censored_defaults import CENSORED_REASONABLE_DEFAULTS
 from pyborg.util.util_cli import mk_folder
@@ -398,7 +399,7 @@ class pyborg:
             raw_json = f.read()
         logger.debug(raw_json)
         try:
-            brain = json.loads(raw_json)
+            brain = ujson.loads(raw_json)
         except json.decoder.JSONDecodeError as e:
             logger.exception(e)
             logger.info("Tried to open brain %s", brain_path)
@@ -442,7 +443,7 @@ class pyborg:
         tmp_file = os.path.join(folder, "tmp", "current.pyborg.json")
         with open(tmp_file, 'w') as f:
             # this can fail half way...
-            json.dump(brain, f)
+            ujson.dump(brain, f)
         # if we didn't crash
         os.rename(tmp_file, self.brain_path)
         logger.debug("Successful writing of brain & renaming.")
