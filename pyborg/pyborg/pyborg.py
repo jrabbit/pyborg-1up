@@ -44,6 +44,7 @@ from zlib import crc32
 import attr
 import click
 import toml
+import orjson
 
 from pyborg.util.censored_defaults import CENSORED_REASONABLE_DEFAULTS
 from pyborg.util.util_cli import mk_folder
@@ -398,8 +399,8 @@ class pyborg:
             raw_json = f.read()
         logger.debug(raw_json)
         try:
-            brain = json.loads(raw_json)
-        except json.decoder.JSONDecodeError as e:
+            brain = orjson.loads(raw_json)
+        except orjson.JSONDecodeError as e:
             logger.exception(e)
             logger.info("Tried to open brain %s", brain_path)
             # if the file is just empty for instance a Tempfile from `tempfile` just record it and raise a less scary error.
@@ -442,7 +443,7 @@ class pyborg:
         tmp_file = os.path.join(folder, "tmp", "current.pyborg.json")
         with open(tmp_file, 'w') as f:
             # this can fail half way...
-            json.dump(brain, f)
+            orjson.dump(brain, f, option=orjson.OPT_NON_STR_KEYS)
         # if we didn't crash
         os.rename(tmp_file, self.brain_path)
         logger.debug("Successful writing of brain & renaming.")
