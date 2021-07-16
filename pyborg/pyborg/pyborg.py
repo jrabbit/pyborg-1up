@@ -316,6 +316,9 @@ class PyborgExperimental:
         os.rename(tmp_file, self.brain)
         logger.debug("Successful writing of brain & renaming. Quitting.")
 
+    def save_brain(self):
+        "for bridging. should be removed."
+        self.save()
 
 class PyborgSystemdNotify(PyborgExperimental):
     def on_ready(self):

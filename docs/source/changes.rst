@@ -12,6 +12,8 @@ Changelog summaries; for past changes check `the github releases <https://github
 2.0.1 (Next)
 ------------
 
+- add :kbd:`--enable-notify` flag to http server command to clarify systemd notify intent from user. :ghissue:`136`
+- fixed systemd notify bug that caused it to crash
 
 2.0
 ---

@@ -512,16 +512,20 @@ def tumblr(conf_file: str) -> None:
 
 
 @cli_base.command()
+@click.option("--enable-notify", default=False)
 @click.option("--brain_name", default="current")
 @click.option("--host", default="localhost")
 @click.option("--port", default=2001)
 @click.option("--reloader", default=False)
-def http(reloader: bool, port: int, host: str, brain_name: str) -> None:
+def http(reloader: bool, port: int, host: str, brain_name: str, enable_notify: bool) -> None:
     """Run a server for mutliheaded (multiplex) pyborg"""
     brain_path = resolve_brain(brain_name)
-    if systemd:
+    if systemd and enable_notify:
         logger.info("booting with systemd notify support")
         bottle.install(BottledPyborg(brain_path=brain_path, notify=True))
+    elif enable_notify:
+        print("this won't work without systemd. bailing.")
+        sys.exit(5)
     else:
         bottle.install(BottledPyborg(brain_path=brain_path))
     bottle.run(host=host, port=port, reloader=reloader)
