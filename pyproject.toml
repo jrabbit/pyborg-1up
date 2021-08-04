@@ -90,6 +90,8 @@ line_length = 140
 [tool.black]
 line-length = 140
 
+[tool.pyright]
+ignore = ["*/misc/*", "**/test/*"]
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
