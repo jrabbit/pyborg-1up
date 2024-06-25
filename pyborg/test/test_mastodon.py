@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG)
 @mock.patch("pyborg.mod.mod_mastodon.PyborgMastodon.should_reply_direct")
 @mock.patch("pyborg.mod.mod_mastodon.PyborgMastodon.learn")
 @mock.patch("pyborg.mod.mod_mastodon.PyborgMastodon.reply")
-@mock.patch("mastodon.Mastodon.status_post")
+@mock.patch("mastodon.Mastodon.status_post", create=True)
 class TestTimezoneCrap(unittest.TestCase):
 
     with open("pyborg/test/fixtures/toots.json") as f:

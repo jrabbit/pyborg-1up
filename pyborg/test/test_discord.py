@@ -5,32 +5,30 @@ from functools import partial
 from pathlib import Path
 from unittest import mock
 
-import asynctest
-
 import pyborg
 from pyborg.util.utils_testing import do_nothing
 
 logging.basicConfig(level=logging.DEBUG)
 
-
-class TestOnMessage(asynctest.TestCase):
+class TestOnMessage(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
-        # self.loop.set_debug(True)
+        self.loop.set_debug(True)
         self.our_pybd = pyborg.mod.mod_discord.PyborgDiscord(Path(Path.cwd(), "pyborg", "test", "fixtures", "discord.toml"))
 
-    async def tearDown(self):
+    async def asyncTearDown(self):
         await self.our_pybd.teardown()
 
     @mock.patch("pyborg.mod.mod_discord.PyborgDiscord._plaintext_name")
     @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
-    @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
-    @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
     def test_no_reply(self, patched_reply, patched_learn, patched_user, patched_namecheck):
         msg = mock.Mock()
         msg.content = "Yolo!"
         patched_reply.return_value = ""
+        patched_reply.split.side_effect = []
         patched_user.mentioned_in.return_value = False
         patched_namecheck.return_value = False
 
@@ -39,33 +37,33 @@ class TestOnMessage(asynctest.TestCase):
 
     @mock.patch("pyborg.mod.mod_discord.normalize_awoos")
     @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
-    @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
-    @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
-    def test_reply(self, patched_reply, patched_learn, patched_user, patched_normalize):
-        msg = asynctest.MagicMock()
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+    async def test_reply(self, patched_reply, patched_learn, patched_user, patched_normalize):
+        msg = mock.MagicMock()
         msg.content.return_value = "<@221134985560588289> you should play dota!"
-        msg.content.split.return_value = ["<@!221134985560588289>", "you", "should", "play", "dota!"]
+        msg.content.split.side_effect = ["<@!221134985560588289>", "you", "should", "play", "dota!"]
         msg.channel.return_value = "maketotaldestroy"
         msg.author.mention.return_value = "<@42303631157544375>"
-        msg.channel.send = asynctest.CoroutineMock()
+        msg.channel.send = mock.AsyncMock()
         patched_user.return_value.id = "221134985560588289"
         patched_reply.return_value = "I should play dota!"
         patched_reply.replace.return_value = "I should play dota!"
 
-        self.loop.run_until_complete(self.our_pybd.on_message(msg))
+        await self.our_pybd.on_message(msg)
         patched_learn.assert_called_once_with(patched_normalize.return_value)
         patched_reply.assert_called_once_with(patched_normalize.return_value)
 
     @mock.patch("pyborg.mod.mod_discord.normalize_awoos")
     @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
-    @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
-    @asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+    @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
     def test_nick_replace(self, patched_reply, patched_learn, patched_user, patched_normalize):
-        msg = asynctest.MagicMock()
+        msg = mock.MagicMock()
         msg.content.return_value = "<@221134985560588289> you should play dota!"
         msg.content.split.return_value = ["<@!221134985560588289>", "you", "should", "play", "dota!"]
         msg.channel.return_value = "maketotaldestroy"
-        msg.channel.send = asynctest.CoroutineMock()
+        msg.channel.send = mock.AsyncMock()
         msg.author.mention.return_value = "<@42303631157544375>"
 
         patched_user.return_value.id = "221134985560588289"
@@ -77,6 +75,7 @@ class TestOnMessage(asynctest.TestCase):
 
         self.loop.run_until_complete(self.our_pybd.on_message(msg))
         # print(asyncio.Task.all_tasks())
+        print(msg.await_args_list)
         patched_learn.assert_called_once_with(patched_normalize.return_value)
         patched_reply.assert_called_once_with(patched_normalize.return_value)
 
@@ -84,8 +83,8 @@ class TestOnMessage(asynctest.TestCase):
 @mock.patch("pyborg.mod.mod_discord.normalize_awoos")
 @mock.patch("pyborg.mod.mod_discord.PyborgDiscord._plaintext_name")
 @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
-@asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
-@asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+@mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+@mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
 class TestPlaintexPing(unittest.TestCase):
     def setUp(self):
         self.loop = asyncio.new_event_loop()
@@ -96,10 +95,12 @@ class TestPlaintexPing(unittest.TestCase):
         self.loop.close()
 
     def test_nick_substitution(self, patched_reply, patched_learn, patched_user, patched_plaintext, patched_normalize):
-        msg = asynctest.MagicMock()
-        msg.channel.send = asynctest.CoroutineMock()
+        msg = mock.MagicMock()
+        msg.channel.send = mock.AsyncMock()
+        # msg.content.split = mock.M
         patched_user.mentioned_in.return_value = False
         patched_plaintext.return_value = True  # implict
+        patched_reply.return_value = "this is a reply to users"
         self.loop.run_until_complete(self.pybd.on_message(msg))
         patched_learn.assert_called_once_with(patched_normalize.return_value)
         patched_reply.assert_called_once_with(patched_normalize.return_value)
@@ -108,8 +109,8 @@ class TestPlaintexPing(unittest.TestCase):
 @unittest.skip("not implemented yet")
 @mock.patch("pyborg.mod.mod_discord.PyborgDiscord._plaintext_name")
 @mock.patch("pyborg.mod.mod_discord.PyborgDiscord.user", create=True)
-@asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
-@asynctest.mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
+@mock.patch("pyborg.mod.mod_discord.PyborgDiscord.learn")
+@mock.patch("pyborg.mod.mod_discord.PyborgDiscord.reply")
 class TestPlaintextPingRedact(unittest.TestCase):
     def setUp(self):
         self.loop = asyncio.new_event_loop()
@@ -120,8 +121,8 @@ class TestPlaintextPingRedact(unittest.TestCase):
         self.loop.close()
 
     def test_nick_purged(self, patched_reply, patched_learn, patched_user, patched_plaintext):
-        msg = asynctest.MagicMock()
-        msg.channel.send = asynctest.CoroutineMock()
+        msg = mock.AsyncMock()
+        msg.channel.send = mock.MagicMock()
         msg.content.return_value = "pyborg tell me about life"
         patched_user.mentioned_in.return_value = False
         patched_plaintext.return_value = True  # implict
