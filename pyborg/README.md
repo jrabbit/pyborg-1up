@@ -18,7 +18,7 @@ Early test/beta releases can be found via:
 `pip install --pre pyborg`
 
 
-Note that we're using Python 3.6+ (for fancy type declarations).
+Note that we're using Python 3.8+ (for fancy type declarations).
 
 Python 2 support was [dropped with](https://pythonclock.org/) the release of pyborg 2.0.
 
