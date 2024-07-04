@@ -8,12 +8,9 @@ import re
 import sys
 from functools import partial
 from types import ModuleType
-from typing import cast, overload, Any, Callable, Dict, List, MutableMapping, Optional, Union
+from typing import cast, overload, Any, Callable, Dict, List, MutableMapping, Optional, Union, Protocol
 from pathlib import Path
-if sys.version_info >= (3, 8):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol
+
 
 import aiohttp
 import attr
