@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/pyborg)](https://pypi.org/project/pyborg/)
 [![codecov](https://codecov.io/gh/jrabbit/pyborg-1up/branch/dev/graph/badge.svg)](https://codecov.io/gh/jrabbit/pyborg-1up)
-[![Build Status](https://travis-ci.com/jrabbit/pyborg-1up.svg?branch=dev)](https://travis-ci.com/jrabbit/pyborg-1up)
+[![Github Actions](https://github.com/jrabbit/pyborg-1up/actions/workflows/pythonapp.yml/badge.svg)](https://github.com/jrabbit/pyborg-1up/actions/workflows/pythonapp.yml)
 [![Documentation Status](https://readthedocs.org/projects/pyborg/badge/?version=latest)](https://pyborg.readthedocs.io/en/latest/?badge=latest)
 
 Install
