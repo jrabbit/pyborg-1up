@@ -5,7 +5,7 @@ description = "Markov chain (chat) bot for a suite for modern services (discord,
 license = "GPL-3.0-or-later"
 readme = "pyborg/README.md"
 authors = [{name = "J Laxson", email = "<jackjrabbit@gmail.com>"}]
-dynamic = ["classifiers"]
+dynamic = ["classifiers", "requires-python", "dependencies"]
 
 [project.urls]
 Repository = "https://github.com/jrabbit/pyborg-1up"
@@ -25,7 +25,7 @@ classifiers = [
 [poetry.scripts]
 pyborg = 'pyborg_entrypoint:cli_base'
 
-[poetry.dependencies]
+[tool.poetry.dependencies]
 python = "^3.8"
 toml = "^0.10.0"
 arrow = "^0.17"
@@ -58,7 +58,28 @@ pysocks = "^1.7.1"
 pydot = {version = "^1.4.1", optional = true}
 pygraphviz = {version = "^1.7", optional = true}
 
-[poetry.group.dev.dependencies]
+[tool.poetry.group.nlp]
+optional = true
+[tool.poetry.group.nlp.dependencies]
+nltk = "^3.4.5"
+[tool.poetry.group.subtitles]
+optional = true
+[tool.poetry.group.subtitles.dependencies]
+aeidon = "^1.7.0"
+[tool.poetry.group.systemd]
+optional = true
+[tool.poetry.group.systemd.dependencies]
+systemd = "^0.16.1"
+[tool.poetry.group.graphing]
+optional = true
+[tool.poetry.group.graphing.dependencies]
+matplotlib = "^3.1.2"
+pydot = "^1.4.1"
+pygraphviz =  "^1.7"
+networkx = "^2.4"
+
+
+[tool.poetry.group.dev.dependencies]
 green = "*"
 coverage = "*"
 sphinx-click = "*"
@@ -76,15 +97,9 @@ sphinxcontrib_github_alt = "^1.2"
 webtest = "*"
 tox = "^3"
 
-[poetry.dev.dependencies.black]
+[tool.poetry.group.dev.dependencies.black]
 version = "*"
 allow-prereleases = true
-
-[project.optional-dependencies]
-nlp = ["nltk"]
-subtitles = ["aeidon"]
-systemd = ["systemd"]
-graphing = ["matplotlib", "networkx", "pydot", "pygraphviz"]
 
 [tool.isort]
 known_third_party = ["aeidon"]
