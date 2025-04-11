@@ -244,7 +244,7 @@ def info_discord_server(server_id_partial: str) -> None:
 
 @cli_base.group()
 def brain() -> None:
-    """Pyborg brain (pybrain.json) utils"""
+    """Pyborg brain (pyborg.json) utils"""
     pass  # pylint: disable=W0107
 
 
@@ -257,7 +257,7 @@ def ls_brains(ctx) -> None:
 
 @brain.command("list")
 def list_brains() -> None:
-    """print out the pyborg brains (pybrain.json)s info"""
+    """print out the pyborg brains (pyborg.json)s info"""
     print(os.path.join(folder, "brains") + ":")
     for brain_name in os.listdir(os.path.join(folder, "brains")):
         brain_size = os.path.getsize(os.path.join(folder, "brains", brain_name))
@@ -412,7 +412,7 @@ def run_mastodon(conf_file: str, secret_folder: str) -> None:
         raise
 
 
-@cli_base.command()
+@utils.command()
 def yeet_config():
     """create example toml configurations in pyborg setting folder"""
     for filename, settings in STOCK_CONFIGS.items():
@@ -532,7 +532,7 @@ def http(reloader: bool, port: int, host: str, brain_name: str, enable_notify: b
     bottle.default_app().close()
 
 
-@cli_base.command("set-log-level")
+@utils.command("set-log-level")
 @click.argument("log-level")
 def set_logging_level(log_level: str) -> None:
     """configure mod_http's log level after launch
@@ -582,7 +582,7 @@ def get_api(conf_file: str) -> tweepy.API:
     return api
 
 
-@cli_base.command()
+@utils.command()
 @click.argument("target-user")
 @click.option("--conf-file", default=os.path.join(folder, "twitter.toml"))
 def follow_twitter_user(conf_file: str, target_user: str) -> None:

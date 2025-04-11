@@ -17,7 +17,7 @@ def mk_folder() -> None:
         os.makedirs(os.path.join(folder, "tmp"))
         logger.info("pyborg folder created.")
     except OSError:
-        logger.info("pyborg folder already exists.")
+        logger.debug("pyborg folder already exists.")
 
 
 @attr.s
