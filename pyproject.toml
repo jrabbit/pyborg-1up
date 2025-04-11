@@ -1,12 +1,17 @@
-[tool.poetry]
+[project]
 name = "pyborg"
 version = "2.1.0a2"
 description = "Markov chain (chat) bot for a suite for modern services (discord, irc, twitter, mastodon, file, linein)"
-license = "GPL-3.0+"
+license = "GPL-3.0-or-later"
 readme = "pyborg/README.md"
-repository = "https://github.com/jrabbit/pyborg-1up"
-documentation = "https://pyborg.readthedocs.io/en/latest/"
-authors = ["J Laxson <jackjrabbit@gmail.com>"]
+authors = [{name = "J Laxson", email = "<jackjrabbit@gmail.com>"}]
+dynamic = ["classifiers"]
+
+[project.urls]
+Repository = "https://github.com/jrabbit/pyborg-1up"
+Documentation = "https://pyborg.readthedocs.io/en/latest/"
+
+[tool.poetry]
 include = ["example.*.toml"]
 packages = [
     { include = "pyborg", from = "pyborg" },
@@ -17,10 +22,10 @@ classifiers = [
     "Topic :: Communications :: Chat :: Internet Relay Chat",
     "Topic :: Games/Entertainment",
 ]
-[tool.poetry.scripts]
+[poetry.scripts]
 pyborg = 'pyborg_entrypoint:cli_base'
 
-[tool.poetry.dependencies]
+[poetry.dependencies]
 python = "^3.8"
 toml = "^0.10.0"
 arrow = "^0.17"
@@ -53,7 +58,7 @@ pysocks = "^1.7.1"
 pydot = {version = "^1.4.1", optional = true}
 pygraphviz = {version = "^1.7", optional = true}
 
-[tool.poetry.dev-dependencies]
+[poetry.group.dev.dependencies]
 green = "*"
 coverage = "*"
 sphinx-click = "*"
@@ -71,11 +76,11 @@ sphinxcontrib_github_alt = "^1.2"
 webtest = "*"
 tox = "^3"
 
-[tool.poetry.dev-dependencies.black]
+[poetry.dev.dependencies.black]
 version = "*"
 allow-prereleases = true
 
-[tool.poetry.extras]
+[poetry.extras]
 nlp = ["nltk"]
 subtitles = ["aeidon"]
 systemd = ["systemd"]
