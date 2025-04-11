@@ -80,7 +80,7 @@ tox = "^3"
 version = "*"
 allow-prereleases = true
 
-[poetry.extras]
+[project.optional-dependencies]
 nlp = ["nltk"]
 subtitles = ["aeidon"]
 systemd = ["systemd"]
