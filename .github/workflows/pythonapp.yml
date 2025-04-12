@@ -16,7 +16,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install -v --with nlp,subtitles
-        poetry run python -m nltk.downloader punkt averaged_perceptron_tagger
+        poetry run python -m nltk.downloader punkt punkt_tab averaged_perceptron_tagger_eng averaged_perceptron_tagger
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
