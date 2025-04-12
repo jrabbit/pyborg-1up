@@ -40,7 +40,8 @@ class ModIRC(irc.bot.SingleServerIRCBot):
         if "password" in self.settings["server"] and self.settings["server"]["password"]:
             password = self.settings["server"]["password"]
         if self.settings["server"]["ssl"]:
-            ssl_factory = irc.connection.Factory(wrapper=ssl.wrap_socket)
+            ssl_ctx = ssl.SSLContext()
+            ssl_factory = irc.connection.Factory(wrapper=ssl_ctx.wrap_socket)
             super(ModIRC, self).__init__([(server, port, password)], nickname, realname, connect_factory=ssl_factory, **connect_params)
         else:
             super(ModIRC, self).__init__([(server, port, password)], nickname, realname, **connect_params)
