@@ -39,7 +39,7 @@ class PyborgDiscord(discord.Client):
     save_status_count: int = attr.ib(default=0, init=False)
     pyborg: Optional[pyb_core.pyborg] = attr.ib(default=None)
     scanner: venusian.Scanner = attr.ib(default=None)
-    loop: Optional[asyncio.BaseEventLoop] = attr.ib(default=None)
+    # loop: Optional[asyncio.BaseEventLoop] = attr.ib(default=None)
     settings: MutableMapping[str, Any] = attr.ib(default=None)
     prefix: str = attr.ib(default="!")
 
@@ -58,7 +58,8 @@ class PyborgDiscord(discord.Client):
             raise NotImplementedError
         else:
             self.pyborg = None
-        super().__init__(loop=self.loop)  # this might create a asyncio.loop!
+        intents = discord.Intents(messages=True, guilds=True)
+        super().__init__(intents=intents)
 
     def our_start(self) -> None:
         """launch discord.Client main event loop (calls Client.run)"""
@@ -68,6 +69,9 @@ class PyborgDiscord(discord.Client):
             self.run(self.settings['discord']['token'])
         else:
             logger.error("No Token. Set one in your conf file.")
+
+    async def setup_hook(self):
+        self.scan()
 
     async def fancy_login(self) -> None:
         """calls Client.login only! no command scan"""
